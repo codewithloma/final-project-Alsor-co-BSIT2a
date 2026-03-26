@@ -30,7 +30,7 @@ DearBUP is a specialized blogging and social networking platform designed exclus
 
 **Brand Logo:**
 
-<img src="<img width="100" height="100" alt="DearBUP logo" src="https://github.com/user-attachments/assets/c030b9fc-17c7-4355-9eb1-fbeb1b87237e" />
+<img width="314" height="314" alt="DearBUP logo" src="https://github.com/user-attachments/assets/c030b9fc-17c7-4355-9eb1-fbeb1b87237e" />
 
 **Visual Theme:**
 * **Aesthetic Goal:** To create a warm, inviting, and community-centric digital space that feels tactile, accessible, and supports emotional expression through text and media (e.g., integrated music links).
