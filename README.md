@@ -1,10 +1,10 @@
 # AlSor Co-FullStackWebApp
 
 ## Group Information
-Group Name: AlSor Co
-Course & Section: IT 112 - 2A
-Semester: 2nd Semester, AY 2025-2026
-Project Title: DearBUP: A Campus Social Network
+**Group Name:** AlSor Co
+**Course & Section:** IT 112 - 2A
+**Semester:** 2nd Semester, AY 2025-2026
+**Project Title:** DearBUP: A Campus Social Network
 
 ---
 
