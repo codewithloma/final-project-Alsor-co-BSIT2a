@@ -3,7 +3,15 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema(
   {
     email: { type: String, required: true, unique: true },
+    student_id: { type: String, required: true, unique: true},
     username: { type: String, required: true, unique: true },
+    course: {
+      type: String,
+      enum: ["Information Technology", "Computer Science", "Animation", "Information System"],
+      required: true,
+    },
+    department: { type:mongoose.Schema.Types.ObjectId, ref: "Department"},
+    organization: { type:mongoose.Schema.Types.ObjectId, ref:"CBO", required: false},
     password: { type: String, required: true },
     
     // Role for security and middleware authorization

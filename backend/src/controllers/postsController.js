@@ -1,12 +1,13 @@
 import Post from "../models/PostModel.js";
+import axios from "axios";
 
-// CREATE POST
+// ---------------- CREATE POST ----------------
 export const createPost = async (req, res) => {
   try {
     const { content, design_template, spotify_track_url, is_anonymous } = req.body;
 
     const post = await Post.create({
-      user_id: req.user.id,       // automatically from middleware
+      user_id: req.user.id,
       content,
       design_template,
       spotify_track_url,
@@ -19,8 +20,7 @@ export const createPost = async (req, res) => {
   }
 };
 
-
-// GET ALL POSTS
+// ---------------- GET POSTS ----------------
 export const getPosts = async (req, res) => {
   try {
     const posts = await Post.find()
@@ -33,44 +33,78 @@ export const getPosts = async (req, res) => {
   }
 };
 
-
-// LIKE / UNLIKE POST
-export const reactToPost = async (req, res) => {
+// ---------------- SPOTIFY SEARCH ----------------
+export const searchSpotify = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    const query = req.query.q;
 
-    const userId = req.user.id;
+    if (!query) return res.status(400).json({ message: "Query is required" });
 
-    if (post.reactions.includes(userId)) {
-      // Already liked → remove like
-      post.reactions = post.reactions.filter(id => id.toString() !== userId);
-    } else {
-      // Add like
-      post.reactions.push(userId);
-    }
+    // Get token (Client Credentials Flow)
+    const tokenRes = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      new URLSearchParams({ grant_type: "client_credentials" }),
+      {
+        headers: {
+          Authorization:
+            "Basic " +
+            Buffer.from(
+              process.env.SPOTIFY_CLIENT_ID +
+              ":" +
+              process.env.SPOTIFY_CLIENT_SECRET
+            ).toString("base64"),
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
-    await post.save();
-    res.json({ message: "Reaction updated", reactions: post.reactions.length });
+    const token = tokenRes.data.access_token;
+
+    const response = await axios.get(
+      "https://api.spotify.com/v1/search",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { q: query, type: "track", limit: 10 },
+      }
+    );
+
+    res.json(response.data.tracks.items);
 
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+// ---------------- REACT ----------------
+export const reactToPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
 
-// ADD COMMENT
+    const userId = req.user.id;
+
+    if (post.reactions.includes(userId)) {
+      post.reactions = post.reactions.filter(id => id.toString() !== userId);
+    } else {
+      post.reactions.push(userId);
+    }
+
+    await post.save();
+    res.json({ reactions: post.reactions.length });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ---------------- COMMENT ----------------
 export const addComment = async (req, res) => {
   try {
     const { text } = req.body;
-    const post = await Post.findById(req.params.postId);
-
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    const post = await Post.findById(req.params.id);
 
     post.comments.push({
       user_id: req.user.id,
       text,
-      date: new Date(),
     });
 
     await post.save();
@@ -81,21 +115,17 @@ export const addComment = async (req, res) => {
   }
 };
 
-
-// SHARE POST
+// ---------------- SHARE ----------------
 export const sharePost = async (req, res) => {
   try {
-    const { postId } = req.params;
-
-    const post = await Post.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    const original = await Post.findById(req.params.id);
 
     const shared = await Post.create({
       user_id: req.user.id,
-      content: post.content,
-      design_template: post.design_template,
-      spotify_track_url: post.spotify_track_url,
-      shared_from: postId,
+      content: original.content,
+      design_template: original.design_template,
+      spotify_track_url: original.spotify_track_url,
+      shared_from: original._id,
     });
 
     res.status(201).json(shared);
@@ -105,25 +135,17 @@ export const sharePost = async (req, res) => {
   }
 };
 
-
-// UPDATE POST
+// ---------------- UPDATE ----------------
 export const updatePost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    const post = await Post.findById(req.params.id);
 
-    // Ownership check
     if (post.user_id.toString() !== req.user.id)
-      return res.status(403).json({ message: "Not authorized to update" });
+      return res.status(403).json({ message: "Unauthorized" });
 
-    const { content, design_template, spotify_track_url, is_anonymous } = req.body;
-
-    post.content = content ?? post.content;
-    post.design_template = design_template ?? post.design_template;
-    post.spotify_track_url = spotify_track_url ?? post.spotify_track_url;
-    post.is_anonymous = is_anonymous ?? post.is_anonymous;
-
+    Object.assign(post, req.body);
     await post.save();
+
     res.json(post);
 
   } catch (error) {
@@ -131,19 +153,16 @@ export const updatePost = async (req, res) => {
   }
 };
 
-
-// DELETE POST
+// ---------------- DELETE ----------------
 export const deletePost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    const post = await Post.findById(req.params.id);
 
-    // Only owner can delete
     if (post.user_id.toString() !== req.user.id)
-      return res.status(403).json({ message: "Not authorized to delete" });
+      return res.status(403).json({ message: "Unauthorized" });
 
     await post.deleteOne();
-    res.json({ message: "Post deleted" });
+    res.json({ message: "Deleted" });
 
   } catch (error) {
     res.status(500).json({ error: error.message });

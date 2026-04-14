@@ -1,13 +1,13 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
-import spotifyRoutes from "./routes/spotifyRoutes.js";
+import letterRoutes from "./routes/letterRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
 
 
-dotenv.config();
 
 
 connectDB();
@@ -21,9 +21,12 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/letters", letterRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/letters", letterRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
-
-app.use("/api/spotify", spotifyRoutes);
 
 
 app.get("/", (req, res) => {
