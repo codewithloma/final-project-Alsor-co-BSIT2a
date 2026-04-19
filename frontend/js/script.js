@@ -666,3 +666,183 @@ window.addEventListener('load', () => {
         }
     });
 });
+const ORGS = [
+    {
+        id:1, name:'Computer Students Society', acronym:'CSS', type:'academic',
+        banner:'linear-gradient(135deg,#1e40af,#2563eb)', initial:'C',
+        desc:'The premier org for CS and IT students, fostering tech innovation and digital literacy.',
+        about:'CSS is dedicated to advancing the technical knowledge and professional development of computer students at BU Polangui. Through seminars, hackathons, and community service, we bridge classroom learning with real-world application.',
+        members:210, eventsCount:7, founded:2005,
+        officers:[{n:'Ana Reyes',p:'President'},{n:'Rico Santos',p:'Vice President'},{n:'Lena Cruz',p:'Secretary'},{n:'Mark Tan',p:'Treasurer'},{n:'Pia Gomez',p:'Auditor'},{n:'Jay Bautista',p:'P.I.O.'}],
+        events:[{day:'22',mon:'Apr',name:'Tech Talk: AI in 2025',venue:'AVR 2, Main Building',tag:'Seminar'},{day:'10',mon:'May',name:'CSS Hackathon 2025',venue:'Computer Lab 3',tag:'Competition'},{day:'28',mon:'Jun',name:'JS Night: Year-End Party',venue:'College Quadrangle',tag:'Social'}]
+    },
+    {
+        id:2, name:'Business Management Society', acronym:'BMS', type:'academic',
+        banner:'linear-gradient(135deg,#065f46,#059669)', initial:'B',
+        desc:'Empowering future business leaders through case competitions, mentorship, and workshops.',
+        about:'BMS cultivates business acumen among students through real-world exposure to entrepreneurship, finance, and management. Our flagship events connect students with industry professionals across the Bicol region.',
+        members:185, eventsCount:5, founded:2008,
+        officers:[{n:'Chloe Lim',p:'President'},{n:'Dan Torres',p:'Vice President'},{n:'Nina Flores',p:'Secretary'},{n:'Ian Delos',p:'Treasurer'},{n:'Rose Abad',p:'Auditor'},{n:'Ben Viray',p:'P.I.O.'}],
+        events:[{day:'25',mon:'Apr',name:'Bizlympics 2025',venue:'Gymnasium',tag:'Competition'},{day:'15',mon:'May',name:'Entrepreneur Summit',venue:'AVR',tag:'Forum'}]
+    },
+    {
+        id:3, name:'Rotaract Club of BUP', acronym:'RCBUP', type:'socio-civic',
+        banner:'linear-gradient(135deg,#92400e,#d97706)', initial:'R',
+        desc:'Service above self — outreach, blood drives, and environmental programs across Polangui.',
+        about:'As the official Rotaract Club of BU Polangui, we are committed to community service, professional development, and international understanding. We run regular outreach programs, medical missions, and advocacy campaigns.',
+        members:95, eventsCount:12, founded:2010,
+        officers:[{n:'Kyle Abuan',p:'President'},{n:'Mia Padua',p:'Vice President'},{n:'Sam Lopez',p:'Secretary'},{n:'Elle Nava',p:'Treasurer'},{n:'Jun Credo',p:'Auditor'},{n:'Ria Maño',p:'P.I.O.'}],
+        events:[{day:'19',mon:'Apr',name:'Blood Letting Drive',venue:'BUP Gymnasium',tag:'Community'},{day:'03',mon:'May',name:'Tree Planting Activity',venue:'Polangui Forest Park',tag:'Environment'},{day:'20',mon:'Jun',name:'Youth Leadership Seminar',venue:'Mini Auditorium',tag:'Development'}]
+    },
+    {
+        id:4, name:'BUP Dance Troupe', acronym:'BDT', type:'cultural',
+        banner:'linear-gradient(135deg,#9d174d,#db2777)', initial:'D',
+        desc:'The official dance company representing BUP in regional and national cultural competitions.',
+        about:'BDT is the artistic heart of BU Polangui, training in folk to contemporary styles. We represent the university in PRISAA, Palarong Pambansa, and regional festivals, showcasing Bicolano culture through performance.',
+        members:60, eventsCount:8, founded:2003,
+        officers:[{n:'Gela Magsino',p:'President'},{n:'Franz Villano',p:'Vice President'},{n:'Liz Salonga',p:'Secretary'},{n:'Kiko Sorio',p:'Treasurer'},{n:'Nela Barba',p:'Auditor'},{n:'Pat Zafra',p:'P.I.O.'}],
+        events:[{day:'30',mon:'Apr',name:'Spring Showcase 2025',venue:'Mini Auditorium',tag:'Performance'},{day:'12',mon:'Jun',name:'PRISAA Dance Competition',venue:'Legaspi City',tag:'Competition'}]
+    },
+    {
+        id:5, name:'BUP Athletics Association', acronym:'BUPAA', type:'sports',
+        banner:'linear-gradient(135deg,#7f1d1d,#dc2626)', initial:'A',
+        desc:'Uniting student-athletes in basketball, volleyball, football, and more under the BUP banner.',
+        about:'BUPAA promotes physical fitness, sportsmanship, and competitive excellence at BU Polangui. We organize intramural sports events, represent the university in PRISAA, and build a culture of healthy competition.',
+        members:280, eventsCount:10, founded:2001,
+        officers:[{n:'Carlos Bueno',p:'President'},{n:'Jan Ortega',p:'Vice President'},{n:'Sol Arce',p:'Secretary'},{n:'Renz Dizon',p:'Treasurer'},{n:'Mela Doria',p:'Auditor'},{n:'Leo Foz',p:'P.I.O.'}],
+        events:[{day:'21',mon:'Apr',name:'Intramurals 2025 Opening',venue:'BUP Gymnasium',tag:'Sports'},{day:'07',mon:'May',name:'Basketball Finals',venue:'Covered Court',tag:'Sports'},{day:'14',mon:'May',name:'Volleyball Championships',venue:'Gymnasium',tag:'Sports'}]
+    },
+    {
+        id:6, name:'Campus Crusade for Christ', acronym:'CCC', type:'religious',
+        banner:'linear-gradient(135deg,#4c1d95,#7c3aed)', initial:'C',
+        desc:'A Christ-centered community offering Bible studies, praise nights, and spiritual formation.',
+        about:'CCC provides a welcoming faith community for students seeking spiritual growth and fellowship. Through weekly cell groups, campus worship nights, and outreach initiatives, we build disciples and serve the BUP community.',
+        members:140, eventsCount:9, founded:2007,
+        officers:[{n:'Ella Soriano',p:'President'},{n:'Rod Malit',p:'Vice President'},{n:'Tina Saguil',p:'Secretary'},{n:'Greg Ubian',p:'Treasurer'},{n:'Mary Pena',p:'Auditor'},{n:'Josh Nario',p:'P.I.O.'}],
+        events:[{day:'26',mon:'Apr',name:'Worship Night',venue:'Mini Auditorium',tag:'Spiritual'},{day:'09',mon:'May',name:'Bible Study Camp',venue:'Polangui Parish',tag:'Spiritual'}]
+    }
+];
+
+const TYPE_LABELS = {academic:'Academic','socio-civic':'Socio-Civic',cultural:'Cultural',sports:'Sports',religious:'Religious'};
+let activeFilter = 'all', activeOrgId = null;
+const following = new Set();
+
+function renderOrgs(filter, search='') {
+    const grid = document.getElementById('orgsGrid');
+    grid.innerHTML = '';
+    const filtered = ORGS.filter(o => {
+        const mf = filter === 'all' || o.type === filter;
+        const ms = o.name.toLowerCase().includes(search.toLowerCase()) || o.acronym.toLowerCase().includes(search.toLowerCase());
+        return mf && ms;
+    });
+    document.getElementById('totalOrgs').textContent = filtered.length;
+    if (!filtered.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:rgba(255,255,255,0.7)"><i class="fas fa-search" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.5"></i>No organizations found.</div>';
+        return;
+    }
+    filtered.forEach(org => {
+        const card = document.createElement('div');
+        card.className = 'org-card';
+        card.innerHTML = `
+            <div class="org-card-banner" style="background:${org.banner}">
+                <div class="org-card-logo" style="background:${org.banner}">${org.initial}</div>
+            </div>
+            <div class="org-card-body">
+                <div class="org-name">${org.name}</div>
+                <div class="org-acronym">${org.acronym}</div>
+                <div class="org-desc">${org.desc}</div>
+                <div class="org-meta">
+                    <div class="org-meta-item"><i class="fas fa-users"></i> ${org.members} members</div>
+                    <div class="org-meta-item"><i class="fas fa-calendar"></i> ${org.eventsCount} events</div>
+                </div>
+                <div class="org-card-footer">
+                    <span class="type-badge ${org.type}">${TYPE_LABELS[org.type]}</span>
+                    <button class="view-btn">View <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>`;
+        card.addEventListener('click', () => openModal(org.id));
+        grid.appendChild(card);
+    });
+}
+
+function openModal(id) {
+    const org = ORGS.find(o => o.id === id);
+    if (!org) return;
+    activeOrgId = id;
+    document.getElementById('modalBanner').style.background = org.banner;
+    const logo = document.getElementById('modalLogo');
+    logo.textContent = org.initial; logo.style.background = org.banner;
+    document.getElementById('modalName').textContent = org.name;
+    document.getElementById('modalSub').textContent = `${org.acronym} · ${TYPE_LABELS[org.type]}`;
+    document.getElementById('mMembers').textContent = org.members;
+    document.getElementById('mEvents').textContent = org.eventsCount;
+    document.getElementById('mFounded').textContent = org.founded;
+    document.getElementById('mAbout').textContent = org.about;
+    const el = document.getElementById('mEventList');
+    el.innerHTML = org.events.map(ev => `
+        <div class="ev-item">
+            <div class="ev-date"><div class="day">${ev.day}</div><div class="mon">${ev.mon}</div></div>
+            <div><div class="ev-name">${ev.name}</div><div class="ev-venue"><i class="fas fa-map-marker-alt" style="margin-right:3px;font-size:10px"></i>${ev.venue}</div><span class="ev-tag">${ev.tag}</span></div>
+        </div>`).join('');
+    const og = document.getElementById('mOfficers');
+    og.innerHTML = org.officers.map(o => `
+        <div class="off-card">
+            <div class="off-av">${o.n.charAt(0)}</div>
+            <div class="off-name">${o.n}</div><div class="off-pos">${o.p}</div>
+        </div>`).join('');
+    syncFollowBtns(id);
+    document.getElementById('orgOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function syncFollowBtns(id) {
+    const isFol = following.has(id);
+    ['followBtn','followBtn2'].forEach(bid => {
+        const b = document.getElementById(bid);
+        b.className = 'follow-btn' + (isFol ? ' following' : '');
+        if (bid === 'followBtn2') b.style.cssText = 'flex:1;justify-content:center';
+        b.innerHTML = isFol ? '<i class="fas fa-check"></i> Following' : '<i class="fas fa-plus"></i> Follow';
+    });
+}
+
+function toggleFollow() {
+    if (!activeOrgId) return;
+    following.has(activeOrgId) ? (following.delete(activeOrgId), showToast('Unfollowed')) : (following.add(activeOrgId), showToast('Now following! 🎉'));
+    syncFollowBtns(activeOrgId);
+}
+
+function closeOrgModal() { document.getElementById('orgOverlay').classList.remove('active'); document.body.style.overflow = ''; }
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Event listeners
+document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelector('.filter-tab.active').classList.remove('active');
+        tab.classList.add('active'); activeFilter = tab.dataset.filter;
+        renderOrgs(activeFilter, document.getElementById('searchInput').value);
+    });
+});
+document.getElementById('searchInput').addEventListener('input', e => renderOrgs(activeFilter, e.target.value));
+document.getElementById('modalClose').addEventListener('click', closeOrgModal);
+document.getElementById('orgOverlay').addEventListener('click', e => { if (e.target === document.getElementById('orgOverlay')) closeOrgModal(); });
+['followBtn','followBtn2'].forEach(id => document.getElementById(id).addEventListener('click', toggleFollow));
+document.getElementById('openFeedbackBtn').addEventListener('click', () => document.getElementById('feedbackOverlay').classList.add('active'));
+document.getElementById('closeFeedback').addEventListener('click', () => document.getElementById('feedbackOverlay').classList.remove('active'));
+document.getElementById('cancelFeedback').addEventListener('click', () => document.getElementById('feedbackOverlay').classList.remove('active'));
+document.getElementById('sendFeedback').addEventListener('click', () => {
+    if (!document.getElementById('fbText').value.trim()) { showToast('Please write your feedback first.'); return; }
+    document.getElementById('feedbackOverlay').classList.remove('active');
+    document.getElementById('fbText').value = '';
+    showToast('Feedback sent! Thank you 💌');
+});
+document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('active'));
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeOrgModal(); document.getElementById('feedbackOverlay').classList.remove('active'); }
+});
+
+renderOrgs('all');
