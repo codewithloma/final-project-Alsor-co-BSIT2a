@@ -8,11 +8,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.GMAIL_PASS,
   },
 });
-
-//testing
-console.log("EMAIL:", process.env.GMAIL_USER);
-console.log("PASS:", process.env.GMAIL_PASS ? "Loaded ✅" : "Missing ❌");
-
 // send OTP email
 export const sendOtpEmail = async (email, code) => {
   try {
