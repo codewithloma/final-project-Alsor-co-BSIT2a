@@ -7,36 +7,37 @@ import postRoutes from "./routes/postRoutes.js";
 import letterRoutes from "./routes/letterRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 
-
-
-
+// Initialize Database
 connectDB();
+
 
 const app = express();
 
 
-app.use(cors());
+// Middleware
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: false
+}));
 app.use(express.json());
-
-
-app.use("/api/auth", authRoutes);
-app.use("/api/posts", postRoutes);
-app.use("/api/letters", letterRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/letters", letterRoutes);
 app.use("/api/feedback", feedbackRoutes);
 
 
-
+// Health Check
 app.get("/", (req, res) => {
-  res.send("Backend is running mga lado...");
+  res.send("Backend is running...");
 });
 
 
+// Port Configuration
 const PORT = process.env.PORT || 5000;
 
+// Use "0.0.0.0" for deployment readiness, but console log localhost for dev
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`🎵 Spotify Login: http://127.0.0.1:${PORT}/api/spotify/login`);
+  console.log(`🎵 Spotify Login: http://localhost:${PORT}/api/spotify/login`);
 });
