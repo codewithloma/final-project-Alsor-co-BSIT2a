@@ -435,3 +435,146 @@ body {
 .shadow-soft {
     box-shadow: 0 10px 30px rgba(224, 106, 114, 0.1);
 }
+.login-card-hero {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2rem 2rem 1.5rem;
+    box-shadow: 0 20px 40px rgba(224, 106, 114, 0.15);
+    width: 100%;
+    max-width: 500px;
+    transition: all 0.3s ease;;
+    height: 500px;
+}
+
+.login-card-hero:hover {
+    box-shadow: 0 30px 60px rgba(224, 106, 114, 0.25);
+    transform: translateY(-4px);
+}
+
+.lch-brand { text-align: center; margin-bottom: 1.25rem; }
+
+.lch-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.lch-title span { -webkit-text-fill-color: #b38b5d; color: #b38b5d; }
+
+.lch-tagline {
+    font-size: 0.7rem;
+    color: var(--rose);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.lch-divider {
+    border-color: #f0d8da;
+    opacity: 1;
+    margin: 1.25rem 0;
+}
+
+.lch-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.lch-input {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 1.5px solid #f0d8da;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    color: #333;
+    background: #fafafa;
+    outline: none;
+    transition: border 0.2s, background 0.2s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.lch-input:focus { border-color: var(--primary-pink); background: #fff; }
+
+.lch-forgot {
+    font-size: 0.78rem;
+    color: var(--primary-pink);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.lch-btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 50px;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(224, 106, 114, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.lch-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(224, 106, 114, 0.4);
+}
+
+.lch-separator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1rem 0;
+    color: #bbb;
+    font-size: 0.8rem;
+}
+
+.lch-separator::before,
+.lch-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #eee;
+}
+
+.lch-btn-secondary {
+    width: 100%;
+    padding: 0.65rem;
+    background: var(--white);
+    border: 1.5px solid #f0d8da;
+    border-radius: 50px;
+    color: var(--rose);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border 0.2s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.lch-btn-secondary:hover { background: #fff5f5; border-color: var(--primary-pink); }
+
+.lch-signup {
+    text-align: center;
+    margin-top: 1.2rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid #f5e8e8;
+    font-size: 0.82rem;
+    color: var(--dark-gray);
+}
+
+.lch-signup a {
+    color: var(--primary-pink);
+    font-weight: 600;
+    text-decoration: none;
+}
