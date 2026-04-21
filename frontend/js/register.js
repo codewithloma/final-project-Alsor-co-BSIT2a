@@ -279,3 +279,35 @@ function showToast(message, type = "info") {
         setTimeout(() => toast.remove(), 400);
     }, 3500);
 }
+// HERO CARD LOGIN
+async function handleHeroLogin() {
+    const email    = document.getElementById("heroEmail").value.trim();
+    const password = document.getElementById("heroPassword").value;
+ 
+    if (!email || !password) {
+        showToast("Please enter your email and password.", "error");
+        return;
+    }
+ 
+    try {
+        const res  = await fetch(`${API_URL}/login`, {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+ 
+        if (!res.ok) {
+            showToast(data.message || "Login failed. Please check your credentials.", "error");
+            return;
+        }
+ 
+        saveAuthData(data);
+        showToast("Welcome back! Redirecting...", "success");
+        setTimeout(() => { window.location.href = HOME_URL; }, 1000);
+ 
+    } catch (err) {
+        console.error(err);
+        showToast("Server error during login. Is the backend running?", "error");
+    }
+}
