@@ -1,10 +1,19 @@
 import Post from "../models/PostModel.js";
+import Notification from "../models/NotificationModel.js";
 import axios from "axios";
+
+
 
 // ---------------- CREATE POST ----------------
 export const createPost = async (req, res) => {
   try {
-    const { content, design_template, spotify_track_url, is_anonymous } = req.body;
+    const {
+      content,
+      design_template,
+      spotify_track_url,
+      is_anonymous,
+      org_id
+    } = req.body;
 
     const post = await Post.create({
       user_id: req.user.id,
@@ -12,6 +21,7 @@ export const createPost = async (req, res) => {
       design_template,
       spotify_track_url,
       is_anonymous: is_anonymous || false,
+      org_id: org_id || null,
     });
 
     res.status(201).json(post);
@@ -23,8 +33,17 @@ export const createPost = async (req, res) => {
 // ---------------- GET POSTS ----------------
 export const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find()
+    const { org } = req.query;
+
+    let query = {};
+
+    if (org) {
+      query.org_id = org;
+    }
+
+    const posts = await Post.find(query)
       .populate("user_id", "username display_name")
+      .populate("org_id", "org_name acronym")
       .sort({ createdAt: -1 });
 
     res.json(posts);
@@ -82,10 +101,25 @@ export const reactToPost = async (req, res) => {
 
     const userId = req.user.id;
 
+    const ownerId = post.user_id.toString();
+
     if (post.reactions.includes(userId)) {
-      post.reactions = post.reactions.filter(id => id.toString() !== userId);
+      post.reactions = post.reactions.filter(
+        id => id.toString() !== userId
+      );
     } else {
       post.reactions.push(userId);
+
+      // 🔔 CREATE NOTIFICATION
+      if (ownerId !== userId) {
+        await Notification.create({
+          user_id: ownerId,
+          from_user: userId,
+          type: "reaction",
+          message: "reacted to your post",
+          related_id: post._id,
+        });
+      }
     }
 
     await post.save();
@@ -107,6 +141,17 @@ export const addComment = async (req, res) => {
       text,
     });
 
+    // 🔔 NOTIFY OWNER
+    if (post.user_id.toString() !== req.user.id) {
+      await Notification.create({
+        user_id: post.user_id,
+        from_user: req.user.id,
+        type: "comment",
+        message: "commented on your post",
+        related_id: post._id,
+      });
+    }
+
     await post.save();
     res.json(post.comments);
 
@@ -127,6 +172,16 @@ export const sharePost = async (req, res) => {
       spotify_track_url: original.spotify_track_url,
       shared_from: original._id,
     });
+
+    if (original.user_id.toString() !== req.user.id) {
+      await Notification.create({
+        user_id: original.user_id,
+        from_user: req.user.id,
+        type: "share",
+        message: "shared your post",
+        related_id: original._id,
+      });
+    }
 
     res.status(201).json(shared);
 
