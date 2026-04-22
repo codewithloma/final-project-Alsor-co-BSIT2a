@@ -7,6 +7,11 @@ import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import letterRoutes from "./routes/letterRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
+import organizationRoutes from "./routes/organizationRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import cboOfficerRoutes from "./routes/cboOfficerRoutes.js";
+
 
 // Initialize Database
 connectDB();
@@ -27,6 +32,11 @@ app.use("/api/posts", postRoutes);
 app.use("/api/letters", letterRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/organizations", organizationRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/officers", cboOfficerRoutes);
+
 
 
 // Health Check
