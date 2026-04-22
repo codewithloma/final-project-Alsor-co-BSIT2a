@@ -1,4 +1,5 @@
 import "dotenv/config";
+import profileRoutes from "./routes/profileRoutes.js";
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
@@ -25,6 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/letters", letterRoutes);
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api/profile", profileRoutes);
 
 
 // Health Check
