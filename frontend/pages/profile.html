@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DearBUP – Profile</title>
+
+  <!-- Shared base styles -->
+  <link rel="stylesheet" href="../CSS/style.css" />
+  <!-- Profile-specific styles -->
+  <link rel="stylesheet" href="../CSS/profile.css" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ── Sidebar ───────────────────────────────────────────── -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <img src="../images/Logo.svg" class="logo-img" alt="DearBUP" />
+        <span>DearBUP</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="home.html"          class="nav-item"><i class="fas fa-home w-6 text-lg"></i><span>Home</span></a>
+      <a href="notifications.html" class="nav-item"><i class="fas fa-bell w-6 text-lg"></i><span>Notifications</span></a>
+      <a href="profile.html"       class="nav-item active"><i class="fas fa-user w-6 text-lg"></i><span>Profile</span></a>
+      <a href="organization.html" class="nav-item"><i class="fas fa-users w-6 text-lg"></i><span>Organizations</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">?</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name"   id="sidebarName">Loading…</div>
+          <div class="sidebar-user-course" id="sidebarCourse"></div>
+        </div>
+        <button id="logoutBtn" class="sidebar-logout" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+
+      <a href="#" id="writePostBtn" class="write-post nav-item">
+        <i class="fas fa-feather-alt"></i> Write
+      </a>
+    </div>
+  </div>
+
+  <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <div class="main-content" id="mainContent">
+
+    <!-- Cover -->
+    <div class="profile-cover" id="profileCover">
+      <div class="cover-pattern"></div>
+      <button class="edit-cover-btn" id="editCoverBtn">
+        <i class="fas fa-camera"></i> Edit cover
+      </button>
+    </div>
+
+    <!-- Info Strip -->
+    <div class="profile-info-strip">
+      <div class="avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <div class="avatar-edit" id="avatarEditBtn" title="Change photo">
+          <i class="fas fa-camera"></i>
+        </div>
+      </div>
+
+      <div class="profile-main-row">
+        <div class="profile-name-block">
+          <div class="profile-display-name" id="profileDisplayName">Loading…</div>
+          <div class="profile-handle"       id="profileHandle">@…</div>
+          <div class="profile-badges"       id="profileBadges"></div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-edit-profile" id="editProfileBtn">
+            <i class="fas fa-pen"></i> Edit Profile
+          </button>
+          <button class="btn-share" id="shareProfileBtn" title="Share profile">
+            <i class="fas fa-share-alt"></i>
+          </button>
+        </div>
+      </div>
+
+      <p class="profile-bio" id="profileBio">No bio yet.</p>
+
+      <div class="profile-stats-row">
+        <div class="pstat" id="statPostsBtn">
+          <span class="num" id="statPosts">—</span>
+          <span class="lbl">Posts</span>
+        </div>
+        <div class="pstat">
+          <span class="num" id="statLikes">—</span>
+          <span class="lbl">Likes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+      <button class="tab-btn active" data-tab="posts">
+        <i class="fas fa-th-list"></i> Posts
+      </button>
+      <button class="tab-btn" data-tab="about">
+        <i class="fas fa-info-circle"></i> About
+      </button>
+    </div>
+
+    <!-- Tab Panels -->
+    <div class="tab-content-wrap">
+
+      <div class="tab-panel active" id="tab-posts">
+        <div id="postsContainer">
+          <div class="feed-loader">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading posts…</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-about">
+        <div class="about-grid" id="aboutContainer">
+          <div class="feed-loader" style="grid-column:1/-1">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Edit Profile Modal ────────────────────────────────── -->
+  <!-- Fields match updateProfile controller: display_name, bio, avatar_url -->
+  <div class="modal-overlay" id="editModal">
+    <div class="edit-modal">
+      <div class="em-header">
+        <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
+        <button class="em-close" id="closeEditModal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="em-body">
+        <!-- display_name -->
+        <div class="em-field">
+          <label for="editDisplayName">Display Name</label>
+          <input type="text" id="editDisplayName"
+                 placeholder="Your display name" maxlength="60" autocomplete="name" />
+        </div>
+
+        <!-- bio -->
+        <div class="em-field">
+          <label for="editBioInput">Bio</label>
+          <textarea id="editBioInput"
+                    placeholder="Tell the BUP community about yourself…"
+                    maxlength="160"></textarea>
+          <span class="char-hint"><span id="bioCharCount">0</span>/160</span>
+        </div>
+
+        <!-- avatar_url -->
+        <div class="em-field">
+          <label for="editAvatarUrl">Profile Photo URL</label>
+          <input type="url" id="editAvatarUrl"
+                 placeholder="https://example.com/your-photo.jpg" />
+        </div>
+      </div>
+
+      <div class="em-footer">
+        <button class="btn-cancel-em" id="cancelEditModal">Cancel</button>
+        <button class="btn-save-em"   id="saveProfileBtn">
+          <i class="fas fa-check"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast ─────────────────────────────────────────────── -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Profile logic -->
+  <script src="../js/profile.js"></script>
+</body>
+</html>
