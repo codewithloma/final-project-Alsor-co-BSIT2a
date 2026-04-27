@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>DearBUP - Activity Tracker</title>
+
+  <link rel="stylesheet" href="../CSS/style.css" />
+  <link rel="stylesheet" href="../CSS/activity-tracker.css" />
+
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    rel="stylesheet"
+  />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar fixed top-0 left-0 h-screen w-[280px] bg-ash gray/95 backdrop-blur-xl border-r border-black/10 flex flex-col z-50 shadow-lg">
+    <div class="p-8 pb-0">
+      <div class="flex items-center gap-3 text-[#d65d64] text-2xl font-extrabold tracking-tight mb-10">
+        <img src="../images/Logo.svg" class="w-[50px] h-[50px]" />
+        <span>DearBUP</span>
+      </div>
+    </div>
+
+    <nav class="flex-1 px-6 space-y-2">
+      <a href="home.html" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+
+      <a href="#" class="nav-item">
+        <i class="fas fa-bell"></i>
+        <span>Notifications</span>
+      </a>
+
+      <a href="#" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+
+      <a href="organization.html" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span>Organizations</span>
+      </a>
+
+      <a href="activity-tracker.html" class="nav-item active">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Activity Tracker</span>
+      </a>
+    </nav>
+
+    <div class="p-6 space-y-3">
+      <a href="#" class="write-post flex items-center justify-center gap-3 w-full">
+        <i class="fas fa-feather-alt"></i>
+        Write
+      </a>
+    </div>
+  </div>
+
+  <button id="menuToggle" class="menu-toggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="page-wrapper">
+      <div class="page-header">
+        <h1>Activity Tracker</h1>
+        <p>View upcoming campus activities and organization events.</p>
+      </div>
+
+      <div class="tracker-stats">
+        <div class="tracker-stat-card">
+          <span class="tracker-stat-num" id="totalUpcoming">0</span>
+          <div class="tracker-stat-label">Upcoming Events</div>
+        </div>
+
+        <div class="tracker-stat-card">
+          <span class="tracker-stat-num" id="todayEvents">0</span>
+          <div class="tracker-stat-label">Today</div>
+        </div>
+
+        <div class="tracker-stat-card">
+          <span class="tracker-stat-num" id="nextEventDate">--</span>
+          <div class="tracker-stat-label">Nearest Event</div>
+        </div>
+      </div>
+
+      <div class="tracker-section">
+        <div class="tracker-section-header">
+          <div>
+            <h2 class="tracker-section-title">Upcoming Activities</h2>
+            <p class="tracker-section-subtitle">Events are sorted chronologically.</p>
+          </div>
+
+          <button id="refreshEventsBtn" class="tracker-refresh-btn">
+            <i class="fas fa-sync-alt"></i>
+            Refresh
+          </button>
+        </div>
+
+        <div id="eventList" class="tracker-event-list">
+          <div class="tracker-empty">Loading events...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Details Modal -->
+<div class="event-modal-overlay" id="eventModalOverlay">
+  <div class="event-modal">
+    <button class="event-modal-close" id="closeEventModal">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="event-modal-header">
+      <div class="event-modal-type" id="modalEventType">Event</div>
+      <h2 id="modalEventTitle">Event Title</h2>
+      <p id="modalEventOrg">Campus Organization</p>
+    </div>
+
+    <div class="event-modal-body">
+      <p id="modalEventDesc"></p>
+
+      <div class="event-modal-info">
+        <div><i class="fas fa-calendar"></i> <span id="modalEventDate"></span></div>
+        <div><i class="fas fa-clock"></i> <span id="modalEventTime"></span></div>
+        <div><i class="fas fa-map-marker-alt"></i> <span id="modalEventVenue"></span></div>
+        <div><i class="fas fa-calendar-check"></i> <span id="modalEventStatus"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="../js/activity-tracker.js"></script>
+</body>
+</html>
