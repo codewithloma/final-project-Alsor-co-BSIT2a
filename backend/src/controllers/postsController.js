@@ -36,6 +36,13 @@ export const getPosts = async (req, res) => {
       .populate("user_id", "username display_name avatar_url")
       .populate("org_id", "org_name acronym")
       .populate("comments.user_id", "username display_name avatar_url")
+      .populate({                                   
+        path: "shared_from",
+        populate: {
+            path: "user_id",
+            select: "username display_name avatar_url"
+        }
+    })
       .sort({ createdAt: -1 });
 
     // Transform so frontend gets likes_count + liked_by_me
@@ -210,7 +217,14 @@ export const getPostById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
       .populate("user_id", "username display_name avatar_url")
-      .populate("comments.user_id", "username display_name avatar_url");
+      .populate("comments.user_id", "username display_name avatar_url")
+      .populate({
+        path: "shared_from",
+        populate: {
+          path: "user_id",
+          select: "username display_name avatar_url"
+        }
+      });
 
     if (!post) return res.status(404).json({ message: "Post not found" });
     res.json(post);
