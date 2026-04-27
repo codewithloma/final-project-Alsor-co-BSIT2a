@@ -62,8 +62,9 @@ export const createLetter = async (req, res) => {
 // @route   GET /api/letters
 export const getAllLetters = async (req, res) => {
   try {
-    // Sort by newest first
-    const letters = await Letter.find().sort({ createdAt: -1 });
+    const letters = await Letter.find()
+      .populate("user_id", "username display_name avatar_url") 
+      .sort({ createdAt: -1 });
     res.status(200).json(letters);
   } catch (error) {
     res.status(500).json({ error: error.message });
