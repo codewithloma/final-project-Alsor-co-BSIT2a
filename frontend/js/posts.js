@@ -13,7 +13,7 @@ export class PostManager {
         this.writePostBtn    = document.getElementById('writePostBtn');
         this.closeModalBtn   = document.getElementById('closeModal');
         this.logoutBtn       = document.getElementById('logoutBtn'); // Added selector
-
+        this._activePostId = null;
         this.selectedTrack      = null;
         this.spotifySearchTimer = null;
 
@@ -43,6 +43,14 @@ export class PostManager {
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.createPostModal.classList.contains('active')) this.closeModal();
+        });
+        document.getElementById('closeCommentModal')?.addEventListener('click', () => this.closeCommentModal());
+        document.getElementById('commentModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('commentModal')) this.closeCommentModal();
+        });
+        document.getElementById('commentSubmitBtn')?.addEventListener('click', () => this.submitComment());
+        document.getElementById('commentInput')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') this.submitComment();
         });
     }
 
@@ -123,60 +131,102 @@ export class PostManager {
         } catch (err) { console.error('loadPosts error:', err); }
     }
 
-    createPostElement(post) {
-        const el = document.createElement('div');
-        el.className = 'post';
-        el.dataset.id = post._id;
-        el.style.cssText = 'opacity:0;transform:translateY(20px);transition:all 0.4s ease';
+createPostElement(post) {
+    const el = document.createElement('div');
+    el.className = 'post';
+    el.dataset.id = post._id;
+    el.style.cssText = 'opacity:0;transform:translateY(20px);transition:all 0.4s ease';
 
-        const user = post.user_id;
-        const authorName = user?.display_name || user?.username || 'Anonymous';
-        const authorHandle = user?.username ? `@${user.username}` : '';
-        const currentUser = getUser();
-        const alreadyLiked = currentUser && post.reactions?.some(r => r === currentUser.id || r?._id === currentUser.id);
+    const user = post.user_id;
+    const authorName   = user?.display_name || user?.username || 'Anonymous';
+    const authorHandle = user?.username ? `@${user.username}` : '';
+    const avatarHtml   = user?.avatar_url
+        ? `<img src="${user.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+        : authorName.charAt(0).toUpperCase();
 
-        let spotifyEmbedHtml = '';
-        if (post.spotify_track_url) {
-            const embedUrl = post.spotify_track_url.replace('/track/', '/embed/track/');
-            spotifyEmbedHtml = `<div class="post-spotify-player" style="margin: 12px 0; border-radius: 12px; overflow: hidden; background: #282828;">
-                <iframe src="${embedUrl}" width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media" loading="lazy"></iframe>
+    const currentUser  = getUser();
+    const alreadyLiked = currentUser && post.reactions?.some(r => r === currentUser.id || r?._id === currentUser.id);
+
+    // Spotify embed
+    let spotifyEmbedHtml = '';
+    if (post.spotify_track_url && !post.shared_from) {
+        const embedUrl = post.spotify_track_url.replace('/track/', '/embed/track/');
+        spotifyEmbedHtml = `
+            <div class="post-spotify-player">
+                <iframe src="${embedUrl}" width="100%" height="80" frameborder="0"
+                    allowtransparency="true" allow="encrypted-media" loading="lazy"></iframe>
             </div>`;
+    }
+
+    // Shared post card
+    let sharedHtml = '';
+    if (post.shared_from && typeof post.shared_from === 'object') {
+        const orig       = post.shared_from;
+        const origUser   = orig.user_id;
+        const origName   = origUser?.display_name || origUser?.username || 'Someone';
+        const origAvatar = origUser?.avatar_url
+            ? `<img src="${origUser.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : origName.charAt(0).toUpperCase();
+
+        let origSpotify = '';
+        if (orig.spotify_track_url) {
+            const embedUrl = orig.spotify_track_url.replace('/track/', '/embed/track/');
+            origSpotify = `
+                <div class="post-spotify-player" style="margin-top:10px;">
+                    <iframe src="${embedUrl}" width="100%" height="80" frameborder="0"
+                        allowtransparency="true" allow="encrypted-media" loading="lazy"></iframe>
+                </div>`;
         }
 
-        el.innerHTML = `
-            <div class="post-header">
-                <div class="post-avatar">${authorName.charAt(0).toUpperCase()}</div>
-                <div class="post-meta">
-                    <div class="post-author">${authorName}</div>
-                    <div class="post-handle">${authorHandle} · ${formatTime(post.createdAt)}</div>
+        sharedHtml = `
+            <div class="shared-post-card">
+                <div class="shared-post-header">
+                    <div class="shared-post-avatar">${origAvatar}</div>
+                    <div class="shared-post-meta">
+                        <div class="shared-post-author">${origName}</div>
+                        <div class="shared-post-time">${formatTime(orig.createdAt)}</div>
+                    </div>
                 </div>
-            </div>
-            <div class="post-content">${formatContent(post.content)}</div>
-            ${spotifyEmbedHtml}
-            <div class="post-actions-bar">
-                <div class="post-action-group">
-                    <a class="post-action ${alreadyLiked ? 'liked' : ''}" data-action="like" href="#">
-                        <i class="${alreadyLiked ? 'fas' : 'far'} fa-heart" style="${alreadyLiked ? 'color:#e06a72;' : ''}"></i>
-                        <span>${post.reactions?.length || 0}</span>
-                    </a>
-                    <a class="post-action" data-action="comment" href="#">
-                        <i class="far fa-comment"></i><span>${post.comments?.length || 0}</span>
-                    </a>
-                    <a class="post-action" data-action="share" href="#">
-                        <i class="fas fa-share"></i>
-                    </a>
-                </div>
+                <div class="shared-post-content">${formatContent(orig.content || '')}</div>
+                ${origSpotify}
             </div>`;
-
-        el.querySelectorAll('.post-action').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handlePostAction(e, post._id, el);
-            });
-        });
-
-        return el;
     }
+
+    el.innerHTML = `
+        <div class="post-header">
+            <div class="post-avatar">${avatarHtml}</div>
+            <div class="post-meta">
+                <div class="post-author">${authorName}</div>
+                <div class="post-handle">${authorHandle} · ${formatTime(post.createdAt)}</div>
+            </div>
+        </div>
+        ${post.content ? `<div class="post-content">${formatContent(post.content)}</div>` : ''}
+        ${spotifyEmbedHtml}
+        ${sharedHtml}
+        <div class="post-actions-bar">
+            <div class="post-action-group">
+                <a class="post-action ${alreadyLiked ? 'liked' : ''}" data-action="like" href="#">
+                    <i class="${alreadyLiked ? 'fas' : 'far'} fa-heart" style="${alreadyLiked ? 'color:#e06a72;' : ''}"></i>
+                    <span>${post.reactions?.length || 0}</span>
+                </a>
+                <a class="post-action" data-action="comment" href="#">
+                    <i class="far fa-comment"></i><span>${post.comments?.length || 0}</span>
+                </a>
+                <a class="post-action" data-action="share" href="#">
+                    <i class="fas fa-share"></i>
+                </a>
+            </div>
+        </div>`;
+
+    el.querySelectorAll('.post-action').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.handlePostAction(e, post._id, el);
+        });
+    });
+
+    return el;
+}
 
     async handlePostAction(e, postId, el) {
         const action = e.currentTarget.dataset.action;
@@ -196,6 +246,12 @@ export class PostManager {
                 icon.style.color = isNowLiked ? '#e06a72' : '';
                 count.textContent = data.reactions;
             } catch (err) { showToast('Action failed'); }
+                } else if (action === 'comment') {
+            const res = await fetch(`${API}/posts/${postId}`, {
+                headers: authHeaders()
+            });
+            const post = res.ok ? await res.json() : { comments: [] };
+            this.openCommentModal(postId, post);
         } else if (action === 'share') {
             try {
                 const res = await fetch(`${API}/posts/${postId}/share`, { method: 'POST', headers: authHeaders() });
@@ -224,6 +280,174 @@ export class PostManager {
         } catch (err) { showToast('Error'); }
         finally { this.postSubmit.innerHTML = 'Post'; this.postSubmit.disabled = false; }
     }
+
+// --- COMMENTS ---
+openCommentModal(postId, post) {
+    this._activePostId = postId;
+    const modal    = document.getElementById('commentModal');
+    const list     = document.getElementById('commentsList');
+    const input    = document.getElementById('commentInput');
+    const postPreview = document.getElementById('commentModalPost');
+
+    // Show post preview at top
+    if (postPreview) {
+        const user       = post.user_id;
+        const authorName = user?.display_name || user?.username || 'Anonymous';
+        const avatarHtml = user?.avatar_url
+            ? `<img src="${user.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : authorName.charAt(0).toUpperCase();
+
+let sharedHtml = '';
+if (post.shared_from && typeof post.shared_from === 'object') {
+    const orig       = post.shared_from;
+    const origUser   = orig.user_id;
+    const origName   = origUser?.display_name || origUser?.username || 'Someone';
+    const origAvatar = origUser?.avatar_url
+        ? `<img src="${origUser.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+        : origName.charAt(0).toUpperCase();
+
+    // ← ADD Spotify embed for shared post
+    let origSpotify = '';
+    if (orig.spotify_track_url) {
+        const embedUrl = orig.spotify_track_url.replace('/track/', '/embed/track/');
+        origSpotify = `
+            <div style="margin-top:10px; border-radius:12px; overflow:hidden;">
+                <iframe src="${embedUrl}" width="100%" height="80" frameborder="0"
+                    allowtransparency="true" allow="encrypted-media" loading="lazy"
+                    style="border-radius:12px; display:block;"></iframe>
+            </div>`;
+    }
+
+    sharedHtml = `
+        <div class="shared-post-card">
+            <div class="shared-post-header">
+                <div class="shared-post-avatar">${origAvatar}</div>
+                <div class="shared-post-meta">
+                    <div class="shared-post-author">${origName}</div>
+                    <div class="shared-post-time">${formatTime(orig.createdAt)}</div>
+                </div>
+            </div>
+            <div class="shared-post-content">${formatContent(orig.content || '')}</div>
+            ${origSpotify}
+        </div>`;       
+}
+
+postPreview.innerHTML = `
+    <div class="cmp-header">
+        <div class="cmp-avatar">${avatarHtml}</div>
+        <div class="cmp-meta">
+            <div class="cmp-author">${authorName}</div>
+            <div class="cmp-time">${formatTime(post.createdAt)}</div>
+        </div>
+    </div>
+    <div class="cmp-content">${formatContent(post.content || '')}</div>
+    ${sharedHtml}
+    <div class="cmp-stats">
+        <span><i class="fas fa-heart" style="color:#e06a72"></i> ${post.reactions?.length || 0}</span>
+        <span><i class="far fa-comment"></i> ${post.comments?.length || 0} comments</span>
+    </div>`;
+    }
+
+    // Show current user avatar in input area
+    const inputAvatar = document.getElementById('commentInputAvatar');
+    if (inputAvatar) {
+        const currentUser = getUser();
+        inputAvatar.innerHTML = currentUser?.avatar_url
+            ? `<img src="${currentUser.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : (currentUser?.display_name || currentUser?.name || 'U').charAt(0).toUpperCase();
+    }
+
+    // Render comments
+    list.innerHTML = '';
+    const comments = post.comments || [];
+    if (comments.length === 0) {
+        list.innerHTML = '<div class="comment-empty">No comments yet. Be the first!</div>';
+    } else {
+        comments.forEach(c => {
+            const name   = c.user_id?.display_name || c.user_id?.username || 'User';
+            const avatar = c.user_id?.avatar_url
+                ? `<img src="${c.user_id.avatar_url}" alt="" />`
+                : name.charAt(0).toUpperCase();
+
+            const item = document.createElement('div');
+            item.className = 'comment-item';
+            item.innerHTML = `
+                <div class="comment-avatar">${avatar}</div>
+                <div class="comment-body">
+                    <div class="comment-bubble">
+                        <div class="comment-author">${name}</div>
+                        <div class="comment-text">${c.text}</div>
+                    </div>
+                </div>`;
+            list.appendChild(item);
+        });
+    }
+
+    if (input) input.value = '';
+    modal.classList.add('active');
+    if (input) input.focus();
+}
+
+closeCommentModal() {
+    document.getElementById('commentModal')?.classList.remove('active');
+    this._activePostId = null;
+}
+
+async submitComment() {
+    const input   = document.getElementById('commentInput');
+    const text    = input?.value.trim();
+    const postId  = this._activePostId;
+    if (!text || !postId) return;
+
+    const submitBtn = document.getElementById('commentSubmitBtn');
+    if (submitBtn) { submitBtn.disabled = true; }
+
+    try {
+        const res = await fetch(`${API}/posts/${postId}/comment`, {
+            method:  'POST',
+            headers: authHeaders(),
+            body:    JSON.stringify({ text })
+        });
+
+        if (!res.ok) throw new Error('Comment failed');
+
+        const comments = await res.json();
+
+        // Update comment count on the post card
+        const postEl    = document.querySelector(`.post[data-id="${postId}"]`);
+        const countEl   = postEl?.querySelector('[data-action="comment"] span');
+        if (countEl) countEl.textContent = comments.length;
+
+        // Add new comment to list
+        const list = document.getElementById('commentsList');
+        const empty = list.querySelector('.comment-empty');
+        if (empty) empty.remove();
+
+        const currentUser = getUser();
+        const avatar = currentUser?.avatar_url
+            ? `<img src="${currentUser.avatar_url}" alt="" />`
+            : (currentUser?.display_name || currentUser?.name || 'U').charAt(0).toUpperCase();
+
+        const item = document.createElement('div');
+        item.className = 'comment-item';
+        item.innerHTML = `
+            <div class="comment-avatar">${avatar}</div>
+            <div class="comment-body">
+                <div class="comment-author">${currentUser?.display_name || currentUser?.name || 'You'}</div>
+                <div class="comment-text">${text}</div>
+            </div>`;
+        list.appendChild(item);
+        list.scrollTop = list.scrollHeight;
+
+        if (input) input.value = '';
+        showToast('Comment posted! 💬');
+
+    } catch (err) {
+        showToast('Could not post comment.');
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
+}
 
     openModal() { this.createPostModal.classList.add('active'); this.postContent.focus(); }
     closeModal() { this.createPostModal.classList.remove('active'); this.postContent.value = ''; this.clearSelectedTrack(); this.updateCharCount(); }

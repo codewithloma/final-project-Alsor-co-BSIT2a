@@ -85,6 +85,9 @@ function saveAuthData(data) {
     localStorage.setItem("dearbup_user", JSON.stringify({
         id:     data.user._id,
         name:   data.user.display_name || data.user.username,
+        username:     data.user.username,      
+        display_name: data.user.display_name,   
+        avatar_url:   data.user.avatar_url,     
         email:  data.user.email,
         role:   data.user.user_type,
         course: data.user.course

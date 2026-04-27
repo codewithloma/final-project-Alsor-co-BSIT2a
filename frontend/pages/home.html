@@ -9,16 +9,16 @@
     <title>DearBUP - Feel. Write. Share.</title>
 
     <link rel="stylesheet" href="../CSS/style.css" />
+    <link rel="stylesheet" href="../CSS/sidebar.css">
+
 
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      rel="stylesheet"
-    />
+      rel="stylesheet"/>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+      rel="stylesheet"/>
 
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
@@ -42,25 +42,26 @@
       <nav class="flex-1 px-6 space-y-2">
         <a
           href="#"
-          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item active"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item active overflow-hidden"
         >
           <i class="fas fa-home w-6 text-lg"></i>
 
           <span>Home</span>
         </a>
 
-        <a
-          href="#"
-          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item"
-        >
+        <a href="notification.html" class="nav-item" style="position: relative; overflow: hidden;">
           <i class="fas fa-bell w-6 text-lg"></i>
-
           <span>Notifications</span>
+          <span 
+            class="notification-badge" 
+            id="notificationBadge" 
+            style="display:none;"
+          ></span>
         </a>
 
         <a
-          href="#"
-          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item"
+          href="profile.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
         >
           <i class="fas fa-user w-6 text-lg"></i>
 
@@ -68,8 +69,8 @@
         </a>
 
         <a
-          href="#"
-          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item"
+          href="organization.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
         >
           <i class="fas fa-users w-6 text-lg"></i>
 
@@ -471,48 +472,65 @@
           <div class="story-dots" id="storyDots"></div>
         </div>
 
-        <div class="story-right-panel" id="storyRightPanel">
-          <div
-            class="story-music-panel"
-            id="storyMusicPanel"
-            style="display: none"
-          >
-            <div class="story-album-art-wrapper">
-              <img class="story-album-art" id="storyAlbumArt" src="" alt="" />
+<div class="story-right-panel" id="storyRightPanel">
+  <div class="story-music-panel" id="storyMusicPanel" style="display: none; flex-direction: column; align-items: center; justify-content: center;">
 
-              <div class="story-album-spin-ring"></div>
-            </div>
+    <!-- Album art — hidden when embed loads -->
+    <div class="story-album-art-wrapper" id="storyAlbumArtWrapper">
+      <img class="story-album-art" id="storyAlbumArt" src="" alt="" />
+      <div class="story-album-spin-ring"></div>
+    </div>
+    <div class="story-track-info" id="storyTrackInfo">
+      <div class="story-track-name" id="storyTrackName"></div>
+      <div class="story-track-artist" id="storyTrackArtist"></div>
+    </div>
+    <a class="story-spotify-btn" id="storySpotifyBtn" href="" target="_blank">
+      <i class="fab fa-spotify"></i> Listen on Spotify
+    </a>
+    <div class="story-waveform" id="storyWaveform">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
 
-            <div class="story-track-info">
-              <div class="story-track-name" id="storyTrackName"></div>
+    <!-- Embed player injected here by JS -->
+    <div id="storyEmbedContainer" style="width:100%; display:none;"></div>
 
-              <div class="story-track-artist" id="storyTrackArtist"></div>
-            </div>
-
-            <a
-              class="story-spotify-btn"
-              id="storySpotifyBtn"
-              href=""
-              target="_blank"
-            >
-              <i class="fab fa-spotify"></i> Listen on Spotify
-            </a>
-
-            <div class="story-waveform">
-              <span></span><span></span><span></span><span></span><span></span>
-
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
-          </div>
-
-          <div class="story-no-music" id="storyNoMusic" style="display: none">
-            <i class="fas fa-music"></i>
-
-            <span>No song attached</span>
-          </div>
-        </div>
+  </div>
+  <div class="story-no-music" id="storyNoMusic" style="display: none">
+    <i class="fas fa-music"></i>
+    <span>No song attached</span>
+  </div>
+</div>
       </div>
     </div>
+<div class="modal" id="commentModal">
+  <div class="modal-content comment-modal-content">
+
+    <!-- Post preview at top -->
+    <div class="comment-modal-post" id="commentModalPost"></div>
+
+    <div class="comment-modal-header">
+      <h3>Comments</h3>
+      <button class="close-modal" id="closeCommentModal">&times;</button>
+    </div>
+
+    <div id="commentsList" class="comments-list"></div>
+
+    <div class="comment-input-wrap">
+      <div class="comment-input-avatar" id="commentInputAvatar"></div>
+      <input
+        type="text"
+        id="commentInput"
+        placeholder="Write a comment…"
+        maxlength="200"
+        autocomplete="off"
+      />
+      <button id="commentSubmitBtn">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
 
     <script type="module" src="../js/main.js"></script>
   </body>
