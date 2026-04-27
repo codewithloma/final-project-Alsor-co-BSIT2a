@@ -18,6 +18,10 @@
 const API_BASE  = "http://localhost:5000/api";
 const INDEX_URL = "../index.html"; // Adjust to your actual login/landing page path
 
+const CLOUDINARY_CLOUD  = "dqu4ypjhb";
+const CLOUDINARY_PRESET = "DearBUP"; 
+
+let _badgePollInterval = null;
 // ── Auth ──────────────────────────────────────────────────
 const getToken = () => localStorage.getItem("dearbup_token");
 
@@ -74,7 +78,20 @@ function escapeHTML(str = "") {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
   );
 }
+async function uploadToCloudinary(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_PRESET);
 
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+    { method: "POST", body: formData }
+  );
+
+  if (!res.ok) throw new Error("Image upload failed");
+  const data = await res.json();
+  return data.secure_url;
+}
 // ── API calls ─────────────────────────────────────────────
 
 /**
@@ -234,6 +251,20 @@ function renderPosts(posts, user) {
         </div>
       </div>
       <div class="post-card-body">${formatContent(p.content)}</div>
+
+      ${p.spotify_track_url ? `
+        <div class="post-spotify-embed" style="margin: 12px 0; border-radius: 12px; overflow: hidden;">
+          <iframe
+            src="https://open.spotify.com/embed/track/${extractSpotifyId(p.spotify_track_url)}"
+            width="100%"
+            height="80"
+            frameborder="0"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            style="border-radius: 12px; display: block;">
+          </iframe>
+        </div>` : ""}
+
       <div class="post-card-footer">
         <button
           class="pc-action ${p.liked_by_me ? "liked" : ""}"
@@ -252,10 +283,16 @@ function renderPosts(posts, user) {
       </div>
     </div>`).join("");
 
-  // Wire like buttons
   container.querySelectorAll('[data-action="like"]').forEach((btn) =>
     btn.addEventListener("click", () => handleLike(btn))
   );
+}
+
+// ← ADD THIS right after renderPosts, before formatContent
+function extractSpotifyId(url = "") {
+  if (!url) return "";
+  const match = url.match(/track\/([a-zA-Z0-9]+)/);
+  return match ? match[1] : "";
 }
 
 function formatContent(text = "") {
@@ -395,6 +432,37 @@ function openEditModal() {
   document.getElementById("editBioInput").value    = _currentUser.bio || "";
   document.getElementById("editAvatarUrl").value   = _currentUser.avatar_url || "";
   updateBioCount();
+
+  // Show current avatar in preview
+  const preview = document.getElementById("avatarPreview");
+  if (preview) {
+    if (_currentUser.avatar_url) {
+      preview.innerHTML = `<img src="${escapeHTML(_currentUser.avatar_url)}" alt="" />`;
+    } else {
+      preview.textContent = getInitials(_currentUser.display_name || _currentUser.username);
+    }
+  }
+
+  // Wire file picker
+  const fileInput = document.getElementById("avatarFileInput");
+  if (fileInput) {
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Show instant preview before upload
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (preview) preview.innerHTML = `<img src="${ev.target.result}" alt="" />`;
+      };
+      reader.readAsDataURL(file);
+
+      fileInput._pendingFile = file;
+      const hint = document.getElementById("avatarUploadHint");
+      if (hint) hint.textContent = file.name;
+    };
+  }
+
   document.getElementById("editModal").classList.add("active");
 }
 
@@ -412,29 +480,41 @@ async function saveProfile() {
   const saveBtn = document.getElementById("saveProfileBtn");
   if (!saveBtn) return;
 
-  // Only send fields that updateProfile accepts
-  const payload = {
-    display_name: document.getElementById("editDisplayName").value.trim(),
-    bio:          document.getElementById("editBioInput").value.trim(),
-    avatar_url:   document.getElementById("editAvatarUrl").value.trim(),
-  };
-
   saveBtn.disabled  = true;
   saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
 
   try {
-    // PUT /api/profile → controller returns { message, user }
-    const updatedUser = await apiUpdateProfile(payload);
+    const fileInput   = document.getElementById("avatarFileInput");
+    const pendingFile = fileInput?._pendingFile;
 
-    // Merge updated fields into local state (no localStorage caching)
+    // If new photo selected, upload to Cloudinary first
+    if (pendingFile) {
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading photo…';
+      const imageUrl = await uploadToCloudinary(pendingFile);
+      document.getElementById("editAvatarUrl").value = imageUrl;
+      fileInput._pendingFile = null;
+    }
+
+    const payload = {
+      display_name: document.getElementById("editDisplayName").value.trim(),
+      bio:          document.getElementById("editBioInput").value.trim(),
+      avatar_url:   document.getElementById("editAvatarUrl").value.trim(),
+    };
+
+    localStorage.setItem("dearbup_user", JSON.stringify(_currentUser));
+
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+    const updatedUser = await apiUpdateProfile(payload);
     _currentUser = { ..._currentUser, ...updatedUser };
 
-    // Re-render all sections with fresh data
+    localStorage.setItem("dearbup_user", JSON.stringify(_currentUser));
+
     renderProfile(_currentUser);
     populateSidebar(_currentUser);
     renderAbout(_currentUser);
     closeEditModal();
     showToast("Profile updated! ✨", "success");
+
   } catch (err) {
     showToast(err.message || "Could not save profile.", "error");
   } finally {
@@ -527,4 +607,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Failed to load profile:", err);
     showToast("Could not load profile. Please try again.", "error");
   }
+});
+async function initNotificationBadge() {
+  const token = getToken();
+  const badge = document.getElementById("notificationBadge");
+  if (!token || !badge) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/notifications/count`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) return;
+
+    const { unreadCount } = await res.json();
+
+    if (unreadCount > 0) {
+      badge.textContent   = unreadCount > 99 ? "99+" : String(unreadCount);
+      badge.style.display = "inline-flex";
+    } else {
+      badge.textContent   = "";
+      badge.style.display = "none"; // ← only change from your original
+    }
+  } catch (err) {
+    console.warn("Badge fetch failed:", err);
+  }
+}
+
+// Call it on load, then repeat every 30s
+document.addEventListener("DOMContentLoaded", () => {
+  initNotificationBadge();
+  setInterval(initNotificationBadge, 3000);
 });

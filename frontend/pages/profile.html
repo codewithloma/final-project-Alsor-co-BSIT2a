@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DearBUP – Profile</title>
 
-  <!-- Shared base styles -->
   <link rel="stylesheet" href="../CSS/style.css" />
-  <!-- Profile-specific styles -->
+  <link rel="stylesheet" href="../CSS/sidebar.css" />
   <link rel="stylesheet" href="../CSS/profile.css" />
-
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
 
@@ -24,12 +23,44 @@
       </div>
     </div>
 
-    <nav class="sidebar-nav">
-      <a href="home.html"          class="nav-item"><i class="fas fa-home w-6 text-lg"></i><span>Home</span></a>
-      <a href="notifications.html" class="nav-item"><i class="fas fa-bell w-6 text-lg"></i><span>Notifications</span></a>
-      <a href="profile.html"       class="nav-item active"><i class="fas fa-user w-6 text-lg"></i><span>Profile</span></a>
-      <a href="organization.html" class="nav-item"><i class="fas fa-users w-6 text-lg"></i><span>Organizations</span></a>
-    </nav>
+     <nav class="flex-1 px-6 space-y-2">
+        <a
+          href="home.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-home w-6 text-lg"></i>
+
+          <span>Home</span>
+        </a>
+
+        <a href="notification.html" class="nav-item" style="position: relative; overflow: hidden;">
+          <i class="fas fa-bell w-6 text-lg"></i>
+          <span>Notifications</span>
+          <span 
+            class="notification-badge" 
+            id="notificationBadge" 
+            style="display:none;"
+          ></span>
+        </a>
+
+        <a
+          href="profile.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item active overflow-hidden"
+        >
+          <i class="fas fa-user w-6 text-lg"></i>
+
+          <span>Profile</span>
+        </a>
+
+        <a
+          href="organization.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-users w-6 text-lg"></i>
+
+          <span>Organizations</span>
+        </a>
+      </nav>
 
     <div class="sidebar-footer">
       <div class="sidebar-user">
@@ -42,7 +73,6 @@
           <i class="fas fa-sign-out-alt"></i>
         </button>
       </div>
-
       <a href="#" id="writePostBtn" class="write-post nav-item">
         <i class="fas fa-feather-alt"></i> Write
       </a>
@@ -135,39 +165,39 @@
   </div>
 
   <!-- ── Edit Profile Modal ────────────────────────────────── -->
-  <!-- Fields match updateProfile controller: display_name, bio, avatar_url -->
   <div class="modal-overlay" id="editModal">
     <div class="edit-modal">
       <div class="em-header">
         <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
         <button class="em-close" id="closeEditModal"><i class="fas fa-times"></i></button>
       </div>
-
       <div class="em-body">
-        <!-- display_name -->
         <div class="em-field">
           <label for="editDisplayName">Display Name</label>
-          <input type="text" id="editDisplayName"
-                 placeholder="Your display name" maxlength="60" autocomplete="name" />
+          <input type="text" id="editDisplayName" placeholder="Your display name" maxlength="60" autocomplete="name" />
         </div>
-
-        <!-- bio -->
         <div class="em-field">
           <label for="editBioInput">Bio</label>
-          <textarea id="editBioInput"
-                    placeholder="Tell the BUP community about yourself…"
-                    maxlength="160"></textarea>
+          <textarea id="editBioInput" placeholder="Tell the BUP community about yourself…" maxlength="160"></textarea>
           <span class="char-hint"><span id="bioCharCount">0</span>/160</span>
         </div>
-
-        <!-- avatar_url -->
-        <div class="em-field">
-          <label for="editAvatarUrl">Profile Photo URL</label>
-          <input type="url" id="editAvatarUrl"
-                 placeholder="https://example.com/your-photo.jpg" />
-        </div>
-      </div>
-
+            <div class="em-field">
+              <label>Profile Photo</label>
+              <div class="avatar-upload-wrap" id="avatarUploadWrap">
+                <div class="avatar-preview" id="avatarPreview"></div>
+                <label for="avatarFileInput" class="avatar-upload-btn">
+                  <i class="fas fa-camera"></i> Choose Photo
+                </label>
+                <input
+                  type="file"
+                  id="avatarFileInput"
+                  accept="image/*"
+                  style="display: none;"
+                />
+                <p class="avatar-upload-hint" id="avatarUploadHint">No file chosen</p>
+              </div>
+              <input type="hidden" id="editAvatarUrl" />
+            </div>
       <div class="em-footer">
         <button class="btn-cancel-em" id="cancelEditModal">Cancel</button>
         <button class="btn-save-em"   id="saveProfileBtn">
@@ -177,10 +207,9 @@
     </div>
   </div>
 
-  <!-- ── Toast ─────────────────────────────────────────────── -->
+  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- Profile logic -->
   <script src="../js/profile.js"></script>
 </body>
 </html>
