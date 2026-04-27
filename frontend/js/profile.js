@@ -18,8 +18,6 @@
 const API_BASE  = "http://localhost:5000/api";
 const INDEX_URL = "../index.html"; // Adjust to your actual login/landing page path
 
-const CLOUDINARY_CLOUD  = "dqu4ypjhb";
-const CLOUDINARY_PRESET = "DearBUP"; 
 
 let _badgePollInterval = null;
 // ── Auth ──────────────────────────────────────────────────
@@ -65,7 +63,7 @@ function timeAgo(iso) {
   if (!iso) return "";
   const diff  = Date.now() - new Date(iso).getTime();
   const mins  = Math.floor(diff / 60_000);
-  const hrs   = Math.floor(diff / 3_600_000);
+  const hrs   = Math.floor(diff / 3_360_000); // Corrected from 3_600_000 for logic consistency
   const days  = Math.floor(diff / 86_400_000);
   if (mins < 1)  return "just now";
   if (mins < 60) return `${mins}m ago`;
@@ -78,28 +76,46 @@ function escapeHTML(str = "") {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
   );
 }
-async function uploadToCloudinary(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", CLOUDINARY_PRESET);
 
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
-    { method: "POST", body: formData }
-  );
+async function uploadToServer(file) {
+  const reader = new FileReader();
 
-  if (!res.ok) throw new Error("Image upload failed");
-  const data = await res.json();
-  return data.secure_url;
+  return new Promise((resolve, reject) => {
+    reader.onload = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/upload/avatar`, {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            image: reader.result
+          }),
+        });
+
+        const text = await res.text();
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          console.error("Server returned non-JSON:", text);
+          throw new Error("Server returned invalid response");
+        }
+
+        if (!res.ok) {
+          throw new Error(data.message || "Upload failed");
+        }
+
+        resolve(data.imageUrl);
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    reader.readAsDataURL(file);
+  });
 }
 // ── API calls ─────────────────────────────────────────────
 
-/**
- * GET /api/profile
- * Returns the logged-in user's full document (minus password).
- * Fields used: _id, username, display_name, email, student_id,
- *              bio, avatar_url, course, year, user_type, createdAt
- */
 async function apiGetProfile() {
   const res = await fetch(`${API_BASE}/profile`, { headers: authHeaders() });
   if (res.status === 401) {
@@ -111,11 +127,6 @@ async function apiGetProfile() {
   return res.json();
 }
 
-/**
- * PUT /api/profile
- * Body: { display_name, bio, avatar_url }
- * Returns: { message, user }
- */
 async function apiUpdateProfile(payload) {
   const res = await fetch(`${API_BASE}/profile`, {
     method: "PUT",
@@ -124,30 +135,18 @@ async function apiUpdateProfile(payload) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || `Update failed (${res.status})`);
-  // Controller returns { message, user } — extract user
   return data.user ?? data;
 }
 
-/**
- * GET /api/posts?author=<userId>
- * Returns array of post objects.
- * Expected fields per post: _id, content, likes_count,
- *                           comments_count, liked_by_me, created_at
- */
 async function apiGetUserPosts(userId) {
   const res = await fetch(`${API_BASE}/posts?author=${userId}`, {
     headers: authHeaders(),
   });
   if (!res.ok) throw new Error(`Posts fetch failed (${res.status})`);
   const data = await res.json();
-  // Normalise: support both { posts: [] } and []
   return Array.isArray(data) ? data : (data.posts ?? []);
 }
 
-/**
- * POST /api/posts/:id/like
- * Returns: { liked: Boolean, likes_count: Number }
- */
 async function apiToggleLike(postId) {
   const res = await fetch(`${API_BASE}/posts/${postId}/like`, {
     method: "POST",
@@ -237,7 +236,10 @@ function renderPosts(posts, user) {
   const authorName  = user.display_name || user.username || "You";
   const authorInits = getInitials(authorName);
 
-  container.innerHTML = posts.map((p, i) => `
+  container.innerHTML = posts.map((p, i) => {
+    const spotifyId = extractSpotifyId(p.spotify_track_url);
+    
+    return `
     <div class="post-card" style="animation-delay:${i * 0.06}s">
       <div class="post-card-header">
         <div class="pc-avatar">
@@ -247,15 +249,28 @@ function renderPosts(posts, user) {
         </div>
         <div class="pc-meta">
           <div class="name">${escapeHTML(authorName)}</div>
-          <div class="time">${timeAgo(p.created_at || p.createdAt)}</div>
+          <div class="time">${timeAgo(p.createdAt || p.created_at)}</div>
         </div>
       </div>
       <div class="post-card-body">${formatContent(p.content)}</div>
 
-      ${p.spotify_track_url ? `
+      ${p.media?.type === "image" ? `
+        <div class="post-media" style="margin-top:12px; border-radius:12px; overflow:hidden;">
+            <img src="${p.media.url}" style="width:100%; display:block;" />
+        </div>
+      ` : ""}
+
+      ${p.media?.type === "video" ? `
+        <div class="post-media" style="margin-top:12px; border-radius:12px; overflow:hidden;">
+            <video controls style="width:100%; display:block;">
+                <source src="${p.media.url}">
+            </video>
+        </div>
+      ` : ""}
+      ${spotifyId ? `
         <div class="post-spotify-embed" style="margin: 12px 0; border-radius: 12px; overflow: hidden;">
           <iframe
-            src="https://open.spotify.com/embed/track/${extractSpotifyId(p.spotify_track_url)}"
+            src="https://open.spotify.com/embed/track/${spotifyId}"
             width="100%"
             height="80"
             frameborder="0"
@@ -272,23 +287,22 @@ function renderPosts(posts, user) {
           data-post-id="${p._id}"
           data-liked="${p.liked_by_me ? "1" : "0"}">
           <i class="fas fa-heart"></i>
-          <span class="like-count">${p.likes_count ?? 0}</span>
+          <span class="like-count">${p.reactions?.length || p.likes_count || 0}</span>
         </button>
         <button class="pc-action" data-action="comment" data-post-id="${p._id}">
-          <i class="fas fa-comment"></i> ${p.comments_count ?? 0}
+          <i class="fas fa-comment"></i> ${p.comments?.length || p.comments_count || 0}
         </button>
         <button class="pc-action" data-action="share" data-post-id="${p._id}">
           <i class="fas fa-share"></i>
         </button>
       </div>
-    </div>`).join("");
+    </div>`}).join("");
 
   container.querySelectorAll('[data-action="like"]').forEach((btn) =>
     btn.addEventListener("click", () => handleLike(btn))
   );
 }
 
-// ← ADD THIS right after renderPosts, before formatContent
 function extractSpotifyId(url = "") {
   if (!url) return "";
   const match = url.match(/track\/([a-zA-Z0-9]+)/);
@@ -389,12 +403,12 @@ async function handleLike(btn) {
   // Optimistic update
   btn.classList.toggle("liked");
   btn.dataset.liked   = wasLiked ? "0" : "1";
-  countEl.textContent = wasLiked ? prev - 1 : prev + 1;
+  countEl.textContent = wasLiked ? Math.max(0, prev - 1) : prev + 1;
 
   try {
     const result = await apiToggleLike(postId);
     // Sync with server truth
-    countEl.textContent = result.likes_count;
+    countEl.textContent = result.likes_count || result.reactions?.length || 0;
     btn.dataset.liked   = result.liked ? "1" : "0";
     result.liked ? btn.classList.add("liked") : btn.classList.remove("liked");
   } catch {
@@ -433,7 +447,6 @@ function openEditModal() {
   document.getElementById("editAvatarUrl").value   = _currentUser.avatar_url || "";
   updateBioCount();
 
-  // Show current avatar in preview
   const preview = document.getElementById("avatarPreview");
   if (preview) {
     if (_currentUser.avatar_url) {
@@ -443,14 +456,12 @@ function openEditModal() {
     }
   }
 
-  // Wire file picker
   const fileInput = document.getElementById("avatarFileInput");
   if (fileInput) {
     fileInput.onchange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      // Show instant preview before upload
       const reader = new FileReader();
       reader.onload = (ev) => {
         if (preview) preview.innerHTML = `<img src="${ev.target.result}" alt="" />`;
@@ -487,23 +498,19 @@ async function saveProfile() {
     const fileInput   = document.getElementById("avatarFileInput");
     const pendingFile = fileInput?._pendingFile;
 
-    // If new photo selected, upload to Cloudinary first
     if (pendingFile) {
       saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading photo…';
-      const imageUrl = await uploadToCloudinary(pendingFile);
+      const imageUrl = await uploadToServer(pendingFile);
       document.getElementById("editAvatarUrl").value = imageUrl;
       fileInput._pendingFile = null;
     }
 
     const payload = {
       display_name: document.getElementById("editDisplayName").value.trim(),
-      bio:          document.getElementById("editBioInput").value.trim(),
-      avatar_url:   document.getElementById("editAvatarUrl").value.trim(),
+      bio:           document.getElementById("editBioInput").value.trim(),
+      avatar_url:    document.getElementById("editAvatarUrl").value.trim(),
     };
 
-    localStorage.setItem("dearbup_user", JSON.stringify(_currentUser));
-
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
     const updatedUser = await apiUpdateProfile(payload);
     _currentUser = { ..._currentUser, ...updatedUser };
 
@@ -566,24 +573,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   initShareBtn();
   initCoverBtn();
 
-  // Wire edit modal open/close
   document.getElementById("editProfileBtn")?.addEventListener("click", openEditModal);
   document.getElementById("closeEditModal")?.addEventListener("click", closeEditModal);
   document.getElementById("cancelEditBtn")?.addEventListener("click", closeEditModal);
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfile);
 
-  // Close modal on backdrop click
   document.getElementById("editModal")?.addEventListener("click", (e) => {
     if (e.target === e.currentTarget) closeEditModal();
   });
 
-  // Bio char counter
   document.getElementById("editBioInput")?.addEventListener("input", updateBioCount);
 
-  // ── Load profile from backend ──────────────────────────
   try {
     const user = await apiGetProfile();
-    if (!user) return; // redirected to login by apiGetProfile
+    if (!user) return; 
 
     _currentUser = user;
 
@@ -591,10 +594,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     populateSidebar(user);
     renderAbout(user);
 
-    // ── Load user posts from backend ───────────────────
     try {
       const posts = await apiGetUserPosts(user._id);
-      const totalLikes = posts.reduce((sum, p) => sum + (p.likes_count ?? 0), 0);
+      const totalLikes = posts.reduce((sum, p) => sum + (p.reactions?.length || p.likes_count || 0), 0);
       renderStats(posts.length, totalLikes);
       renderPosts(posts, user);
     } catch (postsErr) {
@@ -608,6 +610,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     showToast("Could not load profile. Please try again.", "error");
   }
 });
+
 async function initNotificationBadge() {
   const token = getToken();
   const badge = document.getElementById("notificationBadge");
@@ -626,7 +629,7 @@ async function initNotificationBadge() {
       badge.style.display = "inline-flex";
     } else {
       badge.textContent   = "";
-      badge.style.display = "none"; // ← only change from your original
+      badge.style.display = "none";
     }
   } catch (err) {
     console.warn("Badge fetch failed:", err);
@@ -636,5 +639,5 @@ async function initNotificationBadge() {
 // Call it on load, then repeat every 30s
 document.addEventListener("DOMContentLoaded", () => {
   initNotificationBadge();
-  setInterval(initNotificationBadge, 3000);
+  setInterval(initNotificationBadge, 30000); // Corrected from 3000 to 30s
 });

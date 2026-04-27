@@ -259,26 +259,100 @@ createPostElement(post) {
             } catch { showToast('Failed to share'); }
         }
     }
+// --- MEDIA UPLOAD ---
+   async uploadPostMedia(file) {
+    const reader = new FileReader();
 
+    return new Promise((resolve, reject) => {
+        reader.onload = async () => {
+            try {
+                const mediaType = file.type.startsWith("video/")
+                    ? "video"
+                    : "image";
+
+                const res = await fetch(`${API}/upload/post-media`, {
+                    method: "POST",
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        file: reader.result,
+                        mediaType
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Media upload failed");
+                }
+
+                resolve({
+                    url: data.mediaUrl,
+                    type: data.mediaType
+                });
+
+            } catch (error) {
+                reject(error);
+            }
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
     // --- SUBMISSION ---
-    async handlePostSubmit(e) {
+   async handlePostSubmit(e) {
         e.preventDefault();
         if (!getToken()) { showToast('Please login'); return; }
-        const content = this.postContent.value.trim();
-        if (!content) return;
 
-        this.postSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
+        const content = this.postContent.value.trim();
+        
+        const fileInput = document.getElementById('postFileInput'); 
+        const selectedFile = fileInput?.files[0];
+
+       
+        if (!content && !selectedFile && !this.selectedTrack) return;
+
+       
+        this.postSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
         this.postSubmit.disabled = true;
 
         try {
+            let uploadedMedia = null;
+
+            // --- STEP 6 LOGIC START ---
+            if (selectedFile) {
+            
+                uploadedMedia = await this.uploadPostMedia(selectedFile);
+            }
+
             const res = await fetch(`${API}/posts`, {
-                method: 'POST',
+                method: "POST",
                 headers: authHeaders(),
-                body: JSON.stringify({ content, spotify_track_url: this.selectedTrack?.url, is_anonymous: false })
+                body: JSON.stringify({
+                    content,
+                    spotify_track_url: this.selectedTrack?.url,
+                    media: uploadedMedia, // This contains { url, type } from Cloudinary
+                    is_anonymous: false
+                }),
             });
-            if (res.ok) { await this.loadPosts(); this.closeModal(); showToast('Posted! ✨'); }
-        } catch (err) { showToast('Error'); }
-        finally { this.postSubmit.innerHTML = 'Post'; this.postSubmit.disabled = false; }
+            // --- STEP 6 LOGIC END ---
+
+            if (res.ok) { 
+                await this.loadPosts(); 
+                this.closeModal(); 
+                if (fileInput) fileInput.value = ''; // Reset file input
+                showToast('Posted! ✨'); 
+            } else {
+                const errorData = await res.json();
+                throw new Error(errorData.error || "Failed to create post");
+            }
+
+        } catch (err) { 
+            console.error("Submission error:", err);
+            showToast(err.message || 'Error'); 
+        } finally { 
+            this.postSubmit.innerHTML = 'Post'; 
+            this.postSubmit.disabled = false; 
+        }
     }
 
 // --- COMMENTS ---

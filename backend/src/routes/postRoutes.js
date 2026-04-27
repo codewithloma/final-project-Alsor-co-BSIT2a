@@ -1,4 +1,6 @@
 import express from "express";
+import multer from "multer";
+
 import {
   createPost,
   getPosts,
@@ -14,18 +16,19 @@ import {
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+const upload = multer({ dest: "uploads/" });
 
-router.post("/", authMiddleware, createPost);
+router.post("/", authMiddleware, upload.single("media"), createPost);
 router.get("/", getPosts);
 
- 
 router.get("/spotify/search", searchSpotify);
 router.get("/:id", authMiddleware, getPostById);
+
 router.post("/:id/react", authMiddleware, reactToPost);
 router.post("/:id/comment", authMiddleware, addComment);
 router.post("/:id/share", authMiddleware, sharePost);
+
 router.put("/:id", authMiddleware, updatePost);
 router.delete("/:id", authMiddleware, deletePost);
-
 
 export default router;

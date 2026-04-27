@@ -1,12 +1,20 @@
 import Post from "../models/PostModel.js";
 import Notification from "../models/NotificationModel.js";
-import User from "../models/UserModel.js"; // ← ADD THIS
+import User from "../models/UserModel.js"; // 
 import axios from "axios";
+import cloudinary from "../config/cloudinary.js";
 
 // ---------------- CREATE POST ----------------
 export const createPost = async (req, res) => {
   try {
-    const { content, design_template, spotify_track_url, is_anonymous, org_id } = req.body;
+    const {
+      content,
+      design_template,
+      spotify_track_url,
+      is_anonymous,
+      org_id,
+      media,
+    } = req.body;
 
     const post = await Post.create({
       user_id: req.user.id,
@@ -15,6 +23,7 @@ export const createPost = async (req, res) => {
       spotify_track_url,
       is_anonymous: is_anonymous || false,
       org_id: org_id || null,
+      media: media || null,
     });
 
     res.status(201).json(post);
