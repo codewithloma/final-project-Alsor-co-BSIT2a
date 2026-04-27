@@ -28,7 +28,16 @@ const PostSchema = new mongoose.Schema(
 
     content: {
       type: String,
-      required: true,
+      default: "",
+    },
+
+    media: {
+      url: { type: String, default: null },
+      type: {
+        type: String,
+        enum: ["image", "video", null],
+        default: null,
+      },
     },
 
     design_template: {
@@ -46,19 +55,16 @@ const PostSchema = new mongoose.Schema(
       default: false,
     },
 
-    // ⭐ ORGANIZATION FEED SUPPORT
     org_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "CBO",
       default: null,
     },
 
-    reactions: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    reactions: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
 
     comments: [CommentSchema],
 
