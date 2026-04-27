@@ -60,25 +60,30 @@ export class LetterManager {
         });
     }
 
-    createLetterCard(letter, index) {
-        const card = document.createElement('div');
-        card.className   = 'letter-card';
-        card.dataset.index = index;
+createLetterCard(letter, index) {
+    const card = document.createElement('div');
+    card.className     = 'letter-card';
+    card.dataset.index = index;
 
-        const authorName = letter.display_name || 'Anonymous';
-        const hasTrack   = !!letter.spotifySongName;
+    const authorName = letter.display_name || 'Anonymous';
+    const hasTrack   = !!letter.spotifySongName;
 
-        card.innerHTML = `
-            ${hasTrack ? '<div class="letter-music-badge"><i class="fab fa-spotify"></i></div>' : ''}
-            <div class="letter-card-header">
-                <div class="letter-avatar">${authorName.charAt(0).toUpperCase()}</div>
-                <div class="letter-author">${authorName}</div>
-            </div>
-            <div class="letter-preview">${letter.letter_content}</div>`;
+    const avatarHtml = (!letter.is_anonymous && letter.user_id?.avatar_url)
+        ? `<img src="${letter.user_id.avatar_url}" alt=""
+             style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+        : authorName.charAt(0).toUpperCase();
 
-        card.addEventListener('click', () => this.openStory(index));
-        return card;
-    }
+    card.innerHTML = `
+        ${hasTrack ? '<div class="letter-music-badge"><i class="fab fa-spotify"></i></div>' : ''}
+        <div class="letter-card-header">
+            <div class="letter-avatar">${avatarHtml}</div>
+            <div class="letter-author">${authorName}</div>
+        </div>
+        <div class="letter-preview">${letter.letter_content}</div>`;
+
+    card.addEventListener('click', () => this.openStory(index));
+    return card;
+}
 
     initLettersDragScroll() {
         let isDown = false, startX, scrollLeft;
@@ -303,8 +308,14 @@ export class LetterManager {
     renderStory() {
         const letter = this.lettersData[this.currentLetterIndex];
         const total  = this.lettersData.length;
-
-        document.getElementById('storyAvatar').textContent = (letter.display_name || 'A').charAt(0).toUpperCase();
+        const storyAvatar = document.getElementById('storyAvatar');
+        if (!letter.is_anonymous && letter.user_id?.avatar_url) {
+            storyAvatar.innerHTML = `<img src="${letter.user_id.avatar_url}" alt=""
+                style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+        } else {
+            storyAvatar.textContent = (letter.display_name || 'A').charAt(0).toUpperCase();
+        }
+            
         document.getElementById('storyAuthor').textContent = letter.display_name || 'Anonymous';
         document.getElementById('storyTitle').textContent  = letter.letter_title || '';
         document.getElementById('storyText').textContent   = letter.letter_content;
@@ -324,24 +335,48 @@ export class LetterManager {
         const musicPanel = document.getElementById('storyMusicPanel');
         const noMusic    = document.getElementById('storyNoMusic');
 
-        if (letter.spotifySongName) {
-            document.getElementById('storyAlbumArt').src             = letter.spotifyImageUrl || '';
-            document.getElementById('storyTrackName').textContent    = letter.spotifySongName;
-            document.getElementById('storyTrackArtist').textContent  = letter.spotifyArtist || '';
-            const trackId = (letter.spotifyTrackUri || '').split(':')[2] || '';
-            document.getElementById('storySpotifyBtn').href = trackId ? `https://open.spotify.com/track/${trackId}` : '#';
-            musicPanel.style.display = 'flex';
-            noMusic.style.display    = 'none';
-        } else {
-            musicPanel.style.display = 'none';
-            noMusic.style.display    = 'flex';
-        }
+if (letter.spotifySongName) {
+    const trackId = (letter.spotifyTrackUri || '').split(':')[2] || '';
+
+    // Show circular album art design
+    document.getElementById('storyAlbumArt').src            = letter.spotifyImageUrl || '';
+    document.getElementById('storyTrackName').textContent   = letter.spotifySongName;
+    document.getElementById('storyTrackArtist').textContent = letter.spotifyArtist || '';
+    document.getElementById('storySpotifyBtn').href         = trackId
+        ? `https://open.spotify.com/track/${trackId}` : '#';
+
+    // Show all decorative elements
+    document.getElementById('storyAlbumArtWrapper').style.display = 'flex';
+    document.getElementById('storyTrackInfo').style.display       = 'block';
+    document.getElementById('storyWaveform').style.display        = 'flex';
+    document.getElementById('storySpotifyBtn').style.display      = 'flex';
+
+    // Hide embed container
+    const embedContainer = document.getElementById('storyEmbedContainer');
+    if (embedContainer) {
+        embedContainer.innerHTML     = '';
+        embedContainer.style.display = 'none';
     }
 
-    closeStory() {
-        document.getElementById('letterStoryOverlay').classList.remove('active');
-        document.body.style.overflow = 'auto';
+    musicPanel.style.display = 'flex';
+    noMusic.style.display    = 'none';
+} else {
+    const embedContainer = document.getElementById('storyEmbedContainer');
+    if (embedContainer) {
+        embedContainer.innerHTML     = '';
+        embedContainer.style.display = 'none';
     }
+    musicPanel.style.display = 'none';
+    noMusic.style.display    = 'flex';
+}
+    }
+
+closeStory() {
+    document.getElementById('letterStoryOverlay').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    const embed = document.getElementById('storySpotifyEmbed');
+    if (embed) embed.remove();
+}
 
     nextLetter() {
         if (this.currentLetterIndex < this.lettersData.length - 1) {
