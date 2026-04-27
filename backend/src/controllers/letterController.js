@@ -63,7 +63,7 @@ export const createLetter = async (req, res) => {
 export const getAllLetters = async (req, res) => {
   try {
     const letters = await Letter.find()
-      .populate("user_id", "username display_name avatar_url") // ← add this
+      .populate("user_id", "username display_name avatar_url") 
       .sort({ createdAt: -1 });
     res.status(200).json(letters);
   } catch (error) {
