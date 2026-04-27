@@ -2,6 +2,7 @@ import express from "express";
 import {
   createPost,
   getPosts,
+  getPostById,
   reactToPost,
   addComment,
   sharePost,
@@ -19,7 +20,7 @@ router.get("/", getPosts);
 
  
 router.get("/spotify/search", searchSpotify);
-
+router.get("/:id", authMiddleware, getPostById);
 router.post("/:id/react", authMiddleware, reactToPost);
 router.post("/:id/comment", authMiddleware, addComment);
 router.post("/:id/share", authMiddleware, sharePost);
