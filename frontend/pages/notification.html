@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DearBUP – Notifications</title>
+
+  <link rel="stylesheet" href="../CSS/style.css" />
+  <link rel="stylesheet" href="../CSS/notification.css" />
+  <link rel="stylesheet" href="../CSS/sidebar.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+  <!-- ── Sidebar ───────────────────────────────────────────── -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <img src="../images/Logo.svg" class="logo-img" alt="DearBUP" />
+        <span>DearBUP</span>
+      </div>
+    </div>
+
+    <nav class="flex-1 px-6 space-y-2">
+        <a
+          href="home.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-home w-6 text-lg"></i>
+
+          <span>Home</span>
+        </a>
+
+        <a href="notification.html" class="nav-item active" style="position: relative; overflow: hidden;">
+          <i class="fas fa-bell w-6 text-lg"></i>
+          <span>Notifications</span>
+          <span 
+            class="notification-badge" 
+            id="notificationBadge" 
+            style="display:none;"
+          ></span>
+        </a>
+
+        <a
+          href="profile.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-user w-6 text-lg"></i>
+
+          <span>Profile</span>
+        </a>
+
+        <a
+          href="organization.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-users w-6 text-lg"></i>
+
+          <span>Organizations</span>
+        </a>
+      </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">?</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name"   id="sidebarName">Loading…</div>
+          <div class="sidebar-user-course" id="sidebarCourse"></div>
+        </div>
+        <button id="logoutBtn" class="sidebar-logout" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+      <a href="#" id="writePostBtn" class="write-post nav-item">
+        <i class="fas fa-feather-alt"></i> Write
+      </a>
+    </div>
+  </div>
+
+  <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <div class="main-content">
+    <div class="notif-wrapper">
+
+      <!-- Page Header -->
+      <div class="notif-page-header">
+        <div class="notif-header-left">
+          <h1>Notifications</h1>
+          <span class="notif-unread-badge" id="unreadBadge" style="display:none;">0</span>
+        </div>
+        <button class="btn-mark-all" id="markAllBtn" style="display:none;">
+          <i class="fas fa-check-double"></i> Mark all as read
+        </button>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="notif-filter-row">
+        <button class="notif-filter active" data-filter="all">All</button>
+        <button class="notif-filter" data-filter="reaction">
+          <i class="fas fa-heart"></i> Reactions
+        </button>
+        <button class="notif-filter" data-filter="comment">
+          <i class="fas fa-comment"></i> Comments
+        </button>
+        <button class="notif-filter" data-filter="share">
+          <i class="fas fa-share"></i> Shares
+        </button>
+        <button class="notif-filter" data-filter="event">
+          <i class="fas fa-calendar"></i> Events
+        </button>
+        <button class="notif-filter" data-filter="organization">
+          <i class="fas fa-users"></i> Organizations
+        </button>
+      </div>
+
+      <!-- Notification List -->
+      <div class="notif-list" id="notifList">
+        <div class="notif-loader">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Loading notifications…</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- notif-badge runs first to avoid badge showing on this page -->
+  <script src="../js/notification.js"></script>
+</body>
+</html>
