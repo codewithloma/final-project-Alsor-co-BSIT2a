@@ -539,6 +539,39 @@
   </div>
 </div>
 
+<!-- Share Modal -->
+<div class="modal" id="shareModal">
+  <div class="modal-content share-modal-content">
+
+    <!-- Post preview -->
+    <div class="share-modal-post" id="shareModalPost"></div>
+
+    <div class="share-modal-header">
+      <h3>Share Post</h3>
+      <button class="close-modal" id="closeShareModal">&times;</button>
+    </div>
+
+    <div class="share-modal-body">
+      <div class="share-caption-wrap">
+        <div class="share-user-avatar" id="shareUserAvatar"></div>
+        <textarea 
+          id="shareCaptionInput" 
+          placeholder="Say something about this…"
+          maxlength="280"
+          rows="3"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="share-modal-footer">
+      <button class="share-now-btn" id="shareNowBtn">
+        <i class="fas fa-share"></i> Share now
+      </button>
+    </div>
+
+  </div>
+</div>
+
     <script type="module" src="../js/main.js"></script>
   </body>
 </html>
