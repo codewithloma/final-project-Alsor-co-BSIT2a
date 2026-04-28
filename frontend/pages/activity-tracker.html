@@ -32,32 +32,52 @@
       </div>
     </div>
 
-    <nav class="flex-1 px-6 space-y-2">
-      <a href="home.html" class="nav-item">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-      </a>
+     <nav class="flex-1 px-6 space-y-2">
+        <a
+          href="home.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-home w-6 text-lg"></i>
 
-      <a href="#" class="nav-item">
-        <i class="fas fa-bell"></i>
-        <span>Notifications</span>
-      </a>
+          <span>Home</span>
+        </a>
 
-      <a href="#" class="nav-item">
-        <i class="fas fa-user"></i>
-        <span>Profile</span>
-      </a>
+        <a href="notification.html" class="nav-item" style="position: relative; overflow: hidden;">
+          <i class="fas fa-bell w-6 text-lg"></i>
+          <span>Notifications</span>
+          <span 
+            class="notification-badge" 
+            id="notificationBadge" 
+            style="display:none;"
+          ></span>
+        </a>
 
-      <a href="organization.html" class="nav-item">
-        <i class="fas fa-users"></i>
-        <span>Organizations</span>
-      </a>
+        <a
+          href="profile.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-user w-6 text-lg"></i>
 
-      <a href="activity-tracker.html" class="nav-item active">
-        <i class="fas fa-calendar-alt"></i>
-        <span>Activity Tracker</span>
-      </a>
-    </nav>
+          <span>Profile</span>
+        </a>
+
+        <a
+          href="organization.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-users w-6 text-lg"></i>
+
+          <span>Organizations</span>
+        </a>
+        
+        <a
+          href="activity-tracker.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item active overflow-hidden"
+        >
+          <i class="fas fa-calendar-alt w-6 text-lg"></i>
+          <span>Activity Tracker</span>
+        </a>
+      </nav>
 
     <div class="p-6 space-y-3">
       <a href="#" class="write-post flex items-center justify-center gap-3 w-full">
