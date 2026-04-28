@@ -236,71 +236,104 @@ function renderPosts(posts, user) {
   const authorName  = user.display_name || user.username || "You";
   const authorInits = getInitials(authorName);
 
-  container.innerHTML = posts.map((p, i) => {
-    const spotifyId = extractSpotifyId(p.spotify_track_url);
-    
+container.innerHTML = posts.map((p, i) => {
+
+    // Spotify embed (only for non-shared posts)
+    let spotifyHtml = '';
+    if (p.spotify_track_url && !p.shared_from) {
+        const spotifyId = extractSpotifyId(p.spotify_track_url);
+        if (spotifyId) {
+            spotifyHtml = `
+                <div class="post-spotify-embed" style="margin:12px 0;border-radius:12px;overflow:hidden;">
+                    <iframe src="https://open.spotify.com/embed/track/${spotifyId}"
+                        width="100%" height="80" frameborder="0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy" style="border-radius:12px;display:block;">
+                    </iframe>
+                </div>`;
+        }
+    }
+
+    // Shared post card
+    let sharedHtml = '';
+    if (p.shared_from && p.shared_from._id) {
+        const orig     = p.shared_from;
+        const origUser = orig.user_id;
+        const origName = origUser?.display_name || origUser?.username || 'Someone';
+        const origAvatar = origUser?.avatar_url
+            ? `<img src="${escapeHTML(origUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : origName.charAt(0).toUpperCase();
+
+        let origSpotify = '';
+        if (orig.spotify_track_url) {
+            const origId = extractSpotifyId(orig.spotify_track_url);
+            if (origId) {
+                origSpotify = `
+                    <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
+                        <iframe src="https://open.spotify.com/embed/track/${origId}"
+                            width="100%" height="80" frameborder="0"
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy" style="border-radius:12px;display:block;">
+                        </iframe>
+                    </div>`;
+            }
+        }
+
+        sharedHtml = `
+            <div class="shared-post-card">
+                <div class="shared-post-header">
+                    <div class="shared-post-avatar">${origAvatar}</div>
+                    <div class="shared-post-meta">
+                        <div class="shared-post-author">${escapeHTML(origName)}</div>
+                        <div class="shared-post-time">${timeAgo(orig.createdAt || orig.created_at)}</div>
+                    </div>
+                </div>
+                ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
+                ${origSpotify}
+            </div>`;
+    }
+
     return `
     <div class="post-card" style="animation-delay:${i * 0.06}s">
-      <div class="post-card-header">
-        <div class="pc-avatar">
-          ${user.avatar_url
-            ? `<img src="${escapeHTML(user.avatar_url)}" alt="" />`
-            : authorInits}
+        <div class="post-card-header">
+            <div class="pc-avatar">
+                ${user.avatar_url
+                    ? `<img src="${escapeHTML(user.avatar_url)}" alt="" />`
+                    : authorInits}
+            </div>
+            <div class="pc-meta">
+                <div class="name">${escapeHTML(authorName)}</div>
+                <div class="time">${timeAgo(p.createdAt || p.created_at)}</div>
+            </div>
         </div>
-        <div class="pc-meta">
-          <div class="name">${escapeHTML(authorName)}</div>
-          <div class="time">${timeAgo(p.createdAt || p.created_at)}</div>
+        ${p.content ? `<div class="post-card-body">${formatContent(p.content)}</div>` : ''}
+        ${spotifyHtml}
+        ${sharedHtml}
+        <div class="post-card-footer">
+            <button
+                class="pc-action ${p.liked_by_me ? "liked" : ""}"
+                data-action="like"
+                data-post-id="${p._id}"
+                data-liked="${p.liked_by_me ? "1" : "0"}">
+                <i class="fas fa-heart"></i>
+                <span class="like-count">${p.likes_count ?? 0}</span>
+            </button>
+            <button class="pc-action" data-action="comment" data-post-id="${p._id}">
+                <i class="fas fa-comment"></i> ${p.comments_count ?? 0}
+            </button>
+            <button class="pc-action" data-action="share" data-post-id="${p._id}">
+                <i class="fas fa-share"></i>
+            </button>
         </div>
-      </div>
-      <div class="post-card-body">${formatContent(p.content)}</div>
-
-      ${p.media?.type === "image" ? `
-        <div class="post-media" style="margin-top:12px; border-radius:12px; overflow:hidden;">
-            <img src="${p.media.url}" style="width:100%; display:block;" />
-        </div>
-      ` : ""}
-
-      ${p.media?.type === "video" ? `
-        <div class="post-media" style="margin-top:12px; border-radius:12px; overflow:hidden;">
-            <video controls style="width:100%; display:block;">
-                <source src="${p.media.url}">
-            </video>
-        </div>
-      ` : ""}
-      ${spotifyId ? `
-        <div class="post-spotify-embed" style="margin: 12px 0; border-radius: 12px; overflow: hidden;">
-          <iframe
-            src="https://open.spotify.com/embed/track/${spotifyId}"
-            width="100%"
-            height="80"
-            frameborder="0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"
-            style="border-radius: 12px; display: block;">
-          </iframe>
-        </div>` : ""}
-
-      <div class="post-card-footer">
-        <button
-          class="pc-action ${p.liked_by_me ? "liked" : ""}"
-          data-action="like"
-          data-post-id="${p._id}"
-          data-liked="${p.liked_by_me ? "1" : "0"}">
-          <i class="fas fa-heart"></i>
-          <span class="like-count">${p.reactions?.length || p.likes_count || 0}</span>
-        </button>
-        <button class="pc-action" data-action="comment" data-post-id="${p._id}">
-          <i class="fas fa-comment"></i> ${p.comments?.length || p.comments_count || 0}
-        </button>
-        <button class="pc-action" data-action="share" data-post-id="${p._id}">
-          <i class="fas fa-share"></i>
-        </button>
-      </div>
-    </div>`}).join("");
+    </div>`;
+}).join("");
 
   container.querySelectorAll('[data-action="like"]').forEach((btn) =>
     btn.addEventListener("click", () => handleLike(btn))
   );
+  container.querySelectorAll('[data-action="comment"]').forEach((btn) =>
+  btn.addEventListener("click", () => openCommentModal(btn.dataset.postId))
+);
 }
 
 function extractSpotifyId(url = "") {
@@ -577,6 +610,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("closeEditModal")?.addEventListener("click", closeEditModal);
   document.getElementById("cancelEditBtn")?.addEventListener("click", closeEditModal);
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfile);
+  document.getElementById('closeCommentModal')?.addEventListener('click', closeCommentModal);
+  document.getElementById('commentModal')?.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('commentModal')) closeCommentModal();
+  });
+  document.getElementById('commentSubmitBtn')?.addEventListener('click', submitProfileComment);
+  document.getElementById('commentInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitProfileComment();
+  });
 
   document.getElementById("editModal")?.addEventListener("click", (e) => {
     if (e.target === e.currentTarget) closeEditModal();
@@ -636,6 +677,195 @@ async function initNotificationBadge() {
   }
 }
 
+// ── Comment Modal ─────────────────────────────────────────
+let _activeCommentPostId = null;
+
+function openCommentModal(postId) {
+    _activeCommentPostId = postId;
+    const modal    = document.getElementById('commentModal');
+    const list     = document.getElementById('commentsList');
+    const input    = document.getElementById('commentInput');
+    const preview  = document.getElementById('commentModalPost');
+    const inputAvatar = document.getElementById('commentInputAvatar');
+
+    // Show current user avatar
+    if (inputAvatar && _currentUser) {
+        inputAvatar.innerHTML = _currentUser.avatar_url
+            ? `<img src="${escapeHTML(_currentUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : getInitials(_currentUser.display_name || _currentUser.username);
+    }
+
+    // Fetch post data to show preview and comments
+    fetch(`${API_BASE}/posts/${postId}`, { headers: authHeaders() })
+        .then(r => r.json())
+        .then(post => {
+            // Post preview
+            if (preview) {
+                const user       = post.user_id;
+                const authorName = user?.display_name || user?.username || 'Anonymous';
+                const avatarHtml = user?.avatar_url
+                    ? `<img src="${escapeHTML(user.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+                    : authorName.charAt(0).toUpperCase();
+
+                let postSpotify = '';
+                if (post.spotify_track_url && !post.shared_from) {
+                    const id = extractSpotifyId(post.spotify_track_url);
+                    if (id) postSpotify = `
+                        <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
+                            <iframe src="https://open.spotify.com/embed/track/${id}"
+                                width="100%" height="80" frameborder="0"
+                                allow="encrypted-media" loading="lazy"
+                                style="border-radius:12px;display:block;"></iframe>
+                        </div>`;
+                }
+
+                let sharedHtml = '';
+                if (post.shared_from && post.shared_from._id) {
+                    const orig     = post.shared_from;
+                    const origUser = orig.user_id;
+                    const origName = origUser?.display_name || origUser?.username || 'Someone';
+                    const origAvatar = origUser?.avatar_url
+                        ? `<img src="${escapeHTML(origUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+                        : origName.charAt(0).toUpperCase();
+
+                    let origSpotify = '';
+                    if (orig.spotify_track_url) {
+                        const id = extractSpotifyId(orig.spotify_track_url);
+                        if (id) origSpotify = `
+                            <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
+                                <iframe src="https://open.spotify.com/embed/track/${id}"
+                                    width="100%" height="80" frameborder="0"
+                                    allow="encrypted-media" loading="lazy"
+                                    style="border-radius:12px;display:block;"></iframe>
+                            </div>`;
+                    }
+
+                    sharedHtml = `
+                        <div class="shared-post-card">
+                            <div class="shared-post-header">
+                                <div class="shared-post-avatar">${origAvatar}</div>
+                                <div class="shared-post-meta">
+                                    <div class="shared-post-author">${escapeHTML(origName)}</div>
+                                </div>
+                            </div>
+                            ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
+                            ${origSpotify}
+                        </div>`;
+                }
+
+                preview.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;overflow:hidden;flex-shrink:0;">
+                            ${avatarHtml}
+                        </div>
+                        <div>
+                            <div style="font-size:14px;font-weight:600;color:#fff;">${escapeHTML(authorName)}</div>
+                            <div style="font-size:12px;color:rgba(255,255,255,0.5);">${timeAgo(post.createdAt)}</div>
+                        </div>
+                    </div>
+                    ${post.content ? `<div style="font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:8px;">${formatContent(post.content)}</div>` : ''}
+                    ${postSpotify}
+                    ${sharedHtml}
+                    <div style="font-size:12px;color:rgba(255,255,255,0.4);display:flex;gap:12px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);">
+                        <span><i class="fas fa-heart" style="color:#e06a72"></i> ${post.reactions?.length || 0}</span>
+                        <span><i class="far fa-comment"></i> ${post.comments?.length || 0} comments</span>
+                    </div>`;
+            }
+
+            // Render comments
+            list.innerHTML = '';
+            const comments = post.comments || [];
+            if (comments.length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);font-size:13px;padding:20px 0;">No comments yet. Be the first!</div>';
+            } else {
+                comments.forEach(c => {
+                    const name   = c.user_id?.display_name || c.user_id?.username || 'User';
+                    const avatar = c.user_id?.avatar_url
+                        ? `<img src="${escapeHTML(c.user_id.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+                        : name.charAt(0).toUpperCase();
+
+                    const item = document.createElement('div');
+                    item.style.cssText = 'display:flex;align-items:flex-start;gap:8px;';
+                    item.innerHTML = `
+                        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden;">
+                            ${avatar}
+                        </div>
+                        <div style="background:#3a3b3c;border-radius:18px;padding:8px 14px;">
+                            <div style="font-size:13px;font-weight:600;color:#fff;">${escapeHTML(name)}</div>
+                            <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${escapeHTML(c.text)}</div>
+                        </div>`;
+                    list.appendChild(item);
+                });
+            }
+        })
+        .catch(() => {
+            list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px 0;">Could not load comments.</div>';
+        });
+
+    if (input) input.value = '';
+    modal.style.display = 'flex';
+    if (input) input.focus();
+}
+
+function closeCommentModal() {
+    document.getElementById('commentModal').style.display = 'none';
+    _activeCommentPostId = null;
+}
+
+async function submitProfileComment() {
+    const input  = document.getElementById('commentInput');
+    const text   = input?.value.trim();
+    const postId = _activeCommentPostId;
+    if (!text || !postId) return;
+
+    const btn = document.getElementById('commentSubmitBtn');
+    if (btn) btn.disabled = true;
+
+    try {
+        const res = await fetch(`${API_BASE}/posts/${postId}/comment`, {
+            method:  'POST',
+            headers: authHeaders(),
+            body:    JSON.stringify({ text })
+        });
+
+        if (!res.ok) throw new Error('Failed');
+        const comments = await res.json();
+
+        // Update count on post card
+        const countEl = document.querySelector(`.post-card [data-post-id="${postId}"][data-action="comment"]`);
+        if (countEl) countEl.innerHTML = `<i class="fas fa-comment"></i> ${comments.length}`;
+
+        // Add to list
+        const list  = document.getElementById('commentsList');
+        const empty = list.querySelector('[style*="No comments"]');
+        if (empty) empty.remove();
+
+        const avatar = _currentUser?.avatar_url
+            ? `<img src="${escapeHTML(_currentUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : getInitials(_currentUser?.display_name || _currentUser?.username || 'U');
+
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:flex-start;gap:8px;';
+        item.innerHTML = `
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden;">
+                ${avatar}
+            </div>
+            <div style="background:#3a3b3c;border-radius:18px;padding:8px 14px;">
+                <div style="font-size:13px;font-weight:600;color:#fff;">${escapeHTML(_currentUser?.display_name || _currentUser?.username || 'You')}</div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${escapeHTML(text)}</div>
+            </div>`;
+        list.appendChild(item);
+        list.scrollTop = list.scrollHeight;
+
+        if (input) input.value = '';
+        showToast('Comment posted! 💬', 'success');
+
+    } catch {
+        showToast('Could not post comment.', 'error');
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   initNotificationBadge();
