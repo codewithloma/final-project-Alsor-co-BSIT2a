@@ -60,6 +60,14 @@
 
           <span>Organizations</span>
         </a>
+        
+        <a
+          href="activity-tracker.html"
+          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
+        >
+          <i class="fas fa-calendar-alt w-6 text-lg"></i>
+          <span>Activity Tracker</span>
+        </a>
       </nav>
 
     <div class="sidebar-footer">
@@ -87,8 +95,6 @@
     <!-- Cover -->
     <div class="profile-cover" id="profileCover">
       <div class="cover-pattern"></div>
-      <button class="edit-cover-btn" id="editCoverBtn">
-        <i class="fas fa-camera"></i> Edit cover
       </button>
     </div>
 
@@ -96,9 +102,6 @@
     <div class="profile-info-strip">
       <div class="avatar-wrap">
         <div class="profile-avatar" id="profileAvatar">?</div>
-        <div class="avatar-edit" id="avatarEditBtn" title="Change photo">
-          <i class="fas fa-camera"></i>
-        </div>
       </div>
 
       <div class="profile-main-row">
@@ -171,7 +174,7 @@
         <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
         <button class="em-close" id="closeEditModal"><i class="fas fa-times"></i></button>
       </div>
-      <div class="em-body">
+       <div class="em-body">
         <div class="em-field">
           <label for="editDisplayName">Display Name</label>
           <input type="text" id="editDisplayName" placeholder="Your display name" maxlength="60" autocomplete="name" />
@@ -181,34 +184,58 @@
           <textarea id="editBioInput" placeholder="Tell the BUP community about yourself…" maxlength="160"></textarea>
           <span class="char-hint"><span id="bioCharCount">0</span>/160</span>
         </div>
-            <div class="em-field">
-              <label>Profile Photo</label>
-              <div class="avatar-upload-wrap" id="avatarUploadWrap">
-                <div class="avatar-preview" id="avatarPreview"></div>
-                <label for="avatarFileInput" class="avatar-upload-btn">
-                  <i class="fas fa-camera"></i> Choose Photo
-                </label>
-                <input
-                  type="file"
-                  id="avatarFileInput"
-                  accept="image/*"
-                  style="display: none;"
-                />
-                <p class="avatar-upload-hint" id="avatarUploadHint">No file chosen</p>
-              </div>
-              <input type="hidden" id="editAvatarUrl" />
-            </div>
+        <div class="em-field">
+          <label>Profile Photo</label>
+          <div class="avatar-upload-wrap" id="avatarUploadWrap">
+            <div class="avatar-preview" id="avatarPreview"></div>
+            <label for="avatarFileInput" class="avatar-upload-btn">
+              <i class="fas fa-camera"></i> Choose Photo
+            </label>
+            <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
+            <p class="avatar-upload-hint" id="avatarUploadHint">No file chosen</p>
+          </div>
+          <input type="hidden" id="editAvatarUrl" />
+        </div>
+      </div>  
+
       <div class="em-footer">
         <button class="btn-cancel-em" id="cancelEditModal">Cancel</button>
-        <button class="btn-save-em"   id="saveProfileBtn">
+        <button class="btn-save-em" id="saveProfileBtn">
           <i class="fas fa-check"></i> Save Changes
         </button>
       </div>
     </div>
   </div>
+  </div>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
+
+  <!-- Comment Modal -->
+<div class="modal-overlay" id="commentModal" style="display:none;">
+  <div class="edit-modal" style="max-width:600px; padding:0; overflow:hidden;">
+
+    <div id="commentModalPost" style="padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.1);"></div>
+
+    <div style="padding:12px 20px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-weight:700; font-size:16px; color:#fff;">Comments</span>
+      <button class="em-close" id="closeCommentModal"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div id="commentsList" style="max-height:300px; overflow-y:auto; padding:12px 20px; display:flex; flex-direction:column; gap:12px;"></div>
+
+    <div style="display:flex; align-items:center; gap:8px; padding:12px 20px; border-top:1px solid rgba(255,255,255,0.1);">
+      <div id="commentInputAvatar" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px;flex-shrink:0;overflow:hidden;"></div>
+      <input type="text" id="commentInput" placeholder="Write a comment…" maxlength="200"
+        style="flex:1;padding:10px 16px;border:none;border-radius:50px;background:#3a3b3c;color:#fff;font-family:inherit;font-size:14px;outline:none;" />
+      <button id="commentSubmitBtn"
+        style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
 
   <script src="../js/profile.js"></script>
 </body>
