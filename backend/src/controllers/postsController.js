@@ -18,7 +18,7 @@ export const createPost = async (req, res) => {
 
     const post = await Post.create({
       user_id: req.user.id,
-      content:           caption || '',
+      content:           content || '',
       design_template,
       spotify_track_url,
       is_anonymous: is_anonymous || false,
@@ -162,27 +162,36 @@ export const addComment = async (req, res) => {
 };
 
 // ---------------- SHARE ----------------
-  export const sharePost = async (req, res) => {
+export const sharePost = async (req, res) => {
   try {
-    const original = await Post.findById(req.params.id);
-    const { caption } = req.body; // ← get caption
+    const postToShare = await Post.findById(req.params.id);
+    const { caption } = req.body;
+
+    // ← If this post is already a share, point to the ORIGINAL post
+    const originalId = postToShare.shared_from 
+      ? postToShare.shared_from 
+      : postToShare._id;
+
+    // Fetch the actual original post for the content/spotify
+    const originalPost = await Post.findById(originalId);
 
     const shared = await Post.create({
       user_id:           req.user.id,
-      content:           caption || '',  
-      design_template:   original.design_template,
-      spotify_track_url: original.spotify_track_url,
-      shared_from:       original._id,
+      content:           caption || '',
+      design_template:   originalPost.design_template,
+      spotify_track_url: originalPost.spotify_track_url,
+      shared_from:       originalId, // ← always points to the root original
     });
 
-    if (original.user_id.toString() !== req.user.id) {
+    // Notify the ORIGINAL post owner, not the sharer
+    if (originalPost.user_id.toString() !== req.user.id) {
       const sender = await User.findById(req.user.id).select("display_name username");
       await Notification.create({
-        user_id:    original.user_id,
+        user_id:    originalPost.user_id,
         from_user:  req.user.id,
         type:       "share",
         message:    `${sender.display_name || sender.username} shared your post`,
-        related_id: original._id,
+        related_id: originalId,
       });
     }
 
