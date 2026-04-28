@@ -636,8 +636,8 @@ async function initNotificationBadge() {
   }
 }
 
-// Call it on load, then repeat every 30s
+
 document.addEventListener("DOMContentLoaded", () => {
   initNotificationBadge();
-  setInterval(initNotificationBadge, 30000); // Corrected from 3000 to 30s
+  setInterval(initNotificationBadge, 3000);
 });
