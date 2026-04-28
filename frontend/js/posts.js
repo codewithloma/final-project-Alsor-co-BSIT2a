@@ -365,9 +365,9 @@ createPostElement(post) {
 // --- COMMENTS ---
 openCommentModal(postId, post) {
     this._activePostId = postId;
-    const modal    = document.getElementById('commentModal');
-    const list     = document.getElementById('commentsList');
-    const input    = document.getElementById('commentInput');
+    const modal       = document.getElementById('commentModal');
+    const list        = document.getElementById('commentsList');
+    const input       = document.getElementById('commentInput');
     const postPreview = document.getElementById('commentModalPost');
 
     // Show post preview at top
@@ -378,55 +378,69 @@ openCommentModal(postId, post) {
             ? `<img src="${user.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
             : authorName.charAt(0).toUpperCase();
 
-let sharedHtml = '';
-if (post.shared_from && typeof post.shared_from === 'object') {
-    const orig       = post.shared_from;
-    const origUser   = orig.user_id;
-    const origName   = origUser?.display_name || origUser?.username || 'Someone';
-    const origAvatar = origUser?.avatar_url
-        ? `<img src="${origUser.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-        : origName.charAt(0).toUpperCase();
+        // Spotify for main post
+        let postSpotify = '';
+        if (post.spotify_track_url && !post.shared_from) {
+            const embedUrl = post.spotify_track_url.replace('/track/', '/embed/track/');
+            postSpotify = `
+                <div style="margin-top:10px; border-radius:12px; overflow:hidden;">
+                    <iframe src="${embedUrl}" width="100%" height="80" frameborder="0"
+                        allowtransparency="true" allow="encrypted-media" loading="lazy"
+                        style="border-radius:12px; display:block;"></iframe>
+                </div>`;
+        }
 
-    // ← ADD Spotify embed for shared post
-    let origSpotify = '';
-    if (orig.spotify_track_url) {
-        const embedUrl = orig.spotify_track_url.replace('/track/', '/embed/track/');
-        origSpotify = `
-            <div style="margin-top:10px; border-radius:12px; overflow:hidden;">
-                <iframe src="${embedUrl}" width="100%" height="80" frameborder="0"
-                    allowtransparency="true" allow="encrypted-media" loading="lazy"
-                    style="border-radius:12px; display:block;"></iframe>
-            </div>`;
-    }
+        // Shared post card
+        let sharedHtml = '';
+        if (post.shared_from && post.shared_from._id) {
+            const orig       = post.shared_from;
+            const origUser   = orig.user_id;
+            const origName   = origUser?.display_name || origUser?.username || 'Someone';
+            const origAvatar = origUser?.avatar_url
+                ? `<img src="${origUser.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+                : origName.charAt(0).toUpperCase();
 
-    sharedHtml = `
-        <div class="shared-post-card">
-            <div class="shared-post-header">
-                <div class="shared-post-avatar">${origAvatar}</div>
-                <div class="shared-post-meta">
-                    <div class="shared-post-author">${origName}</div>
-                    <div class="shared-post-time">${formatTime(orig.createdAt)}</div>
+            let origSpotify = '';
+            if (orig.spotify_track_url) {
+                const embedUrl = orig.spotify_track_url.replace('/track/', '/embed/track/');
+                origSpotify = `
+                    <div style="margin-top:10px; border-radius:12px; overflow:hidden;">
+                        <iframe src="${embedUrl}" width="100%" height="80" frameborder="0"
+                            allowtransparency="true" allow="encrypted-media" loading="lazy"
+                            style="border-radius:12px; display:block;"></iframe>
+                    </div>`;
+            }
+
+            sharedHtml = `
+                <div class="shared-post-card">
+                    <div class="shared-post-header">
+                        <div class="shared-post-avatar">${origAvatar}</div>
+                        <div class="shared-post-meta">
+                            <div class="shared-post-author">${origName}</div>
+                            <div class="shared-post-time">${formatTime(orig.createdAt)}</div>
+                        </div>
+                    </div>
+                    <div class="shared-post-content">${formatContent(orig.content || '')}</div>
+                    ${origSpotify}
+                </div>`;
+        }
+
+        // Single clean innerHTML assignment
+        postPreview.innerHTML = `
+            <div class="cmp-header">
+                <div class="cmp-avatar">${avatarHtml}</div>
+                <div class="cmp-meta">
+                    <div class="cmp-author">${authorName}</div>
+                    <div class="cmp-time">${formatTime(post.createdAt)}</div>
                 </div>
             </div>
-            <div class="shared-post-content">${formatContent(orig.content || '')}</div>
-            ${origSpotify}
-        </div>`;       
-}
-
-postPreview.innerHTML = `
-    <div class="cmp-header">
-        <div class="cmp-avatar">${avatarHtml}</div>
-        <div class="cmp-meta">
-            <div class="cmp-author">${authorName}</div>
-            <div class="cmp-time">${formatTime(post.createdAt)}</div>
-        </div>
-    </div>
-    <div class="cmp-content">${formatContent(post.content || '')}</div>
-    ${sharedHtml}
-    <div class="cmp-stats">
-        <span><i class="fas fa-heart" style="color:#e06a72"></i> ${post.reactions?.length || 0}</span>
-        <span><i class="far fa-comment"></i> ${post.comments?.length || 0} comments</span>
-    </div>`;
+            ${post.content ? `<div class="cmp-content">${formatContent(post.content)}</div>` : ''}
+            ${postSpotify}
+            ${sharedHtml}
+            <div class="cmp-stats">
+                <span><i class="fas fa-heart" style="color:#e06a72"></i> ${post.reactions?.length || 0}</span>
+                <span><i class="far fa-comment"></i> ${post.comments?.length || 0} comments</span>
+            </div>`;
     }
 
     // Show current user avatar in input area
