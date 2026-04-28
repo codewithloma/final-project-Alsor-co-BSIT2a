@@ -14,6 +14,7 @@ export class PostManager {
         this.closeModalBtn   = document.getElementById('closeModal');
         this.logoutBtn       = document.getElementById('logoutBtn'); // Added selector
         this._activePostId = null;
+        this._sharePostId   = null;
         this.selectedTrack      = null;
         this.spotifySearchTimer = null;
 
@@ -52,6 +53,11 @@ export class PostManager {
         document.getElementById('commentInput')?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') this.submitComment();
         });
+        document.getElementById('closeShareModal')?.addEventListener('click', () => this.closeShareModal());
+        document.getElementById('shareModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('shareModal')) this.closeShareModal();
+        });
+        document.getElementById('shareNowBtn')?.addEventListener('click', () => this.submitShare());
     }
 
     // --- SPOTIFY SEARCH ---
@@ -253,10 +259,11 @@ createPostElement(post) {
             const post = res.ok ? await res.json() : { comments: [] };
             this.openCommentModal(postId, post);
         } else if (action === 'share') {
-            try {
-                const res = await fetch(`${API}/posts/${postId}/share`, { method: 'POST', headers: authHeaders() });
-                if (res.ok) { showToast('Post shared! ✨'); this.loadPosts(); }
-            } catch { showToast('Failed to share'); }
+            const res = await fetch(`${API}/posts/${postId}`, {
+                headers: authHeaders()
+            });
+            const post = res.ok ? await res.json() : {};
+            this.openShareModal(postId, post);
         }
     }
 // --- MEDIA UPLOAD ---
@@ -520,6 +527,90 @@ async submitComment() {
         showToast('Could not post comment.');
     } finally {
         if (submitBtn) submitBtn.disabled = false;
+    }
+}
+// --- SHARE MODAL ---
+openShareModal(postId, post) {
+    this._sharePostId = postId;
+    const modal      = document.getElementById('shareModal');
+    const postPreview = document.getElementById('shareModalPost');
+    const caption    = document.getElementById('shareCaptionInput');
+    const userAvatar = document.getElementById('shareUserAvatar');
+
+    // Show current user avatar
+    const currentUser = getUser();
+    if (userAvatar) {
+        userAvatar.innerHTML = currentUser?.avatar_url
+            ? `<img src="${currentUser.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : (currentUser?.display_name || currentUser?.name || 'U').charAt(0).toUpperCase();
+    }
+
+    // Show post preview
+    if (postPreview) {
+        const user       = post.user_id;
+        const authorName = user?.display_name || user?.username || 'Anonymous';
+        const avatarHtml = user?.avatar_url
+            ? `<img src="${user.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : authorName.charAt(0).toUpperCase();
+
+        let spotifyHtml = '';
+        if (post.spotify_track_url) {
+            const embedUrl = post.spotify_track_url.replace('/track/', '/embed/track/');
+            spotifyHtml = `
+                <div style="margin-top:10px; border-radius:10px; overflow:hidden;">
+                    <iframe src="${embedUrl}" width="100%" height="80" frameborder="0"
+                        allow="encrypted-media" loading="lazy"
+                        style="border-radius:10px; display:block;"></iframe>
+                </div>`;
+        }
+
+        postPreview.innerHTML = `
+            <div class="smp-header">
+                <div class="smp-avatar">${avatarHtml}</div>
+                <div>
+                    <div class="smp-author">${authorName}</div>
+                    <div class="smp-time">${formatTime(post.createdAt)}</div>
+                </div>
+            </div>
+            <div class="smp-content">${formatContent(post.content || '')}</div>
+            ${spotifyHtml}`;
+    }
+
+    if (caption) caption.value = '';
+    modal.classList.add('active');
+    if (caption) caption.focus();
+}
+
+closeShareModal() {
+    document.getElementById('shareModal')?.classList.remove('active');
+    this._sharePostId = null;
+}
+
+async submitShare() {
+    const postId  = this._sharePostId;
+    const caption = document.getElementById('shareCaptionInput')?.value.trim() || '';
+    
+    if (!postId) return; // ← only block if no postId, NOT if caption is empty
+
+    const btn = document.getElementById('shareNowBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sharing…'; }
+
+    try {
+        const res = await fetch(`${API}/posts/${postId}/share`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ caption }) // ← caption can be empty string
+        });
+
+        if (res.ok) {
+            this.closeShareModal();
+            await this.loadPosts();
+            showToast('Post shared! ✨');
+        }
+    } catch {
+        showToast('Failed to share');
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-share"></i> Share now'; }
     }
 }
 
