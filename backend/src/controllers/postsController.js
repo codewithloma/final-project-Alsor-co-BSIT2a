@@ -191,7 +191,7 @@ export const sharePost = async (req, res) => {
         from_user:  req.user.id,
         type:       "share",
         message:    `${sender.display_name || sender.username} shared your post`,
-        related_id: originalId,
+        related_id: shared._id,
       });
     }
 
