@@ -148,7 +148,7 @@ async function apiGetUserPosts(userId) {
 }
 
 async function apiToggleLike(postId) {
-  const res = await fetch(`${API_BASE}/posts/${postId}/like`, {
+  const res = await fetch(`${API_BASE}/posts/${postId}/react`, {
     method: "POST",
     headers: authHeaders(),
   });
@@ -236,106 +236,158 @@ function renderPosts(posts, user) {
   const authorName  = user.display_name || user.username || "You";
   const authorInits = getInitials(authorName);
 
-container.innerHTML = posts.map((p, i) => {
+  container.innerHTML = posts.map((p, i) => {
 
-    // Spotify embed (only for non-shared posts)
     let spotifyHtml = '';
     if (p.spotify_track_url && !p.shared_from) {
-        const spotifyId = extractSpotifyId(p.spotify_track_url);
-        if (spotifyId) {
-            spotifyHtml = `
-                <div class="post-spotify-embed" style="margin:12px 0;border-radius:12px;overflow:hidden;">
-                    <iframe src="https://open.spotify.com/embed/track/${spotifyId}"
-                        width="100%" height="80" frameborder="0"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy" style="border-radius:12px;display:block;">
-                    </iframe>
-                </div>`;
-        }
+      const id = extractSpotifyId(p.spotify_track_url);
+      if (id) spotifyHtml = `
+        <div class="post-spotify-embed" style="margin:12px 0;border-radius:12px;overflow:hidden;">
+          <iframe src="https://open.spotify.com/embed/track/${id}"
+            width="100%" height="80" frameborder="0"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy" style="border-radius:12px;display:block;"></iframe>
+        </div>`;
     }
 
-    // Shared post card
     let sharedHtml = '';
     if (p.shared_from && p.shared_from._id) {
-        const orig     = p.shared_from;
-        const origUser = orig.user_id;
-        const origName = origUser?.display_name || origUser?.username || 'Someone';
-        const origAvatar = origUser?.avatar_url
-            ? `<img src="${escapeHTML(origUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-            : origName.charAt(0).toUpperCase();
+      const orig     = p.shared_from;
+      const origUser = orig.user_id;
+      const origName = origUser?.display_name || origUser?.username || 'Someone';
+      const origAvatar = origUser?.avatar_url
+        ? `<img src="${escapeHTML(origUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+        : origName.charAt(0).toUpperCase();
 
-        let origSpotify = '';
-        if (orig.spotify_track_url) {
-            const origId = extractSpotifyId(orig.spotify_track_url);
-            if (origId) {
-                origSpotify = `
-                    <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
-                        <iframe src="https://open.spotify.com/embed/track/${origId}"
-                            width="100%" height="80" frameborder="0"
-                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                            loading="lazy" style="border-radius:12px;display:block;">
-                        </iframe>
-                    </div>`;
-            }
-        }
+      let origSpotify = '';
+      if (orig.spotify_track_url) {
+        const id = extractSpotifyId(orig.spotify_track_url);
+        if (id) origSpotify = `
+          <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
+            <iframe src="https://open.spotify.com/embed/track/${id}"
+              width="100%" height="80" frameborder="0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy" style="border-radius:12px;display:block;"></iframe>
+          </div>`;
+      }
 
-        sharedHtml = `
-            <div class="shared-post-card">
-                <div class="shared-post-header">
-                    <div class="shared-post-avatar">${origAvatar}</div>
-                    <div class="shared-post-meta">
-                        <div class="shared-post-author">${escapeHTML(origName)}</div>
-                        <div class="shared-post-time">${timeAgo(orig.createdAt || orig.created_at)}</div>
-                    </div>
-                </div>
-                ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
-                ${origSpotify}
-            </div>`;
+      sharedHtml = `
+        <div class="shared-post-card">
+          <div class="shared-post-header">
+            <div class="shared-post-avatar">${origAvatar}</div>
+            <div class="shared-post-meta">
+              <div class="shared-post-author">${escapeHTML(origName)}</div>
+              <div class="shared-post-time">${timeAgo(orig.createdAt || orig.created_at)}</div>
+            </div>
+          </div>
+          ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
+          ${origSpotify}
+        </div>`;
     }
 
     return `
-    <div class="post-card" style="animation-delay:${i * 0.06}s">
-        <div class="post-card-header">
-            <div class="pc-avatar">
-                ${user.avatar_url
-                    ? `<img src="${escapeHTML(user.avatar_url)}" alt="" />`
-                    : authorInits}
-            </div>
-            <div class="pc-meta">
-                <div class="name">${escapeHTML(authorName)}</div>
-                <div class="time">${timeAgo(p.createdAt || p.created_at)}</div>
-            </div>
+    <div class="post-card" data-post-id="${p._id}" style="animation-delay:${i * 0.06}s">
+      <div class="post-card-header">
+        <div class="pc-avatar">
+          ${user.avatar_url ? `<img src="${escapeHTML(user.avatar_url)}" alt="" />` : authorInits}
         </div>
-        ${p.content ? `<div class="post-card-body">${formatContent(p.content)}</div>` : ''}
-        ${spotifyHtml}
-        ${sharedHtml}
-        <div class="post-card-footer">
-            <button
-                class="pc-action ${p.liked_by_me ? "liked" : ""}"
-                data-action="like"
-                data-post-id="${p._id}"
-                data-liked="${p.liked_by_me ? "1" : "0"}">
-                <i class="fas fa-heart"></i>
-                <span class="like-count">${p.likes_count ?? 0}</span>
-            </button>
-            <button class="pc-action" data-action="comment" data-post-id="${p._id}">
-                <i class="fas fa-comment"></i> ${p.comments_count ?? 0}
-            </button>
-            <button class="pc-action" data-action="share" data-post-id="${p._id}">
-                <i class="fas fa-share"></i>
-            </button>
+        <div class="pc-meta">
+          <div class="name">${escapeHTML(authorName)}</div>
+          <div class="time">${timeAgo(p.createdAt || p.created_at)}</div>
         </div>
+        <div class="post-menu" style="position:relative;margin-left:auto;">
+          <button class="post-menu-btn" data-menu="${p._id}">
+            <i class="fas fa-ellipsis-h"></i>
+          </button>
+          <div class="post-menu-dropdown" id="menu-${p._id}">
+            <a href="#" data-action="edit" data-post-id="${p._id}">
+              <i class="fas fa-pen"></i> Edit post
+            </a>
+            <a href="#" data-action="delete" data-post-id="${p._id}">
+              <i class="fas fa-trash-alt"></i> Delete post
+            </a>
+          </div>
+        </div>
+      </div>
+      ${p.content ? `<div class="post-card-body">${formatContent(p.content)}${p.edited ? ' <span class="edited-tag">(edited)</span>' : ''}</div>` : ''}
+      ${spotifyHtml}
+      ${sharedHtml}
+      <div class="post-card-footer">
+        <button class="pc-action ${p.liked_by_me ? "liked" : ""}"
+          data-action="like" data-post-id="${p._id}" data-liked="${p.liked_by_me ? "1" : "0"}">
+          <i class="${p.liked_by_me ? 'fas' : 'far'} fa-heart"></i>
+          <span class="like-count">${p.likes_count ?? 0}</span>
+        </button>
+        <button class="pc-action" data-action="comment" data-post-id="${p._id}">
+          <i class="far fa-comment"></i>
+          <span>${p.comments_count ?? 0}</span>
+        </button>
+        <button class="pc-action" data-action="share" data-post-id="${p._id}">
+          <i class="fas fa-share"></i>
+          <span>${p.shares_count ?? 0}</span>
+        </button>
+      </div>
     </div>`;
-}).join("");
+  }).join("");
 
+  // Like buttons
   container.querySelectorAll('[data-action="like"]').forEach((btn) =>
     btn.addEventListener("click", () => handleLike(btn))
   );
-  container.querySelectorAll('[data-action="comment"]').forEach((btn) =>
-  btn.addEventListener("click", () => openCommentModal(btn.dataset.postId))
-);
-}
 
+  // Comment buttons
+  container.querySelectorAll('[data-action="comment"]').forEach((btn) =>
+    btn.addEventListener("click", () => openCommentModal(btn.dataset.postId))
+  );
+
+  // Share buttons
+  container.querySelectorAll('[data-action="share"]').forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      const postId = btn.dataset.postId;
+      const res    = await fetch(`${API_BASE}/posts/${postId}`, { headers: authHeaders() });
+      const post   = res.ok ? await res.json() : {};
+      openProfileShareModal(postId, post);
+    })
+  );
+
+  // Menu toggles
+  container.querySelectorAll('.post-menu-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const menuId   = btn.dataset.menu;
+      const dropdown = document.getElementById(`menu-${menuId}`);
+      document.querySelectorAll('.post-menu-dropdown.open').forEach(d => {
+        if (d !== dropdown) d.classList.remove('open');
+      });
+      dropdown?.classList.toggle('open');
+    });
+  });
+
+  // Edit/Delete actions
+  container.querySelectorAll('.post-menu-dropdown a').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const postId  = btn.dataset.postId;
+      const action  = btn.dataset.action;
+      const postEl  = container.querySelector(`[data-post-id="${postId}"]`);
+
+      document.querySelectorAll('.post-menu-dropdown.open').forEach(d => d.classList.remove('open'));
+
+      if (action === 'edit') {
+        const contentEl = postEl?.querySelector('.post-card-body');
+        openProfileEditModal(postId, contentEl?.innerText || '', postEl);
+      } else if (action === 'delete') {
+        openProfileDeleteModal(postId, postEl);
+      }
+    });
+  });
+
+  // Close menus when clicking outside
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.post-menu-dropdown.open').forEach(d => d.classList.remove('open'));
+  });
+}
 function extractSpotifyId(url = "") {
   if (!url) return "";
   const match = url.match(/track\/([a-zA-Z0-9]+)/);
@@ -438,13 +490,16 @@ async function handleLike(btn) {
   btn.dataset.liked   = wasLiked ? "0" : "1";
   countEl.textContent = wasLiked ? Math.max(0, prev - 1) : prev + 1;
 
-  try {
+ try {
     const result = await apiToggleLike(postId);
-    // Sync with server truth
-    countEl.textContent = result.likes_count || result.reactions?.length || 0;
-    btn.dataset.liked   = result.liked ? "1" : "0";
-    result.liked ? btn.classList.add("liked") : btn.classList.remove("liked");
-  } catch {
+    const newCount = result.reactions ?? 0;
+    const isNowLiked = !wasLiked;
+    countEl.textContent = newCount;
+    btn.dataset.liked   = isNowLiked ? "1" : "0";
+    isNowLiked ? btn.classList.add("liked") : btn.classList.remove("liked");
+    const iconEl = btn.querySelector('i');
+    if (iconEl) iconEl.className = isNowLiked ? 'fas fa-heart' : 'far fa-heart';
+  }catch {
     // Revert on error
     btn.classList.toggle("liked");
     btn.dataset.liked   = wasLiked ? "1" : "0";
@@ -563,6 +618,128 @@ async function saveProfile() {
   }
 }
 
+// ── Profile Share Modal ───────────────────────────────────
+function openProfileShareModal(postId, post) {
+  // Reuse home's share modal structure but post to same API
+  const modal = document.getElementById('shareModal');
+  if (!modal) { showToast('Share feature not available here.'); return; }
+  // fallback — just share directly
+  fetch(`${API_BASE}/posts/${postId}/share`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ caption: '' })
+  }).then(r => {
+    if (r.ok) {
+      showToast('Post shared! ✨', 'success');
+      const shareBtn = document.querySelector(`[data-action="share"][data-post-id="${postId}"] span`);
+      if (shareBtn) shareBtn.textContent = parseInt(shareBtn.textContent || '0') + 1;
+    }
+  }).catch(() => showToast('Failed to share', 'error'));
+}
+
+// ── Profile Edit Post Modal ───────────────────────────────
+let _editingPostId  = null;
+let _editingPostEl  = null;
+
+function openProfileEditModal(postId, currentContent, postEl) {
+  _editingPostId = postId;
+  _editingPostEl = postEl;
+
+  const modal    = document.getElementById('editPostModal');
+  const textarea = document.getElementById('editPostContent');
+  const counter  = document.getElementById('editPostCharCount');
+
+  if (!modal || !textarea) return;
+  textarea.value           = currentContent;
+  if (counter) counter.textContent = currentContent.length;
+  modal.classList.add('active');
+  textarea.focus();
+}
+
+function closeProfileEditModal() {
+  document.getElementById('editPostModal')?.classList.remove('active');
+  _editingPostId = null;
+  _editingPostEl = null;
+}
+
+async function submitProfileEdit() {
+  const postId     = _editingPostId;
+  const postEl     = _editingPostEl;
+  const newContent = document.getElementById('editPostContent')?.value.trim();
+  if (!postId || !newContent) return;
+
+  const btn = document.getElementById('saveEditPostBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…'; }
+
+  try {
+    const res = await fetch(`${API_BASE}/posts/${postId}`, {
+      method:  'PUT',
+      headers: authHeaders(),
+      body:    JSON.stringify({ content: newContent })
+    });
+
+if (res.ok) {
+    const contentEl = postEl?.querySelector('.post-card-body');
+    if (contentEl) contentEl.innerHTML = formatContent(newContent) + ' <span class="edited-tag">(edited)</span>';
+    closeProfileEditModal();
+    showToast('Post updated ✨', 'success');
+}else {
+      showToast('Failed to update', 'error');
+    }
+  } catch {
+    showToast('Failed to update', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Save Changes'; }
+  }
+}
+
+// ── Profile Delete Post Modal ─────────────────────────────
+let _deletingPostId = null;
+let _deletingPostEl = null;
+
+function openProfileDeleteModal(postId, postEl) {
+  _deletingPostId = postId;
+  _deletingPostEl = postEl;
+  document.getElementById('deletePostModal')?.classList.add('active');
+}
+
+function closeProfileDeleteModal() {
+  document.getElementById('deletePostModal')?.classList.remove('active');
+  _deletingPostId = null;
+  _deletingPostEl = null;
+}
+
+async function submitProfileDelete() {
+  const postId = _deletingPostId;
+  const postEl = _deletingPostEl;
+  if (!postId) return;
+
+  const btn = document.getElementById('confirmDeletePostBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting…'; }
+
+  try {
+    const res = await fetch(`${API_BASE}/posts/${postId}`, {
+      method:  'DELETE',
+      headers: authHeaders()
+    });
+
+    if (res.ok) {
+      closeProfileDeleteModal();
+      postEl.style.transition = 'all 0.3s ease';
+      postEl.style.opacity    = '0';
+      postEl.style.transform  = 'translateY(-10px)';
+      setTimeout(() => postEl.remove(), 300);
+      showToast('Post deleted', 'success');
+    } else {
+      showToast('Failed to delete', 'error');
+    }
+  } catch {
+    showToast('Failed to delete', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete'; }
+  }
+}
+
 // ── Logout ────────────────────────────────────────────────
 function initLogout() {
   document.getElementById("logoutBtn")?.addEventListener("click", () => {
@@ -612,8 +789,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfile);
   document.getElementById('closeCommentModal')?.addEventListener('click', closeCommentModal);
   document.getElementById('commentModal')?.addEventListener('click', (e) => {
-      if (e.target === document.getElementById('commentModal')) closeCommentModal();
-  });
+  if (e.target === document.getElementById('commentModal')) closeCommentModal();
+});
   document.getElementById('commentSubmitBtn')?.addEventListener('click', submitProfileComment);
   document.getElementById('commentInput')?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') submitProfileComment();
@@ -650,6 +827,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Failed to load profile:", err);
     showToast("Could not load profile. Please try again.", "error");
   }
+  // Edit post modal
+document.getElementById('closeEditPostModal')?.addEventListener('click', closeProfileEditModal);
+document.getElementById('cancelEditPostModal')?.addEventListener('click', closeProfileEditModal);
+document.getElementById('editPostModal')?.addEventListener('click', (e) => {
+  if (e.target === document.getElementById('editPostModal')) closeProfileEditModal();
+});
+document.getElementById('saveEditPostBtn')?.addEventListener('click', submitProfileEdit);
+document.getElementById('editPostContent')?.addEventListener('input', () => {
+  const len = document.getElementById('editPostContent')?.value.length || 0;
+  const counter = document.getElementById('editPostCharCount');
+  if (counter) counter.textContent = len;
+});
+
+// Delete post modal
+document.getElementById('closeDeletePostModal')?.addEventListener('click', closeProfileDeleteModal);
+document.getElementById('cancelDeletePostModal')?.addEventListener('click', closeProfileDeleteModal);
+document.getElementById('deletePostModal')?.addEventListener('click', (e) => {
+  if (e.target === document.getElementById('deletePostModal')) closeProfileDeleteModal();
+});
+document.getElementById('confirmDeletePostBtn')?.addEventListener('click', submitProfileDelete);
 });
 
 async function initNotificationBadge() {
@@ -699,6 +896,10 @@ function openCommentModal(postId) {
     fetch(`${API_BASE}/posts/${postId}`, { headers: authHeaders() })
         .then(r => r.json())
         .then(post => {
+          const isLiked = _currentUser && post.reactions?.some(r => 
+              r?.toString() === _currentUser._id?.toString() || 
+              r === _currentUser._id
+          );
             // Post preview
             if (preview) {
                 const user       = post.user_id;
@@ -766,9 +967,19 @@ function openCommentModal(postId) {
                     ${post.content ? `<div style="font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:8px;">${formatContent(post.content)}</div>` : ''}
                     ${postSpotify}
                     ${sharedHtml}
-                    <div style="font-size:12px;color:rgba(255,255,255,0.4);display:flex;gap:12px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);">
-                        <span><i class="fas fa-heart" style="color:#e06a72"></i> ${post.reactions?.length || 0}</span>
-                        <span><i class="far fa-comment"></i> ${post.comments?.length || 0} comments</span>
+                    <div class="cmp-stats">
+                        <span class="post-action ${isLiked ? 'liked' : ''}" style="cursor:default">
+                            <i class="${isLiked ? 'fas' : 'far'} fa-heart" style="${isLiked ? 'color:#e06a72' : ''}"></i>
+                            ${post.reactions?.length || 0}
+                        </span>
+                        <span>
+                            <i class="far fa-comment"></i>
+                            ${post.comments?.length || 0} ${post.comments?.length === 1 ? 'comment' : 'comments'}
+                        </span>
+                        <span>
+                            <i class="fas fa-share"></i>
+                            ${post.shares_count || 0} ${post.shares_count === 1 ? 'share' : 'shares'}
+                        </span>
                     </div>`;
             }
 
@@ -802,9 +1013,10 @@ function openCommentModal(postId) {
             list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px 0;">Could not load comments.</div>';
         });
 
-    if (input) input.value = '';
-    modal.style.display = 'flex';
-    if (input) input.focus();
+        if (input) input.value = '';
+        modal.style.display = 'flex';
+        if (input) input.focus();
+
 }
 
 function closeCommentModal() {
