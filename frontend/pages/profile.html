@@ -212,10 +212,10 @@
   <div class="toast" id="toast"></div>
 
   <!-- Comment Modal -->
-<div class="modal-overlay" id="commentModal" style="display:none;">
-  <div class="edit-modal" style="max-width:600px; padding:0; overflow:hidden;">
+<div class="modal-overlay" id="commentModal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
+  <div class="edit-modal" style="max-width:600px; width:90%; padding:0; overflow:hidden;" onclick="event.stopPropagation()">
 
-    <div id="commentModalPost" style="padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.1);"></div>
+    <div class="comment-modal-post" id="commentModalPost"></div>
 
     <div style="padding:12px 20px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
       <span style="font-weight:700; font-size:16px; color:#fff;">Comments</span>
@@ -234,6 +234,45 @@
       </button>
     </div>
 
+  </div>
+</div>
+
+<!-- Edit Post Modal -->
+<div class="modal" id="editPostModal">
+  <div class="modal-content edit-modal-content">
+    <div class="edit-modal-header">
+      <h3><i class="fas fa-pen" style="color:#e06a72;margin-right:8px;"></i>Edit post</h3>
+      <button class="close-modal" id="closeEditPostModal">&times;</button>
+    </div>
+    <div class="edit-modal-body">
+      <textarea id="editPostContent" maxlength="280" placeholder="What's on your mind?"></textarea>
+      <div class="edit-char-counter"><span id="editPostCharCount">0</span>/280</div>
+    </div>
+    <div class="edit-modal-footer">
+      <button class="edit-cancel-btn" id="cancelEditPostModal">Cancel</button>
+      <button class="edit-save-btn" id="saveEditPostBtn">
+        <i class="fas fa-check"></i> Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Post Modal -->
+<div class="modal" id="deletePostModal">
+  <div class="modal-content delete-modal-content">
+    <div class="delete-modal-icon">
+      <i class="fas fa-trash-alt"></i>
+    </div>
+    <div class="delete-modal-body">
+      <h3>Delete post?</h3>
+      <p>This will be permanently deleted and cannot be undone.</p>
+    </div>
+    <div class="delete-modal-footer">
+      <button class="delete-cancel-btn" id="cancelDeletePostModal">Cancel</button>
+      <button class="delete-confirm-btn" id="confirmDeletePostBtn">
+        <i class="fas fa-trash-alt"></i> Delete
+      </button>
+    </div>
   </div>
 </div>
 
