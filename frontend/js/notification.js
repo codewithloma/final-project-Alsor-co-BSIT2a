@@ -279,11 +279,31 @@ function renderList(notifications, filterType = "all") {
       card.style.animationDelay = `${delay * 0.04}s`;
 
       // Click → redirect to post if applicable
-      card.addEventListener("click", () => {
-        const url = resolveRedirectUrl(notif);
-        if (url) window.location.href = url;
-      });
+card.addEventListener("click", async () => {
+    const url = resolveRedirectUrl(notif);
+    if (!url) return;
 
+    // Check if the post still exists
+    if (POST_TYPES.has(notif.type) && notif.related_id) {
+        try {
+            const res = await fetch(`${API_BASE}/posts/${notif.related_id}`, {
+                headers: authHeaders()
+            });
+
+            if (res.status === 404) {
+                showToast('This post has been deleted.', 'error');
+                return;
+            }
+
+            window.location.href = url;
+        } catch {
+            // If check fails, just redirect anyway
+            window.location.href = url;
+        }
+    } else {
+        window.location.href = url;
+    }
+});
       container.appendChild(card);
       delay++;
     }

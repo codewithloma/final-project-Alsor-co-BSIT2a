@@ -803,15 +803,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("editBioInput")?.addEventListener("input", updateBioCount);
 
   try {
-    const user = await apiGetProfile();
-    if (!user) return; 
+const data = await apiGetProfile();
+if (!data) return;
 
-    _currentUser = user;
+const user = data.user;  
+_currentUser = user;
 
-    renderProfile(user);
-    populateSidebar(user);
-    renderAbout(user);
+renderProfile(user);
+populateSidebar(user);
+renderAbout(user);
 
+const posts = await apiGetUserPosts(user._id);
     try {
       const posts = await apiGetUserPosts(user._id);
       const totalLikes = posts.reduce((sum, p) => sum + (p.reactions?.length || p.likes_count || 0), 0);
