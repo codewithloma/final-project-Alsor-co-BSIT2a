@@ -117,16 +117,37 @@ export class PostManager {
     }
 
     renderSpotifyResults(tracks) {
-        const listEl = document.getElementById('postSpotifyResultsList');
+        const listEl           = document.getElementById('postSpotifyResultsList');
         const resultsContainer = document.getElementById('postSpotifyResults');
+        if (!listEl || !resultsContainer) return;
+
         listEl.innerHTML = '';
-        if (!tracks || tracks.length === 0) return;
+        if (!tracks || tracks.length === 0) {
+            resultsContainer.style.display = 'none';
+            return;
+        }
+
         resultsContainer.style.display = 'block';
 
         tracks.forEach(track => {
             const item = document.createElement('div');
             item.className = 'spotify-result-item';
-            item.innerHTML = `<img src="${track.album?.images?.[0]?.url || ''}"><div class="info"><div class="name">${track.name}</div><div class="artist">${track.artists[0].name}</div></div>`;
+
+            const albumImg = track.album?.images?.[0]?.url || '';
+            const artistName = track.artists?.[0]?.name || 'Unknown Artist';
+
+            item.innerHTML = `
+                ${albumImg
+                    ? `<img src="${albumImg}" alt="" />`
+                    : `<div style="width:40px;height:40px;border-radius:6px;background:rgba(29,185,84,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fab fa-spotify" style="color:#1DB954;"></i>
+                    </div>`
+                }
+                <div class="info">
+                    <div class="name">${track.name}</div>
+                    <div class="artist">${artistName}</div>
+                </div>`;
+
             item.addEventListener('click', () => this.selectTrack(track));
             listEl.appendChild(item);
         });

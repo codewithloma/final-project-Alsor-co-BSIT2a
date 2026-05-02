@@ -10,42 +10,25 @@
 
     <link rel="stylesheet" href="../CSS/style.css" />
     <link rel="stylesheet" href="../CSS/sidebar.css">
-
-
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      rel="stylesheet"/>
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"/>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
   <body>
     <!-- Sidebar -->
 
-    <div
-      class="sidebar fixed top-0 left-0 h-screen w-[280px] bg-ash gray/95 backdrop-blur-xl border-r border-black/10 flex flex-col z-50 shadow-lg"
-    >
+    <div class="sidebar fixed top-0 left-0 h-screen w-[280px] bg-ash gray/95 backdrop-blur-xl border-r border-black/10 flex flex-col z-50 shadow-lg">
       <div class="p-8 pb-0">
-        <div
-          class="flex items-center gap-3 text-[#d65d64] text-2xl font-extrabold tracking-tight mb-10"
-        >
+        <div class="flex items-center gap-3 text-[#d65d64] text-2xl font-extrabold tracking-tight mb-10">
           <img src="../images/Logo.svg" class="w-[50px] h-[50px]" />
-
           <span>DearBUP</span>
         </div>
       </div>
 
       <nav class="flex-1 px-6 space-y-2">
-        <a
-          href="#"
-          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item active overflow-hidden"
-        >
+        <a href="#" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item active overflow-hidden">
           <i class="fas fa-home w-6 text-lg"></i>
-
           <span>Home</span>
         </a>
 
@@ -59,27 +42,16 @@
           ></span>
         </a>
 
-        <a
-          href="profile.html"
-          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
-        >
+        <a href="profile.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
           <i class="fas fa-user w-6 text-lg"></i>
-
           <span>Profile</span>
         </a>
 
-        <a
-          href="organization.html"
-          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
-        >
+        <a href="organization.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
           <i class="fas fa-users w-6 text-lg"></i>
-
           <span>Organizations</span>
         </a>
-        <a
-          href="activity-tracker.html"
-          class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden"
-        >
+        <a href="activity-tracker.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
           <i class="fas fa-calendar-alt w-6 text-lg"></i>
           <span>Activity Tracker</span>
         </a>
@@ -89,43 +61,25 @@
         <!-- Logged in user -->
 
         <div class="flex items-center gap-3 px-2 pb-3 border-b border-black/10">
-          <div
-            class="w-9 h-9 rounded-full bg-[#e06a72] flex items-center justify-center text-white font-bold text-sm"
-            id="sidebarAvatar"
-          >
+          <div class="w-9 h-9 rounded-full bg-[#e06a72] flex items-center justify-center text-white font-bold text-sm" id="sidebarAvatar">
             ?
           </div>
 
           <div class="flex-1 min-w-0">
-            <div
-              class="text-sm font-semibold text-gray-700 truncate"
-              id="sidebarName"
-            >
+            <div class="text-sm font-semibold text-gray-700 truncate" id="sidebarName">
               Loading...
             </div>
 
-            <div
-              class="text-xs text-gray-400 truncate"
-              id="sidebarCourse"
-            ></div>
+            <div class="text-xs text-gray-400 truncate" id="sidebarCourse"></div>
           </div>
 
-          <button
-            id="logoutBtn"
-            class="text-gray-400 hover:text-red-500 transition"
-            title="Logout"
-          >
+          <button id="logoutBtn" class="text-gray-400 hover:text-red-500 transition" title="Logout">
             <i class="fas fa-sign-out-alt text-sm"></i>
           </button>
         </div>
 
-        <a
-          href="#"
-          id="writePostBtn"
-          class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl text-white font-semibold bg-gradient-to-r from-[#e06a72] to-[#d65d64] shadow-lg hover:shadow-xl hover:-translate-y-1 transition"
-        >
+        <a href="#" id="writePostBtn" class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl text-white font-semibold bg-gradient-to-r from-[#e06a72] to-[#d65d64] shadow-lg hover:shadow-xl hover:-translate-y-1 transition">
           <i class="fas fa-feather-alt"></i>
-
           Write
         </a>
       </div>
@@ -158,61 +112,33 @@
 
               <!-- Spotify for Post -->
 
-              <div class="spotify-section" style="margin-top: 12px">
+              <div class="spotify-section" style="margin-top:12px;">
                 <div class="spotify-search-bar">
                   <i class="fab fa-spotify spotify-icon"></i>
-
                   <input
                     type="text"
                     id="postSpotifyInput"
                     placeholder="Attach a song (optional)…"
                     autocomplete="off"
                   />
-
-                  <button
-                    type="button"
-                    id="postSpotifySearchBtn"
-                    class="spotify-search-btn"
-                  >
+                  <button type="button" id="postSpotifySearchBtn" class="spotify-search-btn">
                     <i class="fas fa-search"></i>
                   </button>
                 </div>
 
-                <div
-                  class="spotify-results"
-                  id="postSpotifyResults"
-                  style="display: none"
-                >
-                  <div
-                    class="spotify-results-list"
-                    id="postSpotifyResultsList"
-                  ></div>
+                <!-- Results dropdown — THIS must exist and be EMPTY on load -->
+                <div class="spotify-results" id="postSpotifyResults" style="display:none;">
+                  <div class="spotify-results-list" id="postSpotifyResultsList"></div>
                 </div>
 
-                <div
-                  class="spotify-selected"
-                  id="postSpotifySelected"
-                  style="display: none"
-                >
+                <!-- Selected track chip -->
+                <div class="spotify-selected" id="postSpotifySelected" style="display:none;">
                   <img id="postSelectedTrackArt" src="" alt="" />
-
                   <div class="selected-track-info">
-                    <div
-                      class="selected-track-name"
-                      id="postSelectedTrackName"
-                    ></div>
-
-                    <div
-                      class="selected-track-artist"
-                      id="postSelectedTrackArtist"
-                    ></div>
+                    <div class="selected-track-name" id="postSelectedTrackName"></div>
+                    <div class="selected-track-artist" id="postSelectedTrackArtist"></div>
                   </div>
-
-                  <button
-                    type="button"
-                    id="postClearTrackBtn"
-                    class="clear-track-btn"
-                  >
+                  <button type="button" id="postClearTrackBtn" class="clear-track-btn">
                     <i class="fas fa-times"></i>
                   </button>
                 </div>
@@ -254,7 +180,7 @@
               <input
                 type="text"
                 id="letterTitle"
-                placeholder="Letter title…"
+                placeholder="Reciepient Name:"
                 maxlength="100"
                 style="
                   width: 100%;
@@ -404,14 +330,18 @@
         <!-- Letters Section -->
 
         <div class="letters-section" id="lettersSection">
-          <div class="letters-container" id="lettersContainer">
-            <div class="letter-card-add" id="addLetterCard">
-              <div class="letter-card-add-icon">
-                <i class="fas fa-plus"></i>
+          <div class="letters-scroll-wrapper">
+            <div class="letters-container" id="lettersContainer">
+              <div class="letter-card-add" id="addLetterCard">
+                <div class="letter-card-add-icon">
+                  <i class="fas fa-plus"></i>
+                </div>
+                <div class="letter-card-add-label">Write a Letter</div>
               </div>
-
-              <div class="letter-card-add-label">Write a Letter</div>
             </div>
+            <button class="letters-arrow-btn" id="lettersArrowBtn" title="View all letters">
+              <i class="fas fa-arrow-right"></i>
+            </button>
           </div>
         </div>
 
