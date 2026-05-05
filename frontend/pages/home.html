@@ -9,7 +9,6 @@
     <title>DearBUP - Feel. Write. Share.</title>
 
     <link rel="stylesheet" href="../CSS/style.css" />
-    <link rel="stylesheet" href="../CSS/sidebar.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,11 +41,6 @@
           ></span>
         </a>
 
-        <a href="profile.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
-          <i class="fas fa-user w-6 text-lg"></i>
-          <span>Profile</span>
-        </a>
-
         <a href="organization.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
           <i class="fas fa-users w-6 text-lg"></i>
           <span>Organizations</span>
@@ -54,6 +48,10 @@
         <a href="activity-tracker.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
           <i class="fas fa-calendar-alt w-6 text-lg"></i>
           <span>Activity Tracker</span>
+        </a>
+        <a href="profile.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
+          <i class="fas fa-user w-6 text-lg"></i>
+          <span>Profile</span>
         </a>
       </nav>
 
@@ -110,28 +108,33 @@
                 maxlength="280"
               ></textarea>
 
-              <!-- Spotify for Post -->
+              <!-- 1. Media Upload FIRST -->
+              <div class="post-media-upload" id="postMediaUpload">
+                <label for="postFileInput" class="media-upload-label" id="mediaUploadLabel">
+                  <i class="fas fa-image"></i>
+                  <span>Add photo</span>
+                </label>
+                <input type="file" id="postFileInput" accept="image/*,video/*" style="display:none;" />
+                <div class="media-preview-wrap" id="mediaPreviewWrap" style="display:none;">
+                  <img id="mediaPreviewImg" src="" alt="" />
+                  <button type="button" id="removeMediaBtn" class="remove-media-btn">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
 
+              <!-- 2. Spotify SECOND -->
               <div class="spotify-section" style="margin-top:12px;">
                 <div class="spotify-search-bar">
                   <i class="fab fa-spotify spotify-icon"></i>
-                  <input
-                    type="text"
-                    id="postSpotifyInput"
-                    placeholder="Attach a song (optional)…"
-                    autocomplete="off"
-                  />
+                  <input type="text" id="postSpotifyInput" placeholder="Attach a song (optional)…" autocomplete="off" />
                   <button type="button" id="postSpotifySearchBtn" class="spotify-search-btn">
                     <i class="fas fa-search"></i>
                   </button>
                 </div>
-
-                <!-- Results dropdown — THIS must exist and be EMPTY on load -->
                 <div class="spotify-results" id="postSpotifyResults" style="display:none;">
                   <div class="spotify-results-list" id="postSpotifyResultsList"></div>
                 </div>
-
-                <!-- Selected track chip -->
                 <div class="spotify-selected" id="postSpotifySelected" style="display:none;">
                   <img id="postSelectedTrackArt" src="" alt="" />
                   <div class="selected-track-info">
@@ -144,19 +147,10 @@
                 </div>
               </div>
 
+              <!-- 3. Actions last -->
               <div class="post-actions">
-                <div class="char-counter">
-                  <span id="charCount">0</span>/280
-                </div>
-
-                <button
-                  type="submit"
-                  class="post-submit"
-                  id="postSubmitBtn"
-                  disabled
-                >
-                  Post
-                </button>
+                <div class="char-counter"><span id="charCount">0</span>/280</div>
+                <button type="submit" class="post-submit" id="postSubmitBtn" disabled>Post</button>
               </div>
             </form>
           </div>
