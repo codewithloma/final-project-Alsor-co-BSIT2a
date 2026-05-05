@@ -309,9 +309,22 @@ function renderPosts(posts, user) {
           </div>
         </div>
       </div>
-      ${p.content ? `<div class="post-card-body">${formatContent(p.content)}${p.edited ? ' <span class="edited-tag">(edited)</span>' : ''}</div>` : ''}
-      ${spotifyHtml}
-      ${sharedHtml}
+        ${p.content ? `<div class="post-card-body">${formatContent(p.content)}${p.edited ? ' <span class="edited-tag">(edited)</span>' : ''}</div>` : ''}
+
+        ${p.media?.url ? `
+        <div class="post-media" style="margin:10px 0;border-radius:12px;overflow:hidden;background:#000;">
+            ${p.media.type === 'video'
+                ? `<video controls style="width:100%;max-height:500px;border-radius:12px;display:block;">
+                    <source src="${p.media.url}" />
+                  </video>`
+                : `<img src="${p.media.url}" alt=""
+                    style="width:100%;max-height:600px;object-fit:contain;display:block;border-radius:12px;"
+                    loading="lazy" />`
+            }
+        </div>` : ''}
+
+        ${spotifyHtml}
+        ${sharedHtml}
       <div class="post-card-footer">
         <button class="pc-action ${p.liked_by_me ? "liked" : ""}"
           data-action="like" data-post-id="${p._id}" data-liked="${p.liked_by_me ? "1" : "0"}">

@@ -27,6 +27,7 @@ export class PostManager {
         this.bindEvents();
         this.loadPosts();
         this.initSpotifySearch();
+        this.initMediaUpload();
     }
 
     bindEvents() {
@@ -167,6 +168,73 @@ export class PostManager {
         this.selectedTrack = null;
         document.getElementById('postSpotifySelected').style.display = 'none';
     }
+    initMediaUpload() {
+    const fileInput   = document.getElementById('postFileInput');
+    const previewWrap = document.getElementById('mediaPreviewWrap');
+    const previewImg  = document.getElementById('mediaPreviewImg');
+    const removeBtn   = document.getElementById('removeMediaBtn');
+    const uploadLabel = document.getElementById('mediaUploadLabel');
+
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 10 * 1024 * 1024) {
+            showToast('File must be under 10MB');
+            fileInput.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            if (file.type.startsWith('image/')) {
+                previewImg.src            = ev.target.result;
+                previewImg.style.display  = 'block';
+            }
+            previewWrap.style.display  = 'block';
+            uploadLabel.style.display  = 'none';
+        };
+        reader.readAsDataURL(file);
+        this.postSubmit.disabled = false;
+    });
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', () => {
+            fileInput.value           = '';
+            previewImg.src            = '';
+            previewWrap.style.display = 'none';
+            uploadLabel.style.display = 'inline-flex';
+            this.updateCharCount();
+        });
+    }
+}
+
+async uploadImageToCloudinary(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async () => {
+            try {
+                const res = await fetch(`${API}/upload/post-media`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        file: reader.result,
+                        mediaType: file.type.startsWith('video/') ? 'video' : 'image'
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Upload failed');
+                resolve(data.mediaUrl);
+            } catch (err) {
+                reject(err);
+            }
+        };
+        reader.onerror = () => reject(new Error('File read failed'));
+        reader.readAsDataURL(file);
+    });
+}
 
     // --- DISPLAY & REACTIONS ---
     async loadPosts() {
@@ -272,6 +340,17 @@ export class PostManager {
                 </div>` : ''}
             </div>
             ${post.content ? `<div class="post-content">${formatContent(post.content)}</div>` : ''}
+            ${post.media?.url ? `
+                <div class="post-media">
+                    ${post.media.type === 'video'
+                        ? `<video controls style="width:100%;border-radius:12px;display:block;max-height:500px;">
+                            <source src="${post.media.url}" />
+                        </video>`
+                        : `<img src="${post.media.url}" alt=""
+                            style="width:100%;border-radius:12px;display:block;max-height:600px;object-fit:contain;background:#000;"
+                            loading="lazy" />`
+                    }
+                </div>` : ''}
             ${spotifyEmbedHtml}
             ${sharedHtml}
             <div class="post-actions-bar">
@@ -465,10 +544,9 @@ export class PostManager {
     }
 
     // --- MEDIA UPLOAD ---
-    async uploadPostMedia(file) {
-        const reader = new FileReader();
-
-        return new Promise((resolve, reject) => {
+async uploadPostMedia(file) {
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
             reader.onload = async () => {
                 try {
                     const mediaType = file.type.startsWith("video/") ? "video" : "image";
@@ -492,54 +570,54 @@ export class PostManager {
     }
 
     // --- SUBMISSION ---
-    async handlePostSubmit(e) {
-        e.preventDefault();
-        if (!getToken()) { showToast('Please login'); return; }
+async handlePostSubmit(e) {
+    e.preventDefault();
+    if (!getToken()) { showToast('Please login'); return; }
 
-        const content = this.postContent.value.trim();
-        const fileInput = document.getElementById('postFileInput');
-        const selectedFile = fileInput?.files[0];
+    const content      = this.postContent.value.trim();
+    const fileInput    = document.getElementById('postFileInput');
+    const selectedFile = fileInput?.files[0];
 
-        if (!content && !selectedFile && !this.selectedTrack) return;
+    if (!content && !selectedFile && !this.selectedTrack) return;
 
-        this.postSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
-        this.postSubmit.disabled = true;
+    this.postSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+    this.postSubmit.disabled  = true;
 
-        try {
-            let uploadedMedia = null;
+    try {
+        let media_url = null;
 
-            if (selectedFile) {
-                uploadedMedia = await this.uploadPostMedia(selectedFile);
-            }
-
-            const res = await fetch(`${API}/posts`, {
-                method: "POST",
-                headers: authHeaders(),
-                body: JSON.stringify({
-                    content,
-                    spotify_track_url: this.selectedTrack?.url,
-                    media: uploadedMedia,
-                    is_anonymous: false
-                }),
-            });
-
-            if (res.ok) {
-                await this.loadPosts();
-                this.closeModal();
-                if (fileInput) fileInput.value = '';
-                showToast('Posted! ✨');
-            } else {
-                const errorData = await res.json();
-                throw new Error(errorData.error || "Failed to create post");
-            }
-        } catch (err) {
-            console.error("Submission error:", err);
-            showToast(err.message || 'Error');
-        } finally {
-            this.postSubmit.innerHTML = 'Post';
-            this.postSubmit.disabled = false;
+        if (selectedFile) {
+            this.postSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+            media_url = await this.uploadImageToCloudinary(selectedFile);
         }
+
+        const res = await fetch(`${API}/posts`, {
+            method:  'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({
+                content,
+                spotify_track_url: this.selectedTrack?.url,
+                media_url,          // ← was "media: uploadedMedia"
+                is_anonymous: false
+            }),
+        });
+
+        if (res.ok) {
+            await this.loadPosts();
+            this.closeModal();
+            showToast('Posted! ✨');
+        } else {
+            const err = await res.json();
+            throw new Error(err.error || 'Failed to create post');
+        }
+    } catch (err) {
+        console.error('Submission error:', err);
+        showToast(err.message || 'Error');
+    } finally {
+        this.postSubmit.innerHTML = 'Post';
+        this.postSubmit.disabled  = false;
     }
+}
 
     // --- COMMENTS ---
     openCommentModal(postId, post, isLiked = false, sharesCount = 0) {
@@ -601,25 +679,36 @@ export class PostManager {
                     </div>`;
             }
 
-            postPreview.innerHTML = `
-                <div class="cmp-header">
-                    <div class="cmp-avatar">${avatarHtml}</div>
-                    <div class="cmp-meta">
-                        <div class="cmp-author">${authorName}</div>
-                        <div class="cmp-time">${formatTime(post.createdAt)}</div>
-                    </div>
+        postPreview.innerHTML = `
+            <div class="cmp-header">
+                <div class="cmp-avatar">${avatarHtml}</div>
+                <div class="cmp-meta">
+                    <div class="cmp-author">${authorName}</div>
+                    <div class="cmp-time">${formatTime(post.createdAt)}</div>
                 </div>
-                ${post.content ? `<div class="cmp-content">${formatContent(post.content)}</div>` : ''}
-                ${postSpotify}
-                ${sharedHtml}
-                <div class="cmp-stats">
-                    <span class="post-action ${isLiked ? 'liked' : ''}" data-action="like" style="cursor:pointer">
-                        <i class="${isLiked ? 'fas' : 'far'} fa-heart" style="${isLiked ? 'color:#e06a72;' : ''}"></i>
-                        ${post.reactions?.length || 0}
-                    </span>
-                    <span><i class="far fa-comment"></i> ${post.comments?.length || 0} ${post.comments?.length === 1 ? 'comment' : 'comments'}</span>
-                    <span><i class="fas fa-share"></i> ${sharesCount} ${sharesCount === 1 ? 'share' : 'shares'}</span>
-                </div>`;
+            </div>
+            ${post.content ? `<div class="cmp-content">${formatContent(post.content)}</div>` : ''}
+            ${post.media?.url ? `
+                <div style="margin-top:10px;border-radius:12px;overflow:hidden;background:#000;text-align:center;">
+                    ${post.media.type === 'video'
+                        ? `<video controls style="width:100%;max-height:300px;border-radius:12px;display:block;">
+                            <source src="${post.media.url}" />
+                        </video>` 
+                        : `<img src="${post.media.url}" alt=""
+                            style="max-width:100%;max-height:300px;width:auto;height:auto;display:block;margin:0 auto;border-radius:12px;object-fit:contain;"
+                            loading="lazy" />`
+                    }
+                </div>` : ''}
+            ${postSpotify}
+            ${sharedHtml}
+            <div class="cmp-stats">
+                <span class="post-action ${isLiked ? 'liked' : ''}" data-action="like" style="cursor:pointer">
+                    <i class="${isLiked ? 'fas' : 'far'} fa-heart" style="${isLiked ? 'color:#e06a72;' : ''}"></i>
+                    ${post.reactions?.length || 0}
+                </span>
+                <span><i class="far fa-comment"></i> ${post.comments?.length || 0} ${post.comments?.length === 1 ? 'comment' : 'comments'}</span>
+                <span><i class="fas fa-share"></i> ${sharesCount} ${sharesCount === 1 ? 'share' : 'shares'}</span>
+             </div>`;
         }
 
         const inputAvatar = document.getElementById('commentInputAvatar');
@@ -809,6 +898,25 @@ export class PostManager {
     }
 
     openModal() { this.createPostModal.classList.add('active'); this.postContent.focus(); }
-    closeModal() { this.createPostModal.classList.remove('active'); this.postContent.value = ''; this.clearSelectedTrack(); this.updateCharCount(); }
-    updateCharCount() { const len = this.postContent.value.length; this.charCount.textContent = len; this.postSubmit.disabled = len === 0; }
+closeModal() {
+    this.createPostModal.classList.remove('active');
+    this.postContent.value = '';
+    this.clearSelectedTrack();
+    this.updateCharCount();
+
+    const fileInput   = document.getElementById('postFileInput');
+    const previewWrap = document.getElementById('mediaPreviewWrap');
+    const previewImg  = document.getElementById('mediaPreviewImg');
+    const uploadLabel = document.getElementById('mediaUploadLabel');
+    if (fileInput)   fileInput.value           = '';
+    if (previewImg)  previewImg.src            = '';
+    if (previewWrap) previewWrap.style.display = 'none';
+    if (uploadLabel) uploadLabel.style.display = 'inline-flex';
+}
+updateCharCount() {
+    const len     = this.postContent.value.length;
+    this.charCount.textContent = len;
+    const hasFile = !!document.getElementById('postFileInput')?.files[0];
+    this.postSubmit.disabled  = (len === 0 && !hasFile && !this.selectedTrack);
+}
 }
