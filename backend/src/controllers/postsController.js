@@ -13,17 +13,22 @@ export const createPost = async (req, res) => {
       spotify_track_url,
       is_anonymous,
       org_id,
-      media,
+      media_url,    // ← change "media" to "media_url"
     } = req.body;
 
     const post = await Post.create({
-      user_id: req.user.id,
-      content:           content || '',
+      user_id:          req.user.id,
+      content:          content || '',
       design_template,
       spotify_track_url,
-      is_anonymous: is_anonymous || false,
-      org_id: org_id || null,
-      media: media || null,
+      is_anonymous:     is_anonymous || false,
+      org_id:           org_id || null,
+      media: {
+        url:  media_url || null,
+        type: media_url
+          ? (media_url.match(/\.(mp4|mov|webm)/i) || media_url.includes('/video/') ? 'video' : 'image')
+          : null
+      }
     });
 
     res.status(201).json(post);
