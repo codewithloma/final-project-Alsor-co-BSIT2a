@@ -181,7 +181,30 @@ async function loadUpcomingEvents() {
     nextEventDate.textContent = "--";
   }
 }
+function loadSidebarUser() {
+  const user = JSON.parse(localStorage.getItem("dearbup_user"));
+  if (!user) return;
 
+  const nameEl = document.getElementById("sidebarName");
+  const courseEl = document.getElementById("sidebarCourse");
+  const avatarEl = document.getElementById("sidebarAvatar");
+
+  if (nameEl) {
+    nameEl.textContent = user.display_name || user.username || "User";
+  }
+
+  if (courseEl) {
+    courseEl.textContent = user.course || "";
+  }
+
+  if (avatarEl) {
+    if (user.avatar_url) {
+      avatarEl.innerHTML = `<img src="${user.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    } else {
+      avatarEl.textContent = (user.display_name || user.username || "U")[0].toUpperCase();
+    }
+  }
+}
 // =============================
 // REFRESH BUTTON
 // =============================
@@ -200,5 +223,8 @@ document.getElementById("menuToggle")?.addEventListener("click", () => {
 // =============================
 // INITIALIZE PAGE
 // =============================
-loadStats();
-loadUpcomingEvents();
+document.addEventListener("DOMContentLoaded", () => {
+  loadSidebarUser();   // 🔥 ADD THIS
+  loadStats();
+  loadUpcomingEvents();
+});

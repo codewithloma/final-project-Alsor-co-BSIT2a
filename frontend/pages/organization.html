@@ -6,6 +6,7 @@
     <title>DearBUP - Organizations</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../CSS/organization.css">
     <link rel="stylesheet" href="../CSS/style.css">
     
 
@@ -38,11 +39,6 @@
           ></span>
         </a>
 
-        <a href="profile.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
-          <i class="fas fa-user w-6 text-lg"></i>
-          <span>Profile</span>
-        </a>
-
         <a href="organization.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item active overflow-hidden">
           <i class="fas fa-users w-6 text-lg"></i>
           <span>Organizations</span>
@@ -50,6 +46,11 @@
         <a href="activity-tracker.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
           <i class="fas fa-calendar-alt w-6 text-lg"></i>
           <span>Activity Tracker</span>
+        </a>
+
+        <a href="profile.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
+          <i class="fas fa-user w-6 text-lg"></i>
+          <span>Profile</span>
         </a>
       </nav>
 
@@ -85,97 +86,178 @@
       <i class="fas fa-bars"></i>
     </button>
 <!-- Main Content -->
-<div class="main-content">
+ <div class="main-content">
     <div class="page-wrapper">
-        <div class="page-header">
-            <h1>Organizations</h1>
-            <p>Discover and connect with recognized CBOs at BU Polangui</p>
-        </div>
-        <div class="controls-row">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search organizations…" />
-            </div>
-            <div class="filter-tabs">
-                <button class="filter-tab active" data-filter="all">All</button>
-                <button class="filter-tab" data-filter="academic">Academic</button>
-                <button class="filter-tab" data-filter="socio-civic">Civic</button>
-                <button class="filter-tab" data-filter="cultural">Cultural</button>
-                <button class="filter-tab" data-filter="sports">Sports</button>
-                <button class="filter-tab" data-filter="religious">Religious</button>
-            </div>
-        </div>
-        <div class="stats-bar">
-            <div class="stat-card"><span class="stat-num" id="totalOrgs">6</span><div class="stat-label">Recognized CBOs</div></div>
-            <div class="stat-card"><span class="stat-num">8</span><div class="stat-label">Upcoming Events</div></div>
-            <div class="stat-card"><span class="stat-num">1,240+</span><div class="stat-label">Total Members</div></div>
-        </div>
-        <div class="orgs-grid" id="orgsGrid"></div>
-    </div>
-</div>
 
-<!-- Org Modal -->
-<div class="overlay" id="orgOverlay">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>Organizations</h1>
+        <p>Discover and connect with recognized CBOs at BU Polangui</p>
+      </div>
+
+      <!-- Search + Filter -->
+      <div class="controls-row">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search organizations…"
+            autocomplete="off"
+          />
+        </div>
+                <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="Computer Studies Department">Computer Studies</button>
+            <button class="filter-tab" data-filter="Engineering Department">Engineering</button>
+            <button class="filter-tab" data-filter="Nursing Department">Nursing</button>
+            <button class="filter-tab" data-filter="Technology Department">Technology</button>
+            <button class="filter-tab" data-filter="Entrepreneur Department">Entrepreneur</button>
+            <button class="filter-tab" data-filter="Education Department Technology">Education Technology</button>
+          </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-num" id="totalOrgs">—</span>
+          <div class="stat-label">Recognized CBOs</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="totalMembers">—</span>
+          <div class="stat-label">Total Members</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="totalActivities">—</span>
+          <div class="stat-label">Active Activities</div>
+        </div>
+      </div>
+
+      <!-- Orgs Grid -->
+      <div class="orgs-grid" id="orgsGrid">
+        <!-- Cards injected by JS -->
+      </div>
+
+    </div>
+  <!-- ══════════════════════════════════
+       ORG DETAIL MODAL
+  ══════════════════════════════════ -->
+  <div class="overlay" id="orgOverlay">
     <div class="org-modal">
-        <div class="modal-banner" id="modalBanner">
-            <div class="modal-logo" id="modalLogo"></div>
-            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            <div class="modal-toprow">
-                <div>
-                    <div class="modal-name" id="modalName"></div>
-                    <div class="modal-sub" id="modalSub"></div>
-                </div>
-                <button class="follow-btn" id="followBtn"><i class="fas fa-plus"></i> Follow</button>
-            </div>
-            <div class="modal-stats">
-                <div class="mstat"><span class="num" id="mMembers"></span><span class="lbl">Members</span></div>
-                <div class="mstat"><span class="num" id="mEvents"></span><span class="lbl">Events this year</span></div>
-                <div class="mstat"><span class="num" id="mFounded"></span><span class="lbl">Founded</span></div>
-            </div>
-            <div class="msection"><h4>About</h4><p id="mAbout"></p></div>
-            <div class="msection"><h4>Upcoming Events</h4><div class="event-list" id="mEventList"></div></div>
-            <div class="msection"><h4>Officers 2024–2025</h4><div class="officers-grid" id="mOfficers"></div></div>
-            <div class="modal-actions">
-                <button class="follow-btn" id="followBtn2" style="flex:1;justify-content:center"><i class="fas fa-plus"></i> Follow</button>
-                <button class="feedback-btn" id="openFeedbackBtn"><i class="fas fa-comment-dots"></i> Send Feedback</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Feedback Modal -->
-<div class="feedback-overlay" id="feedbackOverlay">
-    <div class="feedback-box">
-        <div class="fb-header">
-            <h3><i class="fas fa-comment-dots" style="margin-right:7px"></i>Send Feedback</h3>
-            <button class="modal-close" id="closeFeedback" style="background:rgba(214,93,100,0.1);color:#d65d64"><i class="fas fa-times"></i></button>
+      <div class="modal-banner" id="modalBanner">
+        <div class="modal-logos" id="modalLogo">
         </div>
-        <div class="fb-body">
-            <label>Category</label>
-            <select id="fbCategory">
-                <option value="">Select a category…</option>
-                <option>Event Suggestion</option>
-                <option>Concern / Complaint</option>
-                <option>General Feedback</option>
-                <option>Recognition / Appreciation</option>
-            </select>
-            <label>Your Message</label>
-            <textarea id="fbText" placeholder="Share your thoughts, suggestions, or concerns…"></textarea>
-            <div class="anon-row">
-                <input type="checkbox" id="anonCheck" />
-                <span>Submit anonymously — your name won't be shown to the organization</span>
-            </div>
+        <button class="modal-close" id="modalClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-toprow">
+          <div>
+            <div class="modal-name" id="modalName"></div>
+            <div class="modal-sub" id="modalSub"></div>
+            <span class="modal-dept-badge" id="modalDept"></span>
+          </div>
+          <button class="follow-btn" id="followBtn">
+            <i class="fas fa-plus"></i> Join
+          </button>
         </div>
-        <div class="fb-footer">
-            <button class="btn-cancel" id="cancelFeedback">Cancel</button>
-            <button class="btn-send" id="sendFeedback"><i class="fas fa-paper-plane"></i> Send</button>
+
+        <div class="modal-stats">
+          <div class="mstat">
+            <span class="num" id="mMembers">—</span>
+            <span class="lbl">Members</span>
+          </div>
+          <div class="mstat">
+            <span class="num" id="mApproved">—</span>
+            <span class="lbl">Approved</span>
+          </div>
+          <div class="mstat">
+            <span class="num" id="mPending">—</span>
+            <span class="lbl">Pending</span>
+          </div>
         </div>
+
+        <!-- About -->
+        <div class="msection">
+          <h4>About</h4>
+          <p id="mAbout"></p>
+        </div>
+
+        <!-- Activity Tracker -->
+        <div class="msection">
+          <h4>Activity Tracker</h4>
+          <div class="activity-list" id="activityList"></div>
+        </div>
+
+        <!-- Members -->
+        <div class="msection">
+          <h4>Members</h4>
+          <div class="members-list" id="membersList"></div>
+        </div>
+
+        <!-- Action Row -->
+        <div class="modal-actions">
+          <button class="follow-btn" id="followBtn2" style="flex:1; justify-content:center;">
+            <i class="fas fa-plus"></i> Join
+          </button>
+          <button class="feedback-btn" id="openFeedbackBtn">
+            <i class="fas fa-comment-dots"></i> Send Feedback
+          </button>
+        </div>
+      </div>
+
     </div>
-</div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       FEEDBACK MODAL
+  ══════════════════════════════════ -->
+  <div class="feedback-overlay" id="feedbackOverlay">
+    <div class="feedback-box">
+      <div class="fb-header">
+        <h3><i class="fas fa-comment-dots"></i> Send Feedback</h3>
+        <button class="modal-close" id="closeFeedback">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="fb-body">
+        <label for="fbCategory">Category</label>
+        <select id="fbCategory">
+          <option value="">Select a category…</option>
+          <option>Event Suggestion</option>
+          <option>Concern / Complaint</option>
+          <option>General Feedback</option>
+          <option>Recognition / Appreciation</option>
+        </select>
+        <label for="fbText">Your Message</label>
+        <textarea id="fbText" placeholder="Share your thoughts, suggestions, or concerns…"></textarea>
+        <div class="anon-row">
+          <input type="checkbox" id="anonCheck" />
+          <span>Submit anonymously — your name won't be shown to the organization</span>
+        </div>
+      </div>
+      <div class="fb-footer">
+        <button class="btn-cancel" id="cancelFeedback">Cancel</button>
+        <button class="btn-send" id="sendFeedback">
+          <i class="fas fa-paper-plane"></i> Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+      <i class="fas fa-bars"></i>
+    </button>
+      <!-- Toast -->
+      <div class="toast" id="toast"></div>
+
 
 <div class="toast" id="toast"></div>
-<script src="/frontend/js/main.js"></script>
+  <script src="/js/organization.js"></script>
 </body>
 </html>
