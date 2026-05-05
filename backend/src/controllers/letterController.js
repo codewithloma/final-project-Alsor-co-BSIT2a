@@ -75,15 +75,14 @@ export const getAllLetters = async (req, res) => {
 // @route   GET /api/letters/:id
 export const getLetterById = async (req, res) => {
   try {
-    const letter = await Letter.findById(req.params.id);
+    const letter = await Letter.findById(req.params.id)
+      .populate("user_id", "username display_name avatar_url"); // ← add this
     if (!letter) return res.status(404).json({ message: "Letter not found" });
-    
     res.status(200).json(letter);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 // @desc    Delete a letter (Only by the owner)
 // @route   DELETE /api/letters/:id
 export const deleteLetter = async (req, res) => {
