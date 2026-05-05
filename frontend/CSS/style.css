@@ -447,8 +447,8 @@ body.loaded { animation: fadeIn 0.6s ease-out; }
 .spotify-search-btn:hover { background: #17a349; }
 
 .spotify-results {
-    background: #2a2b2c;
-    border: 1px solid rgba(255,255,255,0.08);
+    background: #fcfcfc;
+    border: 3px solid rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     margin-top: 8px;
     overflow: hidden;
@@ -1833,11 +1833,94 @@ body.loaded { animation: fadeIn 0.6s ease-out; }
     flex-direction: column;
 }
 
-/* Make sure images inside result items are constrained */
 #postSpotifyResultsList img {
     width: 40px !important;
     height: 40px !important;
     border-radius: 6px !important;
     object-fit: cover !important;
     flex-shrink: 0 !important;
+}
+/* ── Post Media Upload ────────────────────────────────────── */
+.post-media-upload {
+    padding: 0 16px 12px;
+}
+
+.media-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1.5px dashed rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.media-upload-label:hover {
+    border-color: #e06a72;
+    color: #e06a72;
+    background: rgba(224,106,114,0.06);
+}
+
+.media-upload-label i { font-size: 15px; }
+
+.media-preview-wrap {
+    position: relative;
+    margin-top: 10px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.media-preview-wrap img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px;
+}
+
+.remove-media-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    border: none; color: white;
+    font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    backdrop-filter: blur(4px);
+}
+
+.remove-media-btn:hover { background: rgba(214,93,100,0.8); }
+
+/* Post image in feed */
+.post-media {
+    margin: 10px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    text-align: center;
+}
+
+.post-media img {
+    max-width: 100%;
+    max-height: 600px;
+    width: auto;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+    object-fit: contain;
+}
+
+.post-media video {
+    width: 100%;
+    max-height: 500px;
+    border-radius: 12px;
+    display: block;
 }
