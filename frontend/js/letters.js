@@ -13,13 +13,17 @@ export class LetterManager {
         this.init();
     }
 
-    init() {
-        this.loadLetters();
-        this.bindEvents();
-        this.initLetterCompose();
-        this.initStoryOverlay();
-        this.initLettersDragScroll();
-    }
+        init() {
+            this.loadLetters();
+            this.bindEvents();
+            this.initLetterCompose();
+            this.initStoryOverlay();
+            this.initLettersDragScroll();
+
+            document.getElementById('lettersArrowBtn')?.addEventListener('click', () => {
+                window.open('letterfull.html', '_blank');
+            });
+        }
 
     bindEvents() {
         document.getElementById('addLetterCard').addEventListener('click', () => this.openLetterCompose());
@@ -81,7 +85,9 @@ createLetterCard(letter, index) {
         </div>
         <div class="letter-preview">${letter.letter_content}</div>`;
 
-    card.addEventListener('click', () => this.openStory(index));
+    card.addEventListener('click', () => {
+    window.open(`letter-view.html?id=${letter._id}`, '_blank');
+});
     return card;
 }
 
