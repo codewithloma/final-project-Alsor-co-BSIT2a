@@ -13,6 +13,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import cboOfficerRoutes from "./routes/cboOfficerRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import path from "path";
+import cboRoutes from "./routes/cboRoutes.js";
 
 
 // Initialize Database
@@ -41,7 +42,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/officers", cboOfficerRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/uploads", express.static("uploads"));
-
+app.use("/api/organization", cboRoutes);
 
 
 
