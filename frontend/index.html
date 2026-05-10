@@ -183,11 +183,59 @@
             <input type="text" class="form-control rounded-3" id="authStudentId">
         </div>
 
-        <!-- COURSE (only for register) -->
-        <div class="mb-3" id="courseField" style="display:none;">
-            <label class="form-label fw-semibold">Course</label>
-            <input type="text" class="form-control rounded-3" id="authCourse">
-        </div>
+<!-- COURSE (only for register) -->
+<div class="mb-3" id="courseField" style="display:none;">
+    <label class="form-label fw-semibold">Course</label>
+
+    <select class="form-select rounded-3" id="authCourse" required>
+        <option value="" selected disabled>Select Your Course</option>
+
+        <option value="BSCPE">
+            Bachelor of Science in Computer Engineering (BSCpE)
+        </option>
+
+        <option value="BSECE">
+            Bachelor of Science in Electronics Engineering (BSECE)
+        </option>
+
+        <option value="BSCS">
+            Bachelor of Science in Computer Science (BSCS)
+        </option>
+
+        <option value="BSIS">
+            Bachelor of Science in Information System (BSIS)
+        </option>
+
+        <option value="BSIT">
+            Bachelor of Science in Information Technology (BSIT)
+        </option>
+        
+        <option value="BSIT-ANIMATION">
+             Bachelor of Science in Information Technology - Animation (BSIT-Animation)
+        </option>
+
+        <option value="BSENTREP">
+            Bachelor of Science in Entrepreneurship (BS Entrep)
+        </option>
+
+        <option value="BSN">
+            Bachelor of Science in Nursing (BSN)
+        </option>
+
+        <option value="BEED">
+            Bachelor of Elementary Education (BEEd)
+        </option>
+
+        <option value="BSED">
+            Bachelor of Secondary Education (BSEd)
+        </option>
+
+        <option value="BTLED">
+            Bachelor of Technology and Livelihood Education (BTLEd)
+        </option>
+
+    </select>
+</div>
 
         <div class="mb-3">
             <label class="form-label fw-semibold">Password</label>
