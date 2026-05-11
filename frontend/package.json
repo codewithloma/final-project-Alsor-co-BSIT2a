@@ -5,6 +5,6 @@
     "dev": "vite"
   },
   "devDependencies": {
-    "vite": "^latest"
+    "vite": "latest"
   }
 }
