@@ -5,6 +5,9 @@ import {
   getOrganizationById,
   joinOrganization,
   approveMember,
+  rejectMember,
+  getPendingMembers,
+  getApprovedMembers,
   leaveOrganization
 } from "../controllers/organizationController.js";
 
@@ -20,6 +23,36 @@ router.get("/:id", getOrganizationById);
 // membership
 router.post("/:id/join", authMiddleware, joinOrganization);
 router.post("/:orgId/approve/:userId", authMiddleware, approveMember);
+router.post("/:id/leave", authMiddleware, leaveOrganization);
+
+
+// membership
+router.post("/:id/join", authMiddleware, joinOrganization);
+
+router.get(
+  "/:orgId/pending-members",
+  authMiddleware,
+  getPendingMembers
+);
+
+router.get(
+  "/:orgId/members",
+  authMiddleware,
+  getApprovedMembers
+);
+
+router.post(
+  "/:orgId/approve/:userId",
+  authMiddleware,
+  approveMember
+);
+
+router.delete(
+  "/:orgId/reject/:userId",
+  authMiddleware,
+  rejectMember
+);
+
 router.post("/:id/leave", authMiddleware, leaveOrganization);
 
 export default router;

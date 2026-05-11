@@ -177,6 +177,135 @@ export const approveMember = async (req, res) => {
   }
 };
 
+// ---------------- GET PENDING MEMBERS ----------------
+export const getPendingMembers = async (req, res) => {
+  try {
+    const { orgId } = req.params;
+
+    // check authorization
+    const requesterRole = await CBOOfficer.findOne({
+      user_id: req.user.id,
+      org_id: orgId,
+    });
+
+    if (
+      !requesterRole &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "Not authorized",
+      });
+    }
+
+    const org = await CBO.findById(orgId)
+      .populate(
+        "members.user_id",
+        "username display_name email student_id avatar_url"
+      );
+
+    if (!org) {
+      return res.status(404).json({
+        message: "Organization not found",
+      });
+    }
+
+    const pendingMembers = org.members.filter(
+      member => member.status === "pending"
+    );
+
+    res.json(pendingMembers);
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+// ---------------- REJECT MEMBER ----------------
+export const rejectMember = async (req, res) => {
+  try {
+    const { orgId, userId } = req.params;
+
+    // check requester role
+    const requesterRole = await CBOOfficer.findOne({
+      user_id: req.user.id,
+      org_id: orgId,
+    });
+
+    if (
+      !requesterRole &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "Not authorized",
+      });
+    }
+
+    const org = await CBO.findById(orgId);
+
+    if (!org) {
+      return res.status(404).json({
+        message: "Organization not found",
+      });
+    }
+
+    const memberIndex = org.members.findIndex(
+      m => m.user_id.toString() === userId
+    );
+
+    if (memberIndex === -1) {
+      return res.status(404).json({
+        message: "Request not found",
+      });
+    }
+
+    // remove member request
+    org.members.splice(memberIndex, 1);
+
+    await org.save();
+
+    res.json({
+      message: "Member request rejected",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+// ---------------- GET APPROVED MEMBERS ----------------
+export const getApprovedMembers = async (req, res) => {
+  try {
+    const { orgId } = req.params;
+
+    const org = await CBO.findById(orgId)
+      .populate(
+        "members.user_id",
+        "username display_name email avatar_url"
+      );
+
+    if (!org) {
+      return res.status(404).json({
+        message: "Organization not found",
+      });
+    }
+
+    const approvedMembers = org.members.filter(
+      member => member.status === "approved"
+    );
+
+    res.json(approvedMembers);
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 // ---------------- LEAVE ORGANIZATION (SAFE FIX) ----------------
 export const leaveOrganization = async (req, res) => {
   try {

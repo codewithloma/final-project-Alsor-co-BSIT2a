@@ -1,5 +1,7 @@
 import { validationResult } from 'express-validator';
 import Event from '../models/EventModel.js';
+import CBOOfficer from "../models/CboOfficerModel.js";
+import User from "../models/UserModel.js";
 
 // ─── Helpers ─────────────────────────────────────────────
 const buildFilter = (query) => {
@@ -95,20 +97,81 @@ export const getEventById = async (req, res, next) => {
 };
 
 // ─── POST /api/events ─────────────────────────────────────
-// CBO officers and admins only
 export const createEvent = async (req, res, next) => {
   try {
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
-      return res.status(422).json({ success: false, errors: errors.array() });
+      return res.status(422).json({
+        success: false,
+        errors: errors.array(),
+      });
     }
 
-    const { org_id, title, content, date, time, venue, event_type, banner_url } = req.body;
+    const {
+      org_id,
+      title,
+      content,
+      date,
+      time,
+      venue,
+      event_type,
+      banner_url,
+    } = req.body;
 
-    const event = await Event.create({ org_id, title, content, date, time, venue, event_type, banner_url });
-    await event.populate('org_id', 'org_name acronym logo_url color');
+    // Check current user
+    const user = await User.findById(req.user.id);
 
-    res.status(201).json({ success: true, data: event });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Admin bypass
+    let isAuthorized = user.user_type === "admin";
+
+    // Check officer role
+    if (!isAuthorized) {
+      const officer = await CBOOfficer.findOne({
+        user_id: req.user.id,
+        org_id,
+      });
+
+      isAuthorized = !!officer;
+    }
+
+    if (!isAuthorized) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Only organization officers or admin can create activities",
+      });
+    }
+
+    const event = await Event.create({
+      org_id,
+      title,
+      content,
+      date,
+      time,
+      venue,
+      event_type,
+      banner_url,
+    });
+
+    await event.populate(
+      "org_id",
+      "org_name acronym logo_url"
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Activity created successfully",
+      data: event,
+    });
+
   } catch (err) {
     next(err);
   }
@@ -117,22 +180,70 @@ export const createEvent = async (req, res, next) => {
 // ─── PUT /api/events/:id ──────────────────────────────────
 export const updateEvent = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ success: false, errors: errors.array() });
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found.",
+      });
     }
 
-    const allowed = ['title', 'content', 'date', 'time', 'venue', 'event_type', 'banner_url', 'is_cancelled'];
+    const user = await User.findById(req.user.id);
+
+    let isAuthorized =
+      user.user_type === "admin";
+
+    if (!isAuthorized) {
+      const officer = await CBOOfficer.findOne({
+        user_id: req.user.id,
+        org_id: event.org_id,
+      });
+
+      isAuthorized = !!officer;
+    }
+
+    if (!isAuthorized) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const allowed = [
+      "title",
+      "content",
+      "date",
+      "time",
+      "venue",
+      "event_type",
+      "banner_url",
+      "is_cancelled",
+    ];
+
     const updates = {};
-    allowed.forEach((k) => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
 
-    const event = await Event.findByIdAndUpdate(req.params.id, updates, {
-      new: true, runValidators: true,
-    }).populate('org_id', 'org_name acronym logo_url color');
+    allowed.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    });
 
-    if (!event) return res.status(404).json({ success: false, message: 'Event not found.' });
+    const updatedEvent =
+      await Event.findByIdAndUpdate(
+        req.params.id,
+        updates,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
 
-    res.json({ success: true, data: event });
+    res.json({
+      success: true,
+      data: updatedEvent,
+    });
+
   } catch (err) {
     next(err);
   }
@@ -141,9 +252,48 @@ export const updateEvent = async (req, res, next) => {
 // ─── DELETE /api/events/:id ───────────────────────────────
 export const deleteEvent = async (req, res, next) => {
   try {
-    const event = await Event.findByIdAndDelete(req.params.id);
-    if (!event) return res.status(404).json({ success: false, message: 'Event not found.' });
-    res.json({ success: true, message: 'Event deleted.' });
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found.",
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+
+    let isAuthorized =
+      user.user_type === "admin";
+
+    if (!isAuthorized) {
+      const officer = await CBOOfficer.findOne({
+        user_id: req.user.id,
+        org_id: event.org_id,
+      });
+
+      isAuthorized =
+        officer &&
+        [
+          "president",
+          "vice_president"
+        ].includes(officer.officer_role);
+    }
+
+    if (!isAuthorized) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    await event.deleteOne();
+
+    res.json({
+      success: true,
+      message: "Activity deleted successfully",
+    });
+
   } catch (err) {
     next(err);
   }

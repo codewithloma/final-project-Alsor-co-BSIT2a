@@ -26,19 +26,22 @@ router.get('/stats', getEventStats);
 router.get('/:id',   getEventById);
 
 // Protected
-router.post('/',
-  protect, authorize('cbo_officer', 'admin'),
+router.post(
+  '/',
+  protect,
   eventValidation,
   createEvent
 );
 
-router.put('/:id',
-  protect, authorize('cbo_officer', 'admin'),
+router.put(
+  '/:id',
+  protect,
   updateEvent
 );
 
-router.delete('/:id',
-  protect, authorize('admin'),
+router.delete(
+  '/:id',
+  protect,
   deleteEvent
 );
 
