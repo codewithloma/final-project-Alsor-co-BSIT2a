@@ -58,6 +58,11 @@ DearBUP is a specialized blogging and social networking platform designed exclus
 
 **A chronological display of upcoming campus events and activities, ensuring students stay informed about important university dates.**
 
+### 4. All Letters Archive
+<img width="1920" height="1080" alt="Screenshot (164)" src="https://github.com/user-attachments/assets/eeaf2fbe-a317-44f6-8316-54d1506159d6" />
+
+**A dedicated space for the "Words from the BUP community." This archive features categorized filters (General, Confession, Gratitude, Concern) and displays digital letters with integrated Spotify tracks, allowing for a seamless browsing experience of student expressions.**
+
 ---
 
 ## Website User Guide
