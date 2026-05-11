@@ -139,12 +139,11 @@ async function apiUpdateProfile(payload) {
 }
 
 async function apiGetUserPosts(userId) {
-  const res = await fetch(`${API_BASE}/posts?author=${userId}`, {
+  const res = await fetch(`${API_BASE}/profile/user/${userId}/posts`, {
     headers: authHeaders(),
   });
   if (!res.ok) throw new Error(`Posts fetch failed (${res.status})`);
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data.posts ?? []);
+  return res.json();
 }
 
 async function apiToggleLike(postId) {
@@ -815,33 +814,58 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("editBioInput")?.addEventListener("input", updateBioCount);
 
-  try {
-const data = await apiGetProfile();
-if (!data) return;
+try {
+    const urlParams  = new URLSearchParams(window.location.search);
+    const viewUserId = urlParams.get('id');
 
-const user = data.user;  
-_currentUser = user;
+    // Fetch logged-in user for sidebar always
+    const myData = await apiGetProfile();
+    if (!myData) return;
+    const loggedInUser = myData.user;
+    populateSidebar(loggedInUser);
 
-renderProfile(user);
-populateSidebar(user);
-renderAbout(user);
+    if (viewUserId && viewUserId !== loggedInUser._id) {
+        // ── Viewing someone else's profile ──
+         document.getElementById('profileNavItem')?.classList.remove('active');
+        _currentUser = loggedInUser;
 
-const posts = await apiGetUserPosts(user._id);
-    try {
-      const posts = await apiGetUserPosts(user._id);
-      const totalLikes = posts.reduce((sum, p) => sum + (p.reactions?.length || p.likes_count || 0), 0);
-      renderStats(posts.length, totalLikes);
-      renderPosts(posts, user);
-    } catch (postsErr) {
-      console.error("Failed to load posts:", postsErr);
-      renderStats(0, 0);
-      renderPosts([], user);
-      showToast("Could not load posts.", "error");
+        const res  = await fetch(`${API_BASE}/profile/user/${viewUserId}`, { headers: authHeaders() });
+        const data = await res.json();
+        const user = data.user;
+
+        renderProfile(user);
+        renderAbout(user);
+
+        // Hide edit button — not your profile
+        document.getElementById('editProfileBtn')?.style.setProperty('display', 'none');
+        document.getElementById('shareProfileBtn')?.style.setProperty('display', 'none');
+
+        // Load their posts
+        const postsRes = await fetch(`${API_BASE}/profile/user/${viewUserId}/posts`, { headers: authHeaders() });
+        const posts    = postsRes.ok ? await postsRes.json() : [];
+        const totalLikes = posts.reduce((sum, p) => sum + (p.likes_count || 0), 0);
+        renderStats(posts.length, totalLikes);
+        renderPosts(posts, user);
+
+    } else {
+        // ── Viewing own profile ──
+           document.getElementById('profileNavItem')?.classList.add('active');
+
+        _currentUser = loggedInUser;
+
+        renderProfile(loggedInUser);
+        renderAbout(loggedInUser);
+
+        const posts = await apiGetUserPosts(loggedInUser._id);
+        const totalLikes = posts.reduce((sum, p) => sum + (p.reactions?.length || p.likes_count || 0), 0);
+        renderStats(posts.length, totalLikes);
+        renderPosts(posts, loggedInUser);
     }
-  } catch (err) {
+
+} catch (err) {
     console.error("Failed to load profile:", err);
     showToast("Could not load profile. Please try again.", "error");
-  }
+}
   // Edit post modal
 document.getElementById('closeEditPostModal')?.addEventListener('click', closeProfileEditModal);
 document.getElementById('cancelEditPostModal')?.addEventListener('click', closeProfileEditModal);
