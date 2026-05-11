@@ -108,14 +108,25 @@ export class PostManager {
         if (clearBtn) clearBtn.addEventListener('click', () => this.clearSelectedTrack());
     }
 
-    async spotifySearch(query) {
-        if (!query) return;
-        try {
-            const res = await fetch(`${API}/posts/spotify/search?q=${encodeURIComponent(query)}`);
-            const tracks = await res.json();
-            this.renderSpotifyResults(tracks);
-        } catch (err) { console.error('Spotify error:', err); }
+async spotifySearch(query) {
+    if (!query) return;
+    try {
+        const res = await fetch(`${API}/posts/spotify/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        // ✅ Guard — if not an array, show empty
+        if (!res.ok || !Array.isArray(data)) {
+            console.error('Spotify search failed:', data);
+            this.renderSpotifyResults([]);
+            return;
+        }
+
+        this.renderSpotifyResults(data);
+    } catch (err) {
+        console.error('Spotify error:', err);
+        this.renderSpotifyResults([]);
     }
+}
 
     renderSpotifyResults(tracks) {
         const listEl           = document.getElementById('postSpotifyResultsList');
@@ -325,9 +336,13 @@ async uploadImageToCloudinary(file) {
 
         el.innerHTML = `
             <div class="post-header">
-                <div class="post-avatar">${avatarHtml}</div>
+                <a href="profile.html?id=${user?._id}" class="post-avatar" style="cursor:pointer;text-decoration:none;">
+                    ${avatarHtml}
+                </a>
                 <div class="post-meta">
-                    <div class="post-author">${authorName}</div>
+                    <a href="profile.html?id=${user?._id}" class="post-author" style="cursor:pointer;text-decoration:none;color:inherit;">
+                        ${authorName}
+                    </a>
                     <div class="post-handle">${authorHandle} · ${formatTime(post.createdAt)}</div>
                 </div>
                 ${isOwner ? `
