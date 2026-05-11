@@ -219,7 +219,7 @@ function renderStats(postsCount, totalLikes) {
 }
 
 // ── Render posts tab ──────────────────────────────────────
-function renderPosts(posts, user) {
+function renderPosts(posts, viewedUser, loggedInUser) {
   const container = document.getElementById("postsContainer");
   if (!container) return;
 
@@ -232,7 +232,7 @@ function renderPosts(posts, user) {
     return;
   }
 
-  const authorName  = user.display_name || user.username || "You";
+  const authorName  = viewedUser.display_name || viewedUser.username || "You";
   const authorInits = getInitials(authorName);
 
   container.innerHTML = posts.map((p, i) => {
@@ -288,25 +288,26 @@ function renderPosts(posts, user) {
     <div class="post-card" data-post-id="${p._id}" style="animation-delay:${i * 0.06}s">
       <div class="post-card-header">
         <div class="pc-avatar">
-          ${user.avatar_url ? `<img src="${escapeHTML(user.avatar_url)}" alt="" />` : authorInits}
+          ${viewedUser.avatar_url ? `<img src="${escapeHTML(viewedUser.avatar_url)}" alt="" />` : authorInits}
         </div>
         <div class="pc-meta">
           <div class="name">${escapeHTML(authorName)}</div>
           <div class="time">${timeAgo(p.createdAt || p.created_at)}</div>
         </div>
-        <div class="post-menu" style="position:relative;margin-left:auto;">
-          <button class="post-menu-btn" data-menu="${p._id}">
-            <i class="fas fa-ellipsis-h"></i>
-          </button>
-          <div class="post-menu-dropdown" id="menu-${p._id}">
-            <a href="#" data-action="edit" data-post-id="${p._id}">
-              <i class="fas fa-pen"></i> Edit post
-            </a>
-            <a href="#" data-action="delete" data-post-id="${p._id}">
-              <i class="fas fa-trash-alt"></i> Delete post
-            </a>
-          </div>
-        </div>
+          ${loggedInUser._id === p.user_id?._id || loggedInUser._id === p.user_id ? `
+          <div class="post-menu" style="position:relative;margin-left:auto;">
+            <button class="post-menu-btn" data-menu="${p._id}">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div class="post-menu-dropdown" id="menu-${p._id}">
+              <a href="#" data-action="edit" data-post-id="${p._id}">
+                <i class="fas fa-pen"></i> Edit post
+              </a>
+              <a href="#" data-action="delete" data-post-id="${p._id}">
+                <i class="fas fa-trash-alt"></i> Delete post
+              </a>
+            </div>
+          </div>` : ''}
       </div>
         ${p.content ? `<div class="post-card-body">${formatContent(p.content)}${p.edited ? ' <span class="edited-tag">(edited)</span>' : ''}</div>` : ''}
 
@@ -826,7 +827,7 @@ try {
 
     if (viewUserId && viewUserId !== loggedInUser._id) {
         // ── Viewing someone else's profile ──
-         document.getElementById('profileNavItem')?.classList.remove('active');
+        document.getElementById('profileNavItem')?.classList.remove('active');
         _currentUser = loggedInUser;
 
         const res  = await fetch(`${API_BASE}/profile/user/${viewUserId}`, { headers: authHeaders() });
@@ -840,26 +841,26 @@ try {
         document.getElementById('editProfileBtn')?.style.setProperty('display', 'none');
         document.getElementById('shareProfileBtn')?.style.setProperty('display', 'none');
 
-        // Load their posts
+        // Other's profile  
         const postsRes = await fetch(`${API_BASE}/profile/user/${viewUserId}/posts`, { headers: authHeaders() });
         const posts    = postsRes.ok ? await postsRes.json() : [];
         const totalLikes = posts.reduce((sum, p) => sum + (p.likes_count || 0), 0);
         renderStats(posts.length, totalLikes);
-        renderPosts(posts, user);
-
+        renderPosts(posts, user, loggedInUser); // ✅ Pass viewed user first, loggedInUser second
     } else {
         // ── Viewing own profile ──
-           document.getElementById('profileNavItem')?.classList.add('active');
+          document.getElementById('profileNavItem')?.classList.add('active');
 
         _currentUser = loggedInUser;
 
         renderProfile(loggedInUser);
         renderAbout(loggedInUser);
 
+        // Own profile
         const posts = await apiGetUserPosts(loggedInUser._id);
         const totalLikes = posts.reduce((sum, p) => sum + (p.reactions?.length || p.likes_count || 0), 0);
         renderStats(posts.length, totalLikes);
-        renderPosts(posts, loggedInUser);
+        renderPosts(posts, loggedInUser, loggedInUser); // ✅ Pass both
     }
 
 } catch (err) {
