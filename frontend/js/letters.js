@@ -21,7 +21,7 @@ export class LetterManager {
             this.initLettersDragScroll();
 
             document.getElementById('lettersArrowBtn')?.addEventListener('click', () => {
-                window.open('letterfull.html', '_blank');
+                 window.location.href = 'letterfull.html'; 
             });
         }
 
@@ -85,8 +85,8 @@ createLetterCard(letter, index) {
         </div>
         <div class="letter-preview">${letter.letter_content}</div>`;
 
-    card.addEventListener('click', () => {
-    window.open(`letter-view.html?id=${letter._id}`, '_blank');
+card.addEventListener('click', () => {
+    window.location.href = `letter-view.html?id=${letter._id}`;
 });
     return card;
 }
