@@ -1,22 +1,23 @@
 import nodemailer from "nodemailer";
+import dns from "dns";
+
+// 🔥 Force Node to prefer IPv4 over IPv6
+dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // must be false for 587
+  secure: false,
+  requireTLS: true,
+
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_PASS,
   },
-});
 
-// verify transporter on startup (optional but useful)
-transporter.verify((error) => {
-  if (error) {
-    console.error("❌ Gmail transporter error:", error.message);
-  } else {
-    console.log("✅ Gmail server is ready");
-  }
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 // SEND OTP EMAIL
@@ -36,6 +37,7 @@ export const sendOtpEmail = async (email, code) => {
     });
 
     console.log("✅ Email sent:", info.messageId);
+
   } catch (error) {
     console.error("❌ Email error:", error);
     throw new Error("Failed to send email");
