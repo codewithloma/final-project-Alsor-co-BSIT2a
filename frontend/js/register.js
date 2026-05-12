@@ -1,7 +1,7 @@
 // DearBUP - Frontend Script
 // IT 112 - 2A | AlSor Co | AY 2025-2026
-
-const API_URL = "http://localhost:5000/api/auth";
+import { API } from './config.js';
+const API_URL = `${API}/auth`;
 const HOME_URL = "../pages/home.html";
 
 let authModal;

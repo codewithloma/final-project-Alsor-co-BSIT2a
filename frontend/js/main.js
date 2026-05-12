@@ -1,9 +1,9 @@
 import { guardAuth, bootSidebar } from './auth.js';
 import { PostManager } from './posts.js';
 import { LetterManager } from './letters.js';
+import { API } from './config.js';
 
-// ── Config ────────────────────────────────────────────────
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = API;
 const getToken = () => localStorage.getItem("dearbup_token");
 
 // Run Auth Check
