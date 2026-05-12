@@ -51,7 +51,7 @@ export const joinOrganization = async (req, res) => {
     const org = await CBO.findById(req.params.id);
     if (!org) return res.status(404).json({ message: "Organization not found" });
 
-    const userId = req.user.id; // comes from authMiddleware → jwt decoded
+    const userId = req.user.id;
 
     const existing = org.members.find(
       (m) => m.user_id?.toString() === userId
@@ -99,5 +99,59 @@ export const leaveOrganization = async (req, res) => {
     res.json({ message: "You have left the organization." });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+// ─── NEW: Admin member management ────────────────────────────
+
+// GET /api/organization/:id/pending
+export const getPendingMembers = async (req, res) => {
+  try {
+    const org = await CBO.findById(req.params.id)
+      .populate("members.user_id", "username display_name email");
+
+    if (!org) return res.status(404).json({ message: "Organization not found" });
+
+    const pending = org.members.filter(m => m.status === "pending");
+    res.json({ pending });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// PATCH /api/organization/:id/members/:userId/approve
+export const approveMember = async (req, res) => {
+  try {
+    const org = await CBO.findById(req.params.id);
+    if (!org) return res.status(404).json({ message: "Organization not found" });
+
+    const member = org.members.find(
+      m => m.user_id?.toString() === req.params.userId
+    );
+    if (!member) return res.status(404).json({ message: "Member not found" });
+
+    member.status = "approved";
+    await org.save();
+
+    res.json({ message: "Member approved", member });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// DELETE /api/organization/:id/members/:userId
+export const rejectMember = async (req, res) => {
+  try {
+    const org = await CBO.findById(req.params.id);
+    if (!org) return res.status(404).json({ message: "Organization not found" });
+
+    org.members = org.members.filter(
+      m => m.user_id?.toString() !== req.params.userId
+    );
+    await org.save();
+
+    res.json({ message: "Member removed" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
