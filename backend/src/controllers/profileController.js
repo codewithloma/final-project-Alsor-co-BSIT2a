@@ -96,12 +96,16 @@ export const getUserPosts = async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    const posts = await Post.find({ user_id: id })
-      .populate("user_id", "username display_name avatar_url")
-      .populate("org_id", "org_name acronym")
-      .populate("comments.user_id", "username display_name avatar_url")
-      .sort({ createdAt: -1 });
-
+const posts = await Post.find({ user_id: userId })
+    .populate('user_id', 'username display_name avatar_url')
+    .populate({
+        path: 'shared_from',
+        populate: {
+            path: 'user_id',
+            select: 'username display_name avatar_url'
+        }
+    })
+    .sort({ createdAt: -1 });
     const transformedPosts = posts.map(post => ({
       ...post.toObject(),
       likes_count: post.reactions.length,
