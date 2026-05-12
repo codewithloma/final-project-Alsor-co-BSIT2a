@@ -5,6 +5,9 @@ import {
   getOrganizationById,
   joinOrganization,
   leaveOrganization,
+  getPendingMembers,
+  approveMember,
+  rejectMember,
 } from "../controllers/cboController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
@@ -14,8 +17,13 @@ const router = express.Router();
 router.get("/",    getOrganizations);
 router.get("/:id", getOrganizationById);
 
-// Protected — need to be logged in
+// Member actions — must be logged in
 router.post("/:id/join",  authMiddleware, joinOrganization);
 router.post("/:id/leave", authMiddleware, leaveOrganization);
+
+// Admin — member management
+router.get("/:id/pending",                    authMiddleware, getPendingMembers);
+router.patch("/:id/members/:userId/approve",  authMiddleware, approveMember);
+router.delete("/:id/members/:userId",         authMiddleware, rejectMember);
 
 export default router;

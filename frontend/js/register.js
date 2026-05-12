@@ -83,17 +83,17 @@ function toggleAuthMode() {
 function saveAuthData(data) {
     localStorage.setItem("dearbup_token", data.token);
     localStorage.setItem("dearbup_user", JSON.stringify({
-        id:     data.user._id,
-        name:   data.user.display_name || data.user.username,
-        username:     data.user.username,      
-        display_name: data.user.display_name,   
-        avatar_url:   data.user.avatar_url,     
-        email:  data.user.email,
-        role:   data.user.user_type,
-        course: data.user.course
+        _id:          data.user._id,
+        id:           data.user._id,
+        username:     data.user.username,
+        display_name: data.user.display_name,
+        avatar_url:   data.user.avatar_url,
+        email:        data.user.email,
+        user_type:    data.user.user_type,  // ← THIS was missing
+        role:         data.user.user_type,
+        course:       data.user.course
     }));
 }
-
 // AUTH HANDLER
 async function handleAuth(e) {
     e.preventDefault();

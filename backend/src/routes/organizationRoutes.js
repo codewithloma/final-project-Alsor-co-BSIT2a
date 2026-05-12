@@ -28,7 +28,6 @@ router.post("/:id/leave", authMiddleware, leaveOrganization);
 
 // membership
 router.post("/:id/join", authMiddleware, joinOrganization);
-
 router.get(
   "/:orgId/pending-members",
   authMiddleware,
