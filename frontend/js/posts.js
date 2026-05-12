@@ -37,12 +37,6 @@ export class PostManager {
         this.postForm.addEventListener('submit', (e) => this.handlePostSubmit(e));
         this.postContent.addEventListener('input', () => this.updateCharCount());
 
-        if (this.logoutBtn) {
-            this.logoutBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                logout();
-            });
-        }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.createPostModal.classList.contains('active')) this.closeModal();
@@ -858,16 +852,27 @@ async handlePostSubmit(e) {
                     </div>`;
             }
 
-            postPreview.innerHTML = `
-                <div class="smp-header">
-                    <div class="smp-avatar">${avatarHtml}</div>
-                    <div>
-                        <div class="smp-author">${authorName}</div>
-                        <div class="smp-time">${formatTime(post.createdAt)}</div>
-                    </div>
-                </div>
-                <div class="smp-content">${formatContent(post.content || '')}</div>
-                ${spotifyHtml}`;
+                    postPreview.innerHTML = `
+                        <div class="smp-header">
+                            <div class="smp-avatar">${avatarHtml}</div>
+                            <div>
+                                <div class="smp-author">${authorName}</div>
+                                <div class="smp-time">${formatTime(post.createdAt)}</div>
+                            </div>
+                        </div>
+                        <div class="smp-content">${formatContent(post.content || '')}</div>
+                        ${post.media?.url ? `
+                            <div style="margin-top:10px;border-radius:10px;overflow:hidden;background:#000;text-align:center;">
+                                ${post.media.type === 'video'
+                                    ? `<video controls style="width:100%;max-height:200px;border-radius:10px;display:block;">
+                                        <source src="${post.media.url}" />
+                                    </video>`
+                                    : `<img src="${post.media.url}" alt=""
+                                        style="max-width:100%;max-height:200px;width:auto;height:auto;display:block;margin:0 auto;border-radius:10px;object-fit:contain;"
+                                        loading="lazy" />`
+                                }
+                            </div>` : ''}
+                        ${spotifyHtml}`;
         }
 
         if (caption) caption.value = '';
