@@ -57,9 +57,6 @@
 
 /* ── Layout ───────────────────────────────────────────────── */
 .main-content {
-    margin-left: 280px;
-    height: 100vh;
-    overflow-y: auto;
     scroll-behavior: smooth;
 }
 .main-content::-webkit-scrollbar       { width: 6px; }
@@ -70,7 +67,7 @@
 .notif-wrapper {
     max-width: 720px;
     margin: 0 auto;
-    padding: 36px 24px 80px;
+    padding: 36px 24px 80px;  
 }
 
 /* ── Page Header ──────────────────────────────────────────── */

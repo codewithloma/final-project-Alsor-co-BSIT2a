@@ -1,35 +1,140 @@
 <!doctype html>
-
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DearBUP - Feel. Write. Share.</title>
+  <link rel="stylesheet" href="../CSS/style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../CSS/home.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- ── TOP NAVBAR ───────────────────────────────────────── -->
+<nav class="fixed top-0 left-0 right-0 z-[200] h-14 bg-[#242526] border-b border-white/[0.08] flex items-center px-4 gap-2">
+ 
+  <!-- Logo -->
+  <a href="#" class="flex items-center gap-2.5 flex-shrink-0 no-underline">
+    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#e06a72] to-[#d65d64] flex items-center justify-center overflow-hidden">
+      <img src="../images/Logo.svg" alt="DearBUP" class="w-full h-full object-cover" />
+    </div>
+    <span class="text-[#e06a72] font-extrabold text-[17px] hidden sm:block">DearBUP</span>
+  </a>
+ 
+  <!-- Center tabs -->
+  <div class="flex-1 flex justify-center gap-0.5">
+ 
+    <a href="home.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navHome">
+      <i class="fas fa-home"></i>
+      <span class="text-[10px] font-semibold">Home</span>
+    </a>
+ 
+    <a href="notification.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navNotifs">
+      <i class="fas fa-bell"></i>
+      <span class="text-[10px] font-semibold">Notifs</span>
+      <span class="notification-badge absolute top-2 right-[22px] min-w-[17px] h-[17px] px-1
+                   bg-red-500 text-white text-[10px] font-bold rounded-full
+                   hidden items-center justify-content border-2 border-[#242526]"
+            id="notificationBadge"></span>
+    </a>
+ 
+    <a href="organization.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navOrgs">
+      <i class="fas fa-users"></i>
+      <span class="text-[10px] font-semibold">Orgs</span>
+    </a>
+ 
+    <a href="activity-tracker.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navActivity">
+      <i class="fas fa-calendar-alt"></i>
+      <span class="text-[10px] font-semibold">Activity</span>
+    </a>
+ 
+    <a href="profile.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navProfile">
+      <i class="fas fa-user"></i>
+      <span class="text-[10px] font-semibold">Profile</span>
+    </a>
+ 
+  </div>
+ 
+  <!-- Right side -->
+  <div class="flex items-center gap-2 flex-shrink-0">
+ 
+    <button id="logoutBtn" title="Logout"
+            class="w-9 h-9 rounded-full bg-white/[0.08] border-none
+                   text-white/80 text-[15px] cursor-pointer
+                   flex items-center justify-center
+                   hover:bg-white/[0.14] transition-colors duration-150">
+      <i class="fas fa-sign-out-alt"></i>
+    </button>
+ 
+    <div id="navAvatar"
+         class="w-9 h-9 rounded-full bg-gradient-to-br from-[#e06a72] to-[#d65d64]
+                flex items-center justify-center
+                text-white font-bold text-[13px] cursor-pointer overflow-hidden
+                border-2 border-white/10">
+      ?
+    </div>
+ 
+  </div>
+</nav>
 
-    <title>DearBUP - Feel. Write. Share.</title>
+  <!-- ── PAGE BODY ────────────────────────────────────────── -->
+  <div class="page-body">
 
-    <link rel="stylesheet" href="../CSS/style.css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-
-  <body>
-    <!-- Sidebar -->
-
-    <div class="sidebar fixed top-0 left-0 h-screen w-[280px] bg-ash gray/95 backdrop-blur-xl border-r border-black/10 flex flex-col z-50 shadow-lg">
-      <div class="p-8 pb-0">
-        <div class="flex items-center gap-3 text-[#d65d64] text-2xl font-extrabold tracking-tight mb-10">
-          <img src="../images/Logo.svg" class="w-[50px] h-[50px]" />
-          <span>DearBUP</span>
-        </div>
+    <!-- LEFT — Organizations -->
+    <div class="left-panel">
+      <div class="panel-title">
+        Organizations
+        <a href="organization.html" class="panel-see-all">See all</a>
       </div>
+      <div id="orgsPanel">
+        <div class="orgs-loading"><i class="fas fa-spinner fa-spin"></i></div>
+      </div>
+    </div>
 
-      <nav class="flex-1 px-6 space-y-2">
-        <a href="#" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item active overflow-hidden">
-          <i class="fas fa-home w-6 text-lg"></i>
-          <span>Home</span>
-        </a>
+    <!-- CENTER — Feed -->
+    <div class="center-feed">
 
         <a href="notification.html" class="nav-item" style="position: relative; overflow: hidden;">
           <i class="fas fa-bell w-6 text-lg"></i>
@@ -52,11 +157,6 @@
         <a href="profile.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
           <i class="fas fa-user w-6 text-lg"></i>
           <span>Profile</span>
-        </a>
-          <a href="admin-dashboard.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
-          <i class="fas fa-user w-6 text-lg"></i>
-          <span>admin-dashboard</span>
-        </a>
       </nav>
 
       <div class="p-6 space-y-3">
@@ -70,488 +170,324 @@
           <div class="flex-1 min-w-0">
             <div class="text-sm font-semibold text-gray-700 truncate" id="sidebarName">
               Loading...
+      <!-- Letters -->
+      <div class="letters-section" id="lettersSection">
+        <div class="letters-scroll-wrapper">
+          <div class="letters-container" id="lettersContainer">
+            <div class="letter-card-add" id="addLetterCard">
+              <div class="letter-card-add-icon"><i class="fas fa-plus"></i></div>
+              <div class="letter-card-add-label">Write a<br>Letter</div>
             </div>
-
-            <div class="text-xs text-gray-400 truncate" id="sidebarCourse"></div>
           </div>
-
-          <button id="logoutBtn" class="text-gray-400 hover:text-red-500 transition" title="Logout">
-            <i class="fas fa-sign-out-alt text-sm"></i>
+          <button class="letters-arrow-btn" id="lettersArrowBtn" title="View all letters">
+            <i class="fas fa-arrow-right"></i>
           </button>
         </div>
+      </div>
 
-        <a href="#" id="writePostBtn" class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl text-white font-semibold bg-gradient-to-r from-[#e06a72] to-[#d65d64] shadow-lg hover:shadow-xl hover:-translate-y-1 transition">
+      <!-- Create post trigger -->
+      <div class="create-post-box" id="createPostTrigger">
+        <div class="create-row">
+          <div class="create-av" id="createAvatar">?</div>
+          <div class="create-input-fake" id="writePostBtn">What's on your mind?</div>
+        </div>
+        <div class="create-divider"></div>
+        <div class="create-actions">
+          <button class="create-action-btn" id="writePostBtnPhoto">
+            <i class="fas fa-image" style="color:#45bd62"></i> Photo
+          </button>
+          <button class="create-action-btn" id="writePostBtnSong">
+            <i class="fab fa-spotify" style="color:#1DB954"></i> Song
+          </button>
+        </div>
+      </div>
+
+      <!-- Posts Feed -->
+      <div class="posts-feed" id="postsFeed">
+        <div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);" id="feedLoader">
+          <i class="fas fa-spinner fa-spin" style="font-size:24px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — Activity Tracker -->
+    <div class="right-panel">
+      <div class="panel-title">
+        Activity Tracker
+        <a href="activity-tracker.html" class="panel-see-all">See all</a>
+      </div>
+      <div id="activitiesPanel">
+        <div class="acts-loading"><i class="fas fa-spinner fa-spin"></i></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ALL EXISTING MODALS (unchanged) ──────────────────── -->
+
+  <!-- Create Post Modal -->
+  <div class="modal" id="createPostModal">
+    <div class="modal-content" style="background:#242526;border-radius:20px;width:100%;max-width:560px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
+      <div class="modal-header" style="background:#2d2e2f;border-bottom:1px solid rgba(255,255,255,0.08);">
+        <h3 style="color:#e06a72;">What's on your mind?</h3>
+        <button class="close-modal" id="closeModal" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);">&times;</button>
+      </div>
+      <form id="postForm" class="post-form">
+        <textarea id="postContent" placeholder="Feel. Write. Share your BUP story..." maxlength="280"
+          style="background:transparent;color:#e0e0e0;padding:20px 24px;width:100%;border:none;outline:none;resize:none;min-height:110px;font-family:inherit;font-size:15px;"></textarea>
+        <!-- Media Upload -->
+        <div class="post-media-upload" id="postMediaUpload">
+          <label for="postFileInput" class="media-upload-label" id="mediaUploadLabel">
+            <i class="fas fa-image"></i><span>Add photo</span>
+          </label>
+          <input type="file" id="postFileInput" accept="image/*,video/*" style="display:none;" />
+          <div class="media-preview-wrap" id="mediaPreviewWrap" style="display:none;">
+            <img id="mediaPreviewImg" src="" alt="" />
+            <button type="button" id="removeMediaBtn" class="remove-media-btn"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <!-- Spotify -->
+        <div class="spotify-section" style="padding:0 16px 12px;">
+          <div class="spotify-search-bar">
+            <i class="fab fa-spotify spotify-icon"></i>
+            <input type="text" id="postSpotifyInput" placeholder="Attach a song (optional)…" autocomplete="off" />
+            <button type="button" id="postSpotifySearchBtn" class="spotify-search-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="spotify-results" id="postSpotifyResults" style="display:none;">
+            <div class="spotify-results-list" id="postSpotifyResultsList"></div>
+          </div>
+          <div class="spotify-selected" id="postSpotifySelected" style="display:none;">
+            <img id="postSelectedTrackArt" src="" alt="" />
+            <div class="selected-track-info">
+              <div class="selected-track-name" id="postSelectedTrackName"></div>
+              <div class="selected-track-artist" id="postSelectedTrackArtist"></div>
+            </div>
+            <button type="button" id="postClearTrackBtn" class="clear-track-btn"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div class="post-actions">
+          <div class="char-counter"><span id="charCount">0</span>/280</div>
+          <button type="submit" class="post-submit" id="postSubmitBtn" disabled>Post</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Letter Compose Modal -->
+  <div class="letter-compose-modal" id="letterComposeModal">
+    <div class="letter-compose-content">
+      <div class="letter-compose-header">
+        <div class="letter-compose-title">
           <i class="fas fa-feather-alt"></i>
-          Write
-        </a>
+          <h3>Write a Letter</h3>
+        </div>
+        <button class="close-modal" id="closeLetterModal">&times;</button>
       </div>
-    </div>
-
-    <button id="menuToggle" class="menu-toggle">
-      <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- Main Content -->
-
-    <div class="main-content">
-      <div class="center-feed">
-        <!-- Create Post Modal -->
-
-        <div class="modal" id="createPostModal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3>What's on your mind?</h3>
-
-              <button class="close-modal" id="closeModal">&times;</button>
+      <div class="letter-compose-body">
+        <input type="text" id="letterTitle" placeholder="Recipient Name:" maxlength="100"
+          style="width:100%;padding:10px 14px;border:1.5px solid rgba(214,93,100,0.2);border-radius:10px;font-size:14px;margin-bottom:10px;outline:none;box-sizing:border-box;background:rgba(255,255,255,0.06);color:#e0e0e0;" />
+        <select id="letterType"
+          style="width:100%;padding:10px 14px;border:1.5px solid rgba(214,93,100,0.2);border-radius:10px;font-size:14px;margin-bottom:10px;outline:none;color:#e0e0e0;box-sizing:border-box;background:#2d2e2f;">
+          <option value="general">General</option>
+          <option value="confession">Confession</option>
+          <option value="gratitude">Gratitude</option>
+          <option value="concern">Concern</option>
+        </select>
+        <textarea id="letterContent" placeholder="Dear BUP family… share what's on your heart." maxlength="500"></textarea>
+        <div class="letter-char-counter"><span id="letterCharCount">0</span>/500</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:12px;cursor:pointer;">
+          <input type="checkbox" id="letterAnonymous" style="width:15px;height:15px;" />
+          Post anonymously
+        </label>
+        <div class="spotify-section">
+          <div class="spotify-search-bar">
+            <i class="fab fa-spotify spotify-icon"></i>
+            <input type="text" id="spotifySearchInput" placeholder="Search a song for your letter…" autocomplete="off" />
+            <button type="button" id="spotifySearchBtn" class="spotify-search-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="spotify-results" id="spotifyResults" style="display:none;">
+            <div class="spotify-results-list" id="spotifyResultsList"></div>
+          </div>
+          <div class="spotify-selected" id="spotifySelected" style="display:none;">
+            <img id="selectedTrackArt" src="" alt="" />
+            <div class="selected-track-info">
+              <div class="selected-track-name" id="selectedTrackName"></div>
+              <div class="selected-track-artist" id="selectedTrackArtist"></div>
             </div>
-
-            <form id="postForm" class="post-form">
-              <textarea
-                id="postContent"
-                placeholder="Feel. Write. Share your BUP story..."
-                maxlength="280"
-              ></textarea>
-
-              <!-- 1. Media Upload FIRST -->
-              <div class="post-media-upload" id="postMediaUpload">
-                <label for="postFileInput" class="media-upload-label" id="mediaUploadLabel">
-                  <i class="fas fa-image"></i>
-                  <span>Add photo</span>
-                </label>
-                <input type="file" id="postFileInput" accept="image/*,video/*" style="display:none;" />
-                <div class="media-preview-wrap" id="mediaPreviewWrap" style="display:none;">
-                  <img id="mediaPreviewImg" src="" alt="" />
-                  <button type="button" id="removeMediaBtn" class="remove-media-btn">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-              </div>
-
-              <!-- 2. Spotify SECOND -->
-              <div class="spotify-section" style="margin-top:12px;">
-                <div class="spotify-search-bar">
-                  <i class="fab fa-spotify spotify-icon"></i>
-                  <input type="text" id="postSpotifyInput" placeholder="Attach a song (optional)…" autocomplete="off" />
-                  <button type="button" id="postSpotifySearchBtn" class="spotify-search-btn">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-                <div class="spotify-results" id="postSpotifyResults" style="display:none;">
-                  <div class="spotify-results-list" id="postSpotifyResultsList"></div>
-                </div>
-                <div class="spotify-selected" id="postSpotifySelected" style="display:none;">
-                  <img id="postSelectedTrackArt" src="" alt="" />
-                  <div class="selected-track-info">
-                    <div class="selected-track-name" id="postSelectedTrackName"></div>
-                    <div class="selected-track-artist" id="postSelectedTrackArtist"></div>
-                  </div>
-                  <button type="button" id="postClearTrackBtn" class="clear-track-btn">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-              </div>
-
-              <!-- 3. Actions last -->
-              <div class="post-actions">
-                <div class="char-counter"><span id="charCount">0</span>/280</div>
-                <button type="submit" class="post-submit" id="postSubmitBtn" disabled>Post</button>
-              </div>
-            </form>
+            <a id="selectedTrackLink" href="" target="_blank" class="spotify-open-btn">
+              <i class="fab fa-spotify"></i> Open
+            </a>
+            <button type="button" id="clearTrackBtn" class="clear-track-btn"><i class="fas fa-times"></i></button>
           </div>
         </div>
-
-        <!-- Letter Compose Modal -->
-
-        <div class="letter-compose-modal" id="letterComposeModal">
-          <div class="letter-compose-content">
-            <div class="letter-compose-header">
-              <div class="letter-compose-title">
-                <i class="fas fa-feather-alt"></i>
-
-                <h3>Write a Letter</h3>
-              </div>
-
-              <button class="close-modal" id="closeLetterModal">&times;</button>
-            </div>
-
-            <div class="letter-compose-body">
-              <input
-                type="text"
-                id="letterTitle"
-                placeholder="Reciepient Name:"
-                maxlength="100"
-                style="
-                  width: 100%;
-                  padding: 10px 14px;
-                  border: 1px solid #e5e7eb;
-                  border-radius: 10px;
-                  font-size: 14px;
-                  margin-bottom: 10px;
-                  outline: none;
-                  box-sizing: border-box;
-                "
-              />
-
-              <select
-                id="letterType"
-                style="
-                  width: 100%;
-                  padding: 10px 14px;
-                  border: 1px solid #e5e7eb;
-                  border-radius: 10px;
-                  font-size: 14px;
-                  margin-bottom: 10px;
-                  outline: none;
-                  color: #555;
-                  box-sizing: border-box;
-                "
-              >
-                <option value="general">General</option>
-
-                <option value="confession">Confession</option>
-
-                <option value="gratitude">Gratitude</option>
-
-                <option value="concern">Concern</option>
-              </select>
-
-              <textarea
-                id="letterContent"
-                placeholder="Dear BUP family… share what's on your heart."
-                maxlength="500"
-              ></textarea>
-
-              <div class="letter-char-counter">
-                <span id="letterCharCount">0</span>/500
-              </div>
-
-              <label
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 8px;
-                  font-size: 13px;
-                  color: #666;
-                  margin-bottom: 12px;
-                  cursor: pointer;
-                "
-              >
-                <input
-                  type="checkbox"
-                  id="letterAnonymous"
-                  style="width: 15px; height: 15px"
-                />
-
-                Post anonymously
-              </label>
-
-              <!-- Spotify for Letter -->
-
-              <div class="spotify-section">
-                <div class="spotify-search-bar">
-                  <i class="fab fa-spotify spotify-icon"></i>
-
-                  <input
-                    type="text"
-                    id="spotifySearchInput"
-                    placeholder="Search a song for your letter…"
-                    autocomplete="off"
-                  />
-
-                  <button
-                    type="button"
-                    id="spotifySearchBtn"
-                    class="spotify-search-btn"
-                  >
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-
-                <div
-                  class="spotify-results"
-                  id="spotifyResults"
-                  style="display: none"
-                >
-                  <div
-                    class="spotify-results-list"
-                    id="spotifyResultsList"
-                  ></div>
-                </div>
-
-                <div
-                  class="spotify-selected"
-                  id="spotifySelected"
-                  style="display: none"
-                >
-                  <img id="selectedTrackArt" src="" alt="" />
-
-                  <div class="selected-track-info">
-                    <div
-                      class="selected-track-name"
-                      id="selectedTrackName"
-                    ></div>
-
-                    <div
-                      class="selected-track-artist"
-                      id="selectedTrackArtist"
-                    ></div>
-                  </div>
-
-                  <a
-                    id="selectedTrackLink"
-                    href=""
-                    target="_blank"
-                    class="spotify-open-btn"
-                  >
-                    <i class="fab fa-spotify"></i> Open
-                  </a>
-
-                  <button
-                    type="button"
-                    id="clearTrackBtn"
-                    class="clear-track-btn"
-                  >
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-              </div>
-
-              <div class="letter-compose-footer">
-                <button class="letter-submit-btn" id="submitLetterBtn">
-                  <i class="fas fa-paper-plane"></i> Post Letter
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Letters Section -->
-
-        <div class="letters-section" id="lettersSection">
-          <div class="letters-scroll-wrapper">
-            <div class="letters-container" id="lettersContainer">
-              <div class="letter-card-add" id="addLetterCard">
-                <div class="letter-card-add-icon">
-                  <i class="fas fa-plus"></i>
-                </div>
-                <div class="letter-card-add-label">Write a Letter</div>
-              </div>
-            </div>
-            <button class="letters-arrow-btn" id="lettersArrowBtn" title="View all letters">
-              <i class="fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Posts Feed -->
-
-        <div class="posts-feed" id="postsFeed">
-          <div
-            style="text-align: center; padding: 40px; color: #aaa"
-            id="feedLoader"
-          >
-            <i class="fas fa-spinner fa-spin" style="font-size: 24px"></i>
-          </div>
+        <div class="letter-compose-footer">
+          <button class="letter-submit-btn" id="submitLetterBtn">
+            <i class="fas fa-paper-plane"></i> Post Letter
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Story Overlay -->
-
-    <div class="letter-story-overlay" id="letterStoryOverlay">
-      <button class="story-nav story-prev" id="storyPrev">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-
-      <button class="story-nav story-next" id="storyNext">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-
-      <div class="story-container-horiz">
-        <div class="story-progress-bar">
-          <div class="story-progress-fill" id="storyProgressFill"></div>
-        </div>
-
-        <div class="story-left-panel">
-          <div class="story-header-horiz">
-            <div class="story-avatar" id="storyAvatar"></div>
-
-            <div>
-              <div class="story-author" id="storyAuthor"></div>
-
-              <div class="story-label" id="storyTypeLabel">Letter</div>
-            </div>
-
-            <button class="story-close" id="storyClose">
-              <i class="fas fa-times"></i>
-            </button>
+  <!-- Story Overlay -->
+  <div class="letter-story-overlay" id="letterStoryOverlay">
+    <button class="story-nav story-prev" id="storyPrev"><i class="fas fa-chevron-left"></i></button>
+    <button class="story-nav story-next" id="storyNext"><i class="fas fa-chevron-right"></i></button>
+    <div class="story-container-horiz">
+      <div class="story-progress-bar"><div class="story-progress-fill" id="storyProgressFill"></div></div>
+      <div class="story-left-panel">
+        <div class="story-header-horiz">
+          <div class="story-avatar" id="storyAvatar"></div>
+          <div>
+            <div class="story-author" id="storyAuthor"></div>
+            <div class="story-label" id="storyTypeLabel">Letter</div>
           </div>
-
-          <div class="story-body">
-            <div class="story-quote-mark">"</div>
-
-            <div
-              class="story-title"
-              id="storyTitle"
-              style="
-                font-size: 16px;
-                font-weight: 600;
-                margin-bottom: 8px;
-                color: #d65d64;
-              "
-            ></div>
-
-            <div class="story-text" id="storyText"></div>
-          </div>
-
-          <div class="story-dots" id="storyDots"></div>
+          <button class="story-close" id="storyClose"><i class="fas fa-times"></i></button>
         </div>
-
-<div class="story-right-panel" id="storyRightPanel">
-  <div class="story-music-panel" id="storyMusicPanel" style="display: none; flex-direction: column; align-items: center; justify-content: center;">
-
-    <!-- Album art — hidden when embed loads -->
-    <div class="story-album-art-wrapper" id="storyAlbumArtWrapper">
-      <img class="story-album-art" id="storyAlbumArt" src="" alt="" />
-      <div class="story-album-spin-ring"></div>
-    </div>
-    <div class="story-track-info" id="storyTrackInfo">
-      <div class="story-track-name" id="storyTrackName"></div>
-      <div class="story-track-artist" id="storyTrackArtist"></div>
-    </div>
-    <a class="story-spotify-btn" id="storySpotifyBtn" href="" target="_blank">
-      <i class="fab fa-spotify"></i> Listen on Spotify
-    </a>
-    <div class="story-waveform" id="storyWaveform">
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-
-    <!-- Embed player injected here by JS -->
-    <div id="storyEmbedContainer" style="width:100%; display:none;"></div>
-
-  </div>
-  <div class="story-no-music" id="storyNoMusic" style="display: none">
-    <i class="fas fa-music"></i>
-    <span>No song attached</span>
-  </div>
-</div>
+        <div class="story-body">
+          <div class="story-quote-mark">"</div>
+          <div class="story-title" id="storyTitle" style="font-size:16px;font-weight:600;margin-bottom:8px;color:#d65d64;"></div>
+          <div class="story-text" id="storyText"></div>
+        </div>
+        <div class="story-dots" id="storyDots"></div>
+      </div>
+      <div class="story-right-panel" id="storyRightPanel">
+        <div class="story-music-panel" id="storyMusicPanel" style="display:none;flex-direction:column;align-items:center;justify-content:center;">
+          <div class="story-album-art-wrapper" id="storyAlbumArtWrapper">
+            <img class="story-album-art" id="storyAlbumArt" src="" alt="" />
+            <div class="story-album-spin-ring"></div>
+          </div>
+          <div class="story-track-info" id="storyTrackInfo">
+            <div class="story-track-name" id="storyTrackName"></div>
+            <div class="story-track-artist" id="storyTrackArtist"></div>
+          </div>
+          <a class="story-spotify-btn" id="storySpotifyBtn" href="" target="_blank">
+            <i class="fab fa-spotify"></i> Listen on Spotify
+          </a>
+          <div class="story-waveform" id="storyWaveform">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div id="storyEmbedContainer" style="width:100%;display:none;"></div>
+        </div>
+        <div class="story-no-music" id="storyNoMusic" style="display:none;">
+          <i class="fas fa-music"></i><span>No song attached</span>
+        </div>
       </div>
     </div>
-<div class="modal" id="commentModal">
-  <div class="modal-content comment-modal-content">
-
-    <!-- Post preview at top -->
-    <div class="comment-modal-post" id="commentModalPost"></div>
-
-    <div class="comment-modal-header">
-      <h3>Comments</h3>
-      <button class="close-modal" id="closeCommentModal">&times;</button>
-    </div>
-
-    <div id="commentsList" class="comments-list"></div>
-
-    <div class="comment-input-wrap">
-      <div class="comment-input-avatar" id="commentInputAvatar"></div>
-      <input
-        type="text"
-        id="commentInput"
-        placeholder="Write a comment…"
-        maxlength="200"
-        autocomplete="off"
-      />
-      <button id="commentSubmitBtn">
-        <i class="fas fa-paper-plane"></i>
-      </button>
-    </div>
   </div>
-</div>
 
-<!-- Share Modal -->
-<div class="modal" id="shareModal">
-  <div class="modal-content share-modal-content">
-
-    <!-- Post preview -->
-    <div class="share-modal-post" id="shareModalPost"></div>
-
-    <div class="share-modal-header">
-      <h3>Share Post</h3>
-      <button class="close-modal" id="closeShareModal">&times;</button>
-    </div>
-
-    <div class="share-modal-body">
-      <div class="share-caption-wrap">
-        <div class="share-user-avatar" id="shareUserAvatar"></div>
-        <textarea 
-          id="shareCaptionInput" 
-          placeholder="Say something about this…"
-          maxlength="280"
-          rows="3"
-        ></textarea>
+  <!-- Comment Modal -->
+  <div class="modal" id="commentModal">
+    <div class="modal-content comment-modal-content">
+      <div class="comment-modal-post" id="commentModalPost"></div>
+      <div class="comment-modal-header">
+        <h3>Comments</h3>
+        <button class="close-modal" id="closeCommentModal">&times;</button>
+      </div>
+      <div id="commentsList" class="comments-list"></div>
+      <div class="comment-input-wrap">
+        <div class="comment-input-avatar" id="commentInputAvatar"></div>
+        <input type="text" id="commentInput" placeholder="Write a comment…" maxlength="200" autocomplete="off" />
+        <button id="commentSubmitBtn"><i class="fas fa-paper-plane"></i></button>
       </div>
     </div>
-
-    <div class="share-modal-footer">
-      <button class="share-now-btn" id="shareNowBtn">
-        <i class="fas fa-share"></i> Share now
-      </button>
-    </div>
-
   </div>
-</div>
 
-<!-- ========== EDIT POST MODAL ========== -->
-<div class="modal" id="editModal">
-  <div class="modal-content edit-modal-content">
-
-    <div class="edit-modal-header">
-      <h3><i class="fas fa-pen" style="color:#e06a72; margin-right:8px;"></i>Edit post</h3>
-      <button class="close-modal" id="closeEditModal">&times;</button>
-    </div>
-
-    <div class="edit-modal-body">
-      <textarea
-        id="editContent"
-        maxlength="280"
-        placeholder="What's on your mind?"
-      ></textarea>
-      <div class="edit-char-counter">
-        <span id="editCharCount">0</span>/280
+  <!-- Share Modal -->
+  <div class="modal" id="shareModal">
+    <div class="modal-content share-modal-content">
+      <div class="share-modal-post" id="shareModalPost"></div>
+      <div class="share-modal-header">
+        <h3>Share Post</h3>
+        <button class="close-modal" id="closeShareModal">&times;</button>
+      </div>
+      <div class="share-modal-body">
+        <div class="share-caption-wrap">
+          <div class="share-user-avatar" id="shareUserAvatar"></div>
+          <textarea id="shareCaptionInput" placeholder="Say something about this…" maxlength="280" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="share-modal-footer">
+        <button class="share-now-btn" id="shareNowBtn"><i class="fas fa-share"></i> Share now</button>
       </div>
     </div>
-
-    <div class="edit-modal-footer">
-      <button class="edit-cancel-btn" id="closeEditModalFooter" onclick="document.getElementById('editModal').classList.remove('active')">Cancel</button>
-      <button class="edit-save-btn" id="editSaveBtn">Save changes</button>
-    </div>
-
   </div>
-</div>
 
-<!-- ========== DELETE POST MODAL ========== -->
-<div class="modal" id="deleteModal">
-  <div class="modal-content delete-modal-content">
-
-    <div class="delete-modal-icon">
-      <i class="fas fa-trash-alt"></i>
+  <!-- Edit Post Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content edit-modal-content">
+      <div class="edit-modal-header">
+        <h3><i class="fas fa-pen" style="color:#e06a72;margin-right:8px;"></i>Edit post</h3>
+        <button class="close-modal" id="closeEditModal">&times;</button>
+      </div>
+      <div class="edit-modal-body">
+        <textarea id="editContent" maxlength="280" placeholder="What's on your mind?"></textarea>
+        <div class="edit-char-counter"><span id="editCharCount">0</span>/280</div>
+      </div>
+      <div class="edit-modal-footer">
+        <button class="edit-cancel-btn" id="closeEditModalFooter" onclick="document.getElementById('editModal').classList.remove('active')">Cancel</button>
+        <button class="edit-save-btn" id="editSaveBtn">Save changes</button>
+      </div>
     </div>
-
-    <div class="delete-modal-body">
-      <h3>Delete post?</h3>
-      <p>This will be permanently deleted and cannot be undone.</p>
-    </div>
-
-    <div class="delete-modal-footer">
-      <button class="delete-cancel-btn" id="deleteCancelBtn">Cancel</button>
-      <button class="delete-confirm-btn" id="deleteConfirmBtn">
-        <i class="fas fa-trash-alt"></i> Delete
-      </button>
-    </div>
-
   </div>
-</div>
- 
 
-    <script type="module" src="../js/main.js"></script>
-  </body>
+  <!-- Delete Post Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content delete-modal-content">
+      <div class="delete-modal-icon"><i class="fas fa-trash-alt"></i></div>
+      <div class="delete-modal-body">
+        <h3>Delete post?</h3>
+        <p>This will be permanently deleted and cannot be undone.</p>
+      </div>
+      <div class="delete-modal-footer">
+        <button class="delete-cancel-btn" id="deleteCancelBtn">Cancel</button>
+        <button class="delete-confirm-btn" id="deleteConfirmBtn">
+          <i class="fas fa-trash-alt"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="../js/main.js"></script>
+
+  <script src="../js/home.js"></script>
+  <script>
+  const page = window.location.pathname.split('/').pop();
+  const map = {
+    'home.html':             'navHome',
+    'notification.html':     'navNotifs',
+    'organization.html':     'navOrgs',
+    'activity-tracker.html': 'navActivity',
+    'profile.html':          'navProfile',
+  };
+  const id = map[page];
+  if (id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add('!text-[#e06a72]', '!border-[#e06a72]');
+      el.classList.remove('text-white/45');
+    }
+  }
+
+  // Navbar avatar
+  const user = JSON.parse(localStorage.getItem('dearbup_user') || '{}');
+  const av = document.getElementById('navAvatar');
+  if (av && user.avatar_url) {
+    av.innerHTML = `<img src="${user.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+  } else if (av && user.display_name) {
+    av.textContent = user.display_name[0].toUpperCase();
+  }
+
+  // Logout
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('dearbup_token');
+    localStorage.removeItem('dearbup_user');
+    window.location.href = '../index.html';
+  });
+</script>
+</body>
 </html>

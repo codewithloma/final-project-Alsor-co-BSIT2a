@@ -305,3 +305,7 @@
   color: #d65d64;
   width: 18px;
 }
+.page-wrapper {
+    padding: 36px 40px 64px;   /* was 44px, already fine */
+    max-width: 1200px;
+}

@@ -1,5 +1,8 @@
 "use strict";
-const API_BASE = 'http://localhost:5000/api';
+import { API } from './config.js';
+
+const API_BASE = API;
+
 let allLetters = [];
 let activeFilter = 'all';
 

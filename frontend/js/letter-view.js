@@ -1,6 +1,8 @@
 "use strict";
 
-const API_BASE = 'http://localhost:5000/api';
+import { API } from './config.js';
+
+const API_BASE = API;
 
 function timeAgo(iso) {
     if (!iso) return '';
