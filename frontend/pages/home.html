@@ -417,17 +417,15 @@
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
-<div id="logoutModal" style="
-    display:none; position:fixed; inset:0; z-index:9999;
-    background:rgba(0,0,0,0.65); backdrop-filter:blur(12px);
-    align-items:center; justify-content:center; padding:20px;">
-  <div style="
+
+<!-- Logout Modal - HOME PAGE FIX -->
+<div class="modal" id="logoutModal" style="display:none;">
+  <div class="modal-content" id="logoutModalBox" style="
       background:#242526; border-radius:20px; width:100%; max-width:380px;
       padding:32px 28px; text-align:center;
       box-shadow:0 24px 60px rgba(0,0,0,0.5);
       border:1px solid rgba(255,255,255,0.08);
-      transform:scale(0.9); transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);"
-      id="logoutModalBox">
+      transform:scale(0.9); transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);">
 
     <div style="
         width:64px; height:64px; border-radius:50%;
