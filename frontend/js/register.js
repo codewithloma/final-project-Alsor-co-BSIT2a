@@ -18,8 +18,8 @@ window.addEventListener("load", () => {
         document.body.classList.remove("loading");
         setTimeout(() => {
             loader.style.display = "none";
-        }, 500); // was 1500
-    }, 1000); // was 5000
+        }, 1500); 
+    }, 5000);
 });
 
 // Initialize
