@@ -220,13 +220,13 @@ async function fetchOrganizations(department, search) {
   if (department && department !== 'all') params.set('department', department);
   if (search) params.set('search', search);
   const qs = params.toString();
-  return api.get(`/organization${qs ? '?' + qs : ''}`);
+  return api.get(`/organizations${qs ? '?' + qs : ''}`);
 }
 
 async function fetchOrgById(id) {
   if (CONFIG.USE_MOCK)
     return MOCK.orgs.find((o) => o._id === id) ?? null;
-  return api.get(`/organization/${id}`);
+  return api.get(`/organizations/${id}`);
 }
 
 async function fetchActivities(orgId) {
@@ -234,7 +234,7 @@ async function fetchActivities(orgId) {
     return MOCK.activities[orgId] ?? [];
   
   try {
-    return await api.get(`/organization/${orgId}/activities`);
+    return await api.get(`/organizations/${orgId}/activities`);
   } catch (error) {
     // If endpoint doesn't exist (404), just return empty array
     if (error.message.includes('404') || error.message.includes('Not Found')) {
@@ -263,7 +263,7 @@ async function requestJoin(orgId) {
     }
     return { message: 'Join request sent' };
   }
-  return api.post(`/organization/${orgId}/join`);
+  return api.post(`/organizations/${orgId}/join`);
 }
 
 async function requestLeave(orgId) {
@@ -276,7 +276,7 @@ async function requestLeave(orgId) {
       );
     return { message: 'Left organization' };
   }
-  return api.post(`/organization/${orgId}/leave`);
+  return api.post(`/organizations/${orgId}/leave`);
 }
 
 /* ──────────────────────────────────────────────────────
