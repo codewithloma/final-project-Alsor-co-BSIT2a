@@ -1,11 +1,11 @@
 /* =====================================================
-   DearBUP – Organizations  |  organization.js
+   DearBUP – Organizations  |  organizations.js
    
    API routes used (matching your Express backend):
-     GET  /api/organization              → getOrganizations
-     GET  /api/organization/:id          → getOrganizationById
-     POST /api/organization/:id/join     → joinOrganization
-     POST /api/organization/:id/leave    → leaveOrganization
+     GET  /api/organizations              → getOrganizations
+     GET  /api/organizations/:id          → getOrganizationById
+     POST /api/organizations/:id/join     → joinOrganization
+     POST /api/organizations/:id/leave    → leaveOrganization
    ===================================================== */
 
 'use strict';
@@ -148,7 +148,7 @@ const MOCK = {
       department: 'religious',
       department_id: '69f0cae42b6f2f68a4221485',
       description:
-        'A faith-based organization nurturing spiritual growth, moral formation, and community values among BU Polangui students and staff.',
+        'A faith-based organizations nurturing spiritual growth, moral formation, and community values among BU Polangui students and staff.',
       logo_url: null,
       created_by: { _id: 'u13', display_name: 'Grace Bautista', username: 'gbautista' },
       members: [
@@ -215,7 +215,7 @@ async function fetchOrganizations(department, search) {
       );
     return data;
   }
-  // Real backend: GET /api/organization?department=x&search=y
+  // Real backend: GET /api/organizations?department=x&search=y
   const params = new URLSearchParams();
   if (department && department !== 'all') params.set('department', department);
   if (search) params.set('search', search);
@@ -274,7 +274,7 @@ async function requestLeave(orgId) {
       org.members = org.members.filter(
         (m) => (m.user_id?._id || m.user_id) !== uid
       );
-    return { message: 'Left organization' };
+    return { message: 'Left organizations' };
   }
   return api.post(`/organizations/${orgId}/leave`);
 }
@@ -544,7 +544,7 @@ async function openModal(orgId) {
     const org = await fetchOrgById(orgId);
     
     if (!org) {
-      throw new Error('Organization not found');
+      throw new Error('organizations not found');
     }
     
     console.log('Org loaded:', org.org_name);
@@ -561,9 +561,9 @@ async function openModal(orgId) {
     populateModal(org, activities);
   } catch (err) {
     console.error('[DearBUP] openModal error:', err);
-    document.getElementById('modalName').innerHTML = 'Error loading organization';
-    document.getElementById('mAbout').innerHTML = err.message || 'Could not load organization details.';
-    showToast(err.message || 'Error loading organization', 'error');
+    document.getElementById('modalName').innerHTML = 'Error loading organizations';
+    document.getElementById('mAbout').innerHTML = err.message || 'Could not load organizations details.';
+    showToast(err.message || 'Error loading organizations', 'error');
   }
 }
 /* ──────────────────────────────────────────────────────
@@ -710,7 +710,7 @@ function renderMembers(approved) {
 
 /* ──────────────────────────────────────────────────────
    JOIN HANDLER
-   Matches: POST /api/organization/:id/join
+   Matches: POST /api/organizations/:id/join
    ────────────────────────────────────────────────────── */
 async function handleJoin() {
   if (!state.currentOrgId) return;
@@ -805,7 +805,7 @@ function resetFeedbackForm() {
 // is never visible when the modal first appears
 document.getElementById('openFeedbackBtn').addEventListener('click', () => {
   if (!state.currentOrg) {
-    showToast('No organization selected.', 'error');
+    showToast('No organizations selected.', 'error');
     return;
   }
   resetFeedbackForm();                                          // ← FIX 2
@@ -833,11 +833,11 @@ document.getElementById('sendFeedback').addEventListener('click', async () => {
   }
 
   if (!state.currentOrg) {
-    showToast('Please open an organization first.', 'error');
+    showToast('Please open an organizations first.', 'error');
     return;
   }
 
-  // Get department_id from the current organization
+  // Get department_id from the current organizations
   const dept_id = state.currentOrg.department_id;
   
   console.log('Sending feedback with:', {
@@ -847,7 +847,7 @@ document.getElementById('sendFeedback').addEventListener('click', async () => {
   });
   
   if (!dept_id) {
-    showToast('Organization department ID missing. Please contact admin.', 'error');
+    showToast('organizations department ID missing. Please contact admin.', 'error');
     console.error('Missing department_id for org:', state.currentOrg);
     return;
   }
