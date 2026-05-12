@@ -250,26 +250,38 @@ function renderPosts(posts, viewedUser, loggedInUser) {
         </div>`;
     }
 
-    let sharedHtml = '';
-    if (p.shared_from && p.shared_from._id) {
-      const orig     = p.shared_from;
-      const origUser = orig.user_id;
-      const origName = origUser?.display_name || origUser?.username || 'Someone';
-      const origAvatar = origUser?.avatar_url
-        ? `<img src="${escapeHTML(origUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-        : origName.charAt(0).toUpperCase();
+   let sharedHtml = '';
+const sharedFrom = p.shared_from;
+if (sharedFrom) {
+    // If it's just a string ID (not populated), show a placeholder
+    if (typeof sharedFrom === 'string' || !sharedFrom.user_id) {
+        sharedHtml = `
+            <div class="shared-post-card" style="opacity:0.5;">
+                <div style="text-align:center;padding:16px;font-size:13px;color:rgba(255,255,255,0.4);">
+                    <i class="fas fa-share" style="margin-right:6px;"></i>
+                    Original post unavailable
+                </div>
+            </div>`;
+    } else {
+        // Fully populated shared post
+        const orig     = sharedFrom;
+        const origUser = orig.user_id;
+        const origName = origUser?.display_name || origUser?.username || 'Someone';
+        const origAvatar = origUser?.avatar_url
+            ? `<img src="${escapeHTML(origUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : origName.charAt(0).toUpperCase();
 
-      let origSpotify = '';
-      if (orig.spotify_track_url) {
-        const id = extractSpotifyId(orig.spotify_track_url);
-        if (id) origSpotify = `
-          <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
-            <iframe src="https://open.spotify.com/embed/track/${id}"
-              width="100%" height="80" frameborder="0"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy" style="border-radius:12px;display:block;"></iframe>
-          </div>`;
-      }
+        let origSpotify = '';
+        if (orig.spotify_track_url) {
+            const id = extractSpotifyId(orig.spotify_track_url);
+            if (id) origSpotify = `
+                <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
+                    <iframe src="https://open.spotify.com/embed/track/${id}"
+                        width="100%" height="80" frameborder="0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy" style="border-radius:12px;display:block;"></iframe>
+                </div>`;
+        }
 
         sharedHtml = `
             <div class="shared-post-card">
@@ -295,6 +307,7 @@ function renderPosts(posts, viewedUser, loggedInUser) {
                 ${origSpotify}
             </div>`;
     }
+}
 
     return `
     <div class="post-card" data-post-id="${p._id}" style="animation-delay:${i * 0.06}s">
