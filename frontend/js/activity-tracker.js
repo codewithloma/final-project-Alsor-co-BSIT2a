@@ -263,7 +263,6 @@ function initLogoutModal() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', initLogoutModal);
 // =============================
 // INITIALIZE PAGE
 // =============================

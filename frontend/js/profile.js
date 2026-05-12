@@ -1133,8 +1133,6 @@ function initLogoutModal() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', initLogoutModal);
-
 document.addEventListener("DOMContentLoaded", () => {
   initNotificationBadge();
   setInterval(initNotificationBadge, 3000);
