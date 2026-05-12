@@ -323,7 +323,7 @@ function renderPosts(posts, viewedUser, loggedInUser) {
       </div>
         ${p.content ? `<div class="post-card-body">${formatContent(p.content)}${p.edited ? ' <span class="edited-tag">(edited)</span>' : ''}</div>` : ''}
 
-        ${p.media?.url ? `
+        ${p.media?.url && !p.shared_from ? `
         <div class="post-media" style="margin:10px 0;border-radius:12px;overflow:hidden;background:#000;">
             ${p.media.type === 'video'
                 ? `<video controls style="width:100%;max-height:500px;border-radius:12px;display:block;">
@@ -335,7 +335,7 @@ function renderPosts(posts, viewedUser, loggedInUser) {
             }
         </div>` : ''}
 
-        ${spotifyHtml}
+        ${p.shared_from ? '' : spotifyHtml}
         ${sharedHtml}
       <div class="post-card-footer">
         <button class="pc-action ${p.liked_by_me ? "liked" : ""}"
@@ -965,17 +965,28 @@ function openCommentModal(postId) {
                             </div>`;
                     }
 
-                    sharedHtml = `
-                        <div class="shared-post-card">
-                            <div class="shared-post-header">
-                                <div class="shared-post-avatar">${origAvatar}</div>
-                                <div class="shared-post-meta">
-                                    <div class="shared-post-author">${escapeHTML(origName)}</div>
-                                </div>
-                            </div>
-                            ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
-                            ${origSpotify}
-                        </div>`;
+                            sharedHtml = `
+                                <div class="shared-post-card">
+                                    <div class="shared-post-header">
+                                        <div class="shared-post-avatar">${origAvatar}</div>
+                                        <div class="shared-post-meta">
+                                            <div class="shared-post-author">${escapeHTML(origName)}</div>
+                                        </div>
+                                    </div>
+                                    ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
+                                    ${orig.media?.url ? `
+                                        <div style="margin-top:10px;border-radius:10px;overflow:hidden;background:#000;text-align:center;">
+                                            ${orig.media.type === 'video'
+                                                ? `<video controls style="width:100%;max-height:200px;border-radius:10px;display:block;">
+                                                    <source src="${orig.media.url}" />
+                                                </video>`
+                                                : `<img src="${orig.media.url}" alt=""
+                                                    style="max-width:100%;max-height:200px;width:auto;height:auto;display:block;margin:0 auto;border-radius:10px;object-fit:contain;"
+                                                    loading="lazy" />`
+                                            }
+                                        </div>` : ''}
+                                    ${origSpotify}
+                                </div>`;
                 }
 
                 preview.innerHTML = `
