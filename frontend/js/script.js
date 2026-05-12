@@ -1,7 +1,9 @@
 // DearBUP - Main Script
 // Wired to backend API
 
-const API = 'http://localhost:5000/api';
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/'
+  : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com/';
 
 // ─── Auth Helpers (mirrors register.js) ─────────────────────
 function getToken() {
