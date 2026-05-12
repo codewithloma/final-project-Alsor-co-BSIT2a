@@ -3,8 +3,9 @@
 //  Loads Organizations + Activity Tracker into home page panels
 //  IT 112 – 2A | AlSor Co | AY 2025-2026
 // ============================================================
+import { API } from './config.js';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = API;
 const getToken = () => localStorage.getItem('dearbup_token');
 const authHeaders = () => ({
     'Content-Type': 'application/json',
