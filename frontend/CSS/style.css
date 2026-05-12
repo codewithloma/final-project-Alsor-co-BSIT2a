@@ -1874,3 +1874,9 @@ body.loaded { animation: fadeIn 0.6s ease-out; }
     transform: translateY(-1px);
     box-shadow: 0 8px 20px rgba(214,93,100,0.4) !important;
 }
+#logoutModal.active {
+    display: flex !important;
+}
+#logoutModal.active #logoutModalBox {
+    transform: scale(1) !important;
+}
