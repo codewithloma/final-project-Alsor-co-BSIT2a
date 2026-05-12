@@ -18,14 +18,13 @@
 }
 
 /* ── Base ─────────────────────────────────────────────────── */
-
-/* ── Main Content ─────────────────────────────────────────── */
-.main-content {
-    margin-left: 280px;
-    height: 100vh;
-    overflow-y: auto;
-    scroll-behavior: smooth;
+body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
 }
+/* ── Main Content ─────────────────────────────────────────── */
+
 .main-content::-webkit-scrollbar       { width: 6px; }
 .main-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
 .main-content::-webkit-scrollbar-thumb { background: rgba(214,93,100,0.4); border-radius: 3px; }
@@ -244,16 +243,50 @@
 .shared-post-time   { font-size: 11px; color: rgba(255,255,255,0.4); }
 .shared-post-content { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; }
 
+/* ── Center Posts ───────────────────────────────────── */
+
+.profile-posts-side {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+}
+
+#postsContainer {
+    width: 100%;
+    max-width: 760px;
+}
+
 /* ── About Grid ───────────────────────────────────────────── */
-.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+#tab-about {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.about-grid {
+    width: 100%;
+    max-width: 900px;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
 .about-card {
-    background: #242526; border-radius: 20px; padding: 22px;
+    background: #242526;
+    border-radius: 20px;
+    padding: 22px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     animation: fadeSlide 0.4s ease-out both;
 }
 .about-card h3 {
-    font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4);
-    letter-spacing: 1.3px; text-transform: uppercase; margin-bottom: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 18px;
+    letter-spacing: 0;
+    text-transform: none;
 }
 .info-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
 .info-row:last-child { margin-bottom: 0; }
@@ -355,7 +388,35 @@
 }
 .btn-save-em:hover    { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(214,93,100,0.35); }
 .btn-save-em:disabled { opacity: 0.65; pointer-events: none; }
+.profile-content-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
 
+.profile-about-side {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 72px;          /* ← navbar height exactly */
+    align-self: flex-start;
+    max-height: calc(100vh - 72px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    left: 150px;
+}
+.profile-about-side::-webkit-scrollbar { display: none; }
+
+.profile-posts-side {
+    flex: 1;
+    min-width: 0;
+}
+
+.about-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
 /* ── Toast ────────────────────────────────────────────────── */
 .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
 .toast.error   { background: linear-gradient(135deg, #ef4444, #dc2626); }
@@ -369,9 +430,25 @@
     .profile-tabs::-webkit-scrollbar { display: none; }
     .about-grid             { grid-template-columns: 1fr; }
     .profile-main-row       { flex-direction: column; align-items: flex-start; }
+    
+    /* Make about side full width and not sticky on mobile */
+    .profile-about-side {
+        position: static;
+        width: 100%;
+        top: auto;
+    }
+    
+    .profile-content-layout {
+        flex-direction: column;
+    }
 }
+
 @media (max-width: 480px) {
     .profile-cover        { height: 150px; }
     .profile-display-name { font-size: 18px; }
     .profile-avatar       { width: 80px; height: 80px; font-size: 28px; }
+    
+    .profile-about-side {
+        width: 100%;
+    }
 }

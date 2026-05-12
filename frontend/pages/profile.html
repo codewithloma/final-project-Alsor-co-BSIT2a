@@ -6,83 +6,119 @@
   <title>DearBUP – Profile</title>
 
   <link rel="stylesheet" href="../CSS/style.css" />
-  <link rel="stylesheet" href="../CSS/sidebar.css" />
+  <link rel="stylesheet" href="../CSS/home.css" />
   <link rel="stylesheet" href="../CSS/profile.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-
-  <!-- ── Sidebar ───────────────────────────────────────────── -->
- <div class="sidebar fixed top-0 left-0 h-screen w-[280px] bg-ash gray/95 backdrop-blur-xl border-r border-black/10 flex flex-col z-50 shadow-lg">
-      <div class="p-8 pb-0">
-        <div class="flex items-center gap-3 text-[#d65d64] text-2xl font-extrabold tracking-tight mb-10">
-          <img src="../images/Logo.svg" class="w-[50px] h-[50px]" />
-          <span>DearBUP</span>
-        </div>
-      </div>
-
-      <nav class="flex-1 px-6 space-y-2">
-        <a href="home.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
-          <i class="fas fa-home w-6 text-lg"></i>
-          <span>Home</span>
-        </a>
-
-        <a href="notification.html" class="nav-item" style="position: relative; overflow: hidden;">
-          <i class="fas fa-bell w-6 text-lg"></i>
-          <span>Notifications</span>
-          <span 
-            class="notification-badge" 
-            id="notificationBadge" 
-            style="display:none;"
-          ></span>
-        </a>
-
-        <a href="organization.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
-          <i class="fas fa-users w-6 text-lg"></i>
-          <span>Organizations</span>
-        </a>
-        <a href="activity-tracker.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden">
-          <i class="fas fa-calendar-alt w-6 text-lg"></i>
-          <span>Activity Tracker</span>
-        </a>
-        <a href="profile.html" class="flex items-center gap-5 px-4 py-3 rounded-xl text-gray-500 font-medium hover:text-[#d65d64] hover:bg-[#e0c0ac]/20 transition nav-item overflow-hidden" id ="profileNavItem">
-          <i class="fas fa-user w-6 text-lg"></i>
-          <span>Profile</span>
-        </a>
-      </nav>
-
-      <div class="p-6 space-y-3">
-        <!-- Logged in user -->
-
-        <div class="flex items-center gap-3 px-2 pb-3 border-b border-black/10">
-          <div class="w-9 h-9 rounded-full bg-[#e06a72] flex items-center justify-center text-white font-bold text-sm" id="sidebarAvatar">
-            ?
-          </div>
-
-          <div class="flex-1 min-w-0">
-            <div class="text-sm font-semibold text-gray-700 truncate" id="sidebarName">
-              Loading...
-            </div>
-
-            <div class="text-xs text-gray-400 truncate" id="sidebarCourse"></div>
-          </div>
-
-          <button id="logoutBtn" class="text-gray-400 hover:text-red-500 transition" title="Logout">
-            <i class="fas fa-sign-out-alt text-sm"></i>
-          </button>
-        </div>
-
-        <a href="#" id="writePostBtn" class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl text-white font-semibold bg-gradient-to-r from-[#e06a72] to-[#d65d64] shadow-lg hover:shadow-xl hover:-translate-y-1 transition">
-          <i class="fas fa-feather-alt"></i>
-          Write
-        </a>
-      </div>
+<!-- ── TOP NAVBAR (Tailwind) ───────────────────────────────── -->
+<nav class="fixed top-0 left-0 right-0 z-[200] h-14 bg-[#242526] border-b border-white/[0.08] flex items-center px-4 gap-2">
+ 
+  <!-- Logo -->
+  <a href="#" class="flex items-center gap-2.5 flex-shrink-0 no-underline">
+    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#e06a72] to-[#d65d64] flex items-center justify-center overflow-hidden">
+      <img src="../images/Logo.svg" alt="DearBUP" class="w-full h-full object-cover" />
     </div>
-
-  <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
-
+    <span class="text-[#e06a72] font-extrabold text-[17px] hidden sm:block">DearBUP</span>
+  </a>
+ 
+  <!-- Center tabs -->
+  <div class="flex-1 flex justify-center gap-0.5">
+ 
+    <a href="home.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navHome">
+      <i class="fas fa-home"></i>
+      <span class="text-[10px] font-semibold">Home</span>
+    </a>
+ 
+    <a href="notification.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navNotifs">
+      <i class="fas fa-bell"></i>
+      <span class="text-[10px] font-semibold">Notifs</span>
+      <span class="notification-badge absolute top-2 right-[22px] min-w-[17px] h-[17px] px-1
+                   bg-red-500 text-white text-[10px] font-bold rounded-full
+                   hidden items-center justify-content border-2 border-[#242526]"
+            id="notificationBadge"></span>
+    </a>
+ 
+    <a href="organization.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navOrgs">
+      <i class="fas fa-users"></i>
+      <span class="text-[10px] font-semibold">Orgs</span>
+    </a>
+ 
+    <a href="activity-tracker.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navActivity">
+      <i class="fas fa-calendar-alt"></i>
+      <span class="text-[10px] font-semibold">Activity</span>
+    </a>
+ 
+    <a href="profile.html"
+       class="flex flex-col items-center justify-center w-[108px] h-[54px] gap-0.5
+              text-white/45 text-[19px] no-underline
+              border-b-[3px] border-transparent
+              rounded-t-lg relative top-px
+              hover:bg-white/5 hover:text-white/75
+              transition-all duration-150
+              [&.active]:text-[#e06a72] [&.active]:border-[#e06a72]"
+       id="navProfile">
+      <i class="fas fa-user"></i>
+      <span class="text-[10px] font-semibold">Profile</span>
+    </a>
+ 
+  </div>
+ 
+  <!-- Right side -->
+  <div class="flex items-center gap-2 flex-shrink-0">
+ 
+    <button id="logoutBtn" title="Logout"
+            class="w-9 h-9 rounded-full bg-white/[0.08] border-none
+                   text-white/80 text-[15px] cursor-pointer
+                   flex items-center justify-center
+                   hover:bg-white/[0.14] transition-colors duration-150">
+      <i class="fas fa-sign-out-alt"></i>
+    </button>
+ 
+    <div id="navAvatar"
+         class="w-9 h-9 rounded-full bg-gradient-to-br from-[#e06a72] to-[#d65d64]
+                flex items-center justify-center
+                text-white font-bold text-[13px] cursor-pointer overflow-hidden
+                border-2 border-white/10">
+      ?
+    </div>
+ 
+  </div>
+</nav>
   <!-- ── Main Content ──────────────────────────────────────── -->
   <div class="main-content" id="mainContent">
 
@@ -129,37 +165,36 @@
     </div>
 
     <!-- Tabs -->
-    <div class="profile-tabs">
-      <button class="tab-btn active" data-tab="posts">
-        <i class="fas fa-th-list"></i> Posts
-      </button>
-      <button class="tab-btn" data-tab="about">
-        <i class="fas fa-info-circle"></i> About
-      </button>
-    </div>
+<div class="profile-tabs">
+  <button class="tab-btn active" data-tab="posts">
+    <i class="fas fa-th-list"></i> Posts
+  </button>
+</div>
 
     <!-- Tab Panels -->
     <div class="tab-content-wrap">
 
-      <div class="tab-panel active" id="tab-posts">
-        <div id="postsContainer">
-          <div class="feed-loader">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading posts…</p>
-          </div>
+<div class="tab-panel active" id="tab-posts">
+
+  <div class="profile-content-layout">
+
+    <!-- LEFT SIDE -->
+    <div class="profile-about-side">
+      <div class="about-grid" id="aboutContainer">
+        <div class="feed-loader" style="grid-column:1/-1">
+          <i class="fas fa-spinner fa-spin"></i>
         </div>
       </div>
-
-      <div class="tab-panel" id="tab-about">
-        <div class="about-grid" id="aboutContainer">
-          <div class="feed-loader" style="grid-column:1/-1">
-            <i class="fas fa-spinner fa-spin"></i>
-          </div>
-        </div>
-      </div>
-
     </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="profile-posts-side">
+      <div id="postsContainer">
+      </div>
+    </div>
+
   </div>
+</div>
 
   <!-- ── Edit Profile Modal ────────────────────────────────── -->
   <div class="modal-overlay" id="editModal">
@@ -271,5 +306,40 @@
 </div>
 
   <script src="../js/profile.js"></script>
+
+  <script>
+  const page = window.location.pathname.split('/').pop();
+  const map = {
+    'home.html':             'navHome',
+    'notification.html':     'navNotifs',
+    'organization.html':     'navOrgs',
+    'activity-tracker.html': 'navActivity',
+    'profile.html':          'navProfile',
+  };
+  const id = map[page];
+  if (id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add('!text-[#e06a72]', '!border-[#e06a72]');
+      el.classList.remove('text-white/45');
+    }
+  }
+
+  // Navbar avatar
+  const user = JSON.parse(localStorage.getItem('dearbup_user') || '{}');
+  const av = document.getElementById('navAvatar');
+  if (av && user.avatar_url) {
+    av.innerHTML = `<img src="${user.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+  } else if (av && user.display_name) {
+    av.textContent = user.display_name[0].toUpperCase();
+  }
+
+  // Logout
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('dearbup_token');
+    localStorage.removeItem('dearbup_user');
+    window.location.href = '../index.html';
+  });
+</script>
 </body>
 </html>

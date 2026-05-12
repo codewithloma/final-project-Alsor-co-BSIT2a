@@ -435,26 +435,6 @@ function renderAbout(user) {
           <div class="value">@${escapeHTML(user.username || "—")}</div>
         </div>
       </div>
-      <div class="info-row">
-        <div class="info-icon"><i class="fas fa-envelope"></i></div>
-        <div class="info-text">
-          <div class="label">Email</div>
-          <div class="value">${escapeHTML(user.email || "—")}</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <div class="info-icon"><i class="fas fa-id-badge"></i></div>
-        <div class="info-text">
-          <div class="label">Student ID</div>
-          <div class="value">${escapeHTML(user.student_id || "—")}</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <div class="info-icon"><i class="fas fa-shield-alt"></i></div>
-        <div class="info-text">
-          <div class="label">Role</div>
-          <div class="value" style="text-transform:capitalize">${escapeHTML(user.user_type || "student")}</div>
-        </div>
       </div>
     </div>
 
