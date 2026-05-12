@@ -100,12 +100,17 @@ const posts = await Post.find({ user_id: userId })
     .populate('user_id', 'username display_name avatar_url')
     .populate({
         path: 'shared_from',
+        select: 'content media spotify_track_url createdAt user_id',
         populate: {
             path: 'user_id',
             select: 'username display_name avatar_url'
         }
     })
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
+
+return res.json(posts);
+
     const transformedPosts = posts.map(post => ({
       ...post.toObject(),
       likes_count: post.reactions.length,
