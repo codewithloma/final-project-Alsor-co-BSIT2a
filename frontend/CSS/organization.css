@@ -310,8 +310,7 @@ body {
 }
 
 .page-wrapper {
-  padding: 44px 40px 64px;
-  max-width: 1200px;
+    padding: 44px 40px 64px;
 }
 
 /* ── Page Header ── */
