@@ -18,9 +18,9 @@
 // ============================================================
 
 "use strict";
-const API_BASE_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:5000/'
-  : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com/';
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com/api';
 const INDEX_URL  = "../index.html";
 const HOME_URL   = "../pages/home.html";
 
