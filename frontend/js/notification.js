@@ -516,5 +516,3 @@ function initLogoutModal() {
         }, 600);
     });
 }
-
-document.addEventListener('DOMContentLoaded', initLogoutModal);
