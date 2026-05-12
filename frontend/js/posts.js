@@ -311,18 +311,29 @@ async uploadImageToCloudinary(file) {
                     </div>`;
             }
 
-            sharedHtml = `
-                <div class="shared-post-card">
-                    <div class="shared-post-header">
-                        <div class="shared-post-avatar">${origAvatar}</div>
-                        <div class="shared-post-meta">
-                            <div class="shared-post-author">${origName}</div>
-                            <div class="shared-post-time">${formatTime(orig.createdAt)}</div>
-                        </div>
-                    </div>
-                    <div class="shared-post-content">${formatContent(orig.content || '')}</div>
-                    ${origSpotify}
-                </div>`;
+                    sharedHtml = `
+                        <div class="shared-post-card">
+                            <div class="shared-post-header">
+                                <div class="shared-post-avatar">${origAvatar}</div>
+                                <div class="shared-post-meta">
+                                    <div class="shared-post-author">${origName}</div>
+                                    <div class="shared-post-time">${formatTime(orig.createdAt)}</div>
+                                </div>
+                            </div>
+                            ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
+                            ${orig.media?.url ? `
+                                <div style="margin-top:10px;border-radius:10px;overflow:hidden;background:#000;text-align:center;">
+                                    ${orig.media.type === 'video'
+                                        ? `<video controls style="width:100%;max-height:300px;border-radius:10px;display:block;">
+                                            <source src="${orig.media.url}" />
+                                        </video>`
+                                        : `<img src="${orig.media.url}" alt=""
+                                            style="max-width:100%;max-height:300px;width:auto;height:auto;display:block;margin:0 auto;border-radius:10px;object-fit:contain;"
+                                            loading="lazy" />`
+                                    }
+                                </div>` : ''}
+                            ${origSpotify}
+                        </div>`;
         }
 
         // Store share count on the element for easy access
@@ -796,6 +807,9 @@ async handlePostSubmit(e) {
                 ? `<img src="${currentUser.avatar_url}" alt="" />`
                 : (currentUser?.display_name || currentUser?.name || 'U').charAt(0).toUpperCase();
 
+            const scrollArea = document.getElementById('commentScrollArea');
+            if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+            
             const item = document.createElement('div');
             item.className = 'comment-item';
             item.innerHTML = `
@@ -807,7 +821,7 @@ async handlePostSubmit(e) {
                     </div>
                 </div>`;
             list.appendChild(item);
-            list.scrollTop = list.scrollHeight;
+
 
             if (input) input.value = '';
             showToast('Comment posted! 💬');
