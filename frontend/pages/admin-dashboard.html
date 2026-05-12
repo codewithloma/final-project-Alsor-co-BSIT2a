@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DearBUP — Admin Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../CSS/admin-dashboard.css" />
+</head>
+<body>
+
+  <!-- ── BACK BUTTON ───────────────────────────────── -->
+  <a href="home.html" class="back-btn" id="backHomeBtn">
+    <i class="fas fa-arrow-left"></i>
+    <span>Back to Home</span>
+  </a>
+
+  <!-- ── TOP NAV BAR ───────────────────────────────── -->
+  <nav class="top-nav" id="topNav">
+    <div class="top-nav-brand">
+      <div class="brand-logo">
+        <img src="../images/Logo.svg" alt="DearBUP" onerror="this.style.display='none'" />
+      </div>
+      <span class="brand-name">DearBUP</span>
+      <span class="admin-pill">Admin</span>
+    </div>
+
+    <div class="top-nav-links">
+      <a href="#" class="nav-item active" data-section="overview">
+        <i class="fas fa-chart-pie"></i>
+        <span>Overview</span>
+      </a>
+      <a href="#" class="nav-item" data-section="organizations">
+        <i class="fas fa-users"></i>
+        <span>Organizations</span>
+        <span class="nav-badge" id="navPendingBadge" style="display:none"></span>
+      </a>
+      <a href="#" class="nav-item" data-section="events">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Events</span>
+      </a>
+      <a href="#" class="nav-item" data-section="members">
+        <i class="fas fa-user-check"></i>
+        <span>Members</span>
+        <span class="nav-badge" id="navMemberBadge" style="display:none"></span>
+      </a>
+      <a href="#" class="nav-item" data-section="officers">
+        <i class="fas fa-shield-alt"></i>
+        <span>Officers</span>
+      </a>
+    </div>
+
+    <div class="top-nav-user">
+      <div class="admin-avatar" id="sidebarAvatar">A</div>
+      <div class="admin-info">
+        <div class="admin-name" id="sidebarName">Admin</div>
+        <div class="admin-role">System Administrator</div>
+      </div>
+      <button class="logout-btn" id="logoutBtn" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── MAIN ───────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- ── OVERVIEW SECTION ─────────────────────────── -->
+    <section class="section active" id="section-overview">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Dashboard Overview</h1>
+          <p class="section-sub">Welcome back — here's what's happening at DearBUP</p>
+        </div>
+        <button class="btn-refresh" onclick="initDashboard()">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card" data-section="organizations">
+          <div class="stat-icon c-purple"><i class="fas fa-users"></i></div>
+          <div class="stat-body">
+            <div class="stat-num" id="statOrgs">—</div>
+            <div class="stat-label">Total Organizations</div>
+          </div>
+        </div>
+        <div class="stat-card" data-section="members">
+          <div class="stat-icon c-amber"><i class="fas fa-user-clock"></i></div>
+          <div class="stat-body">
+            <div class="stat-num" id="statPending">—</div>
+            <div class="stat-label">Pending Requests</div>
+          </div>
+        </div>
+        <div class="stat-card" data-section="events">
+          <div class="stat-icon c-teal"><i class="fas fa-calendar-check"></i></div>
+          <div class="stat-body">
+            <div class="stat-num" id="statEvents">—</div>
+            <div class="stat-label">Total Events</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon c-coral"><i class="fas fa-user-friends"></i></div>
+          <div class="stat-body">
+            <div class="stat-num" id="statMembers">—</div>
+            <div class="stat-label">Active Members</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-inbox"></i> Pending Member Requests</h2>
+          <button class="btn-link" data-section="members">View all</button>
+        </div>
+        <div class="card-body" id="overviewPending">
+          <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading…</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-calendar-alt"></i> Upcoming Events</h2>
+          <button class="btn-link" data-section="events">View all</button>
+        </div>
+        <div class="card-body" id="overviewEvents">
+          <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ORGANIZATIONS SECTION ─────────────────────── -->
+    <section class="section" id="section-organizations">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Organizations</h1>
+          <p class="section-sub">All recognized CBOs at BU Polangui</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" id="orgSearch" placeholder="Search organizations…" />
+        </div>
+        <select class="select-filter" id="orgDeptFilter">
+          <option value="">All Departments</option>
+          <option>Computer Studies Department</option>
+          <option>Engineering Department</option>
+          <option>Nursing Department</option>
+          <option>Technology Department</option>
+          <option>Entrepreneur Department</option>
+          <option>Education Department Technology</option>
+        </select>
+      </div>
+
+      <div class="orgs-grid" id="orgsGrid">
+        <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading organizations…</div>
+      </div>
+    </section>
+
+    <!-- ── EVENTS SECTION ────────────────────────────── -->
+    <section class="section" id="section-events">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Events</h1>
+          <p class="section-sub">All activities across organizations</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" id="eventSearch" placeholder="Search events…" />
+        </div>
+        <select class="select-filter" id="eventStatusFilter">
+          <option value="">All Statuses</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="today">Today</option>
+          <option value="past">Past</option>
+        </select>
+        <select class="select-filter" id="eventOrgFilter">
+          <option value="">All Organizations</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="eventsTable">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Organization</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>RSVPs</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="eventsBody">
+            <tr><td colspan="7" class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="eventsPagination"></div>
+    </section>
+
+    <!-- ── MEMBER REQUESTS SECTION ───────────────────── -->
+    <section class="section" id="section-members">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Member Requests</h1>
+          <p class="section-sub">Approve or reject pending membership requests</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <select class="select-filter" id="memberOrgFilter">
+          <option value="">All Organizations</option>
+        </select>
+      </div>
+
+      <div id="memberRequestsList">
+        <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading requests…</div>
+      </div>
+    </section>
+
+    <!-- ── OFFICERS SECTION ──────────────────────────── -->
+    <section class="section" id="section-officers">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Officers</h1>
+          <p class="section-sub">Manage organization officers and roles</p>
+        </div>
+        <button class="btn-primary" id="assignOfficerBtn">
+          <i class="fas fa-plus"></i> Assign Officer
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <select class="select-filter" id="officerOrgFilter">
+          <option value="">All Organizations</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="officersTable">
+          <thead>
+            <tr>
+              <th>Officer</th>
+              <th>Organization</th>
+              <th>Role</th>
+              <th>Assigned</th>
+            </tr>
+          </thead>
+          <tbody id="officersBody">
+            <tr><td colspan="4" class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── ORG DETAIL DRAWER ─────────────────────────── -->
+  <div class="drawer-overlay" id="drawerOverlay">
+    <div class="drawer" id="orgDrawer">
+      <div class="drawer-header">
+        <h2 class="drawer-title" id="drawerOrgName">Organization</h2>
+        <button class="drawer-close" id="drawerClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="drawer-body">
+        <div class="drawer-stats" id="drawerStats"></div>
+        <div class="drawer-section">
+          <h3 class="drawer-section-title"><i class="fas fa-user-clock"></i> Pending Requests</h3>
+          <div id="drawerPending"></div>
+        </div>
+        <div class="drawer-section">
+          <h3 class="drawer-section-title"><i class="fas fa-users"></i> Approved Members</h3>
+          <div id="drawerMembers"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ASSIGN OFFICER MODAL ──────────────────────── -->
+  <div class="modal-overlay" id="assignModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fas fa-shield-alt"></i> Assign Officer</h3>
+        <button class="modal-close" id="assignModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Organization</label>
+        <select class="form-select" id="assignOrg"></select>
+        <label class="form-label">User ID</label>
+        <input class="form-input" type="text" id="assignUserId" placeholder="MongoDB ObjectId of user" />
+        <label class="form-label">Officer Role</label>
+        <select class="form-select" id="assignRole">
+          <option value="president">President</option>
+          <option value="vice_president">Vice President</option>
+          <option value="secretary">Secretary</option>
+          <option value="treasurer">Treasurer</option>
+          <option value="member">Member</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="assignCancelBtn">Cancel</button>
+        <button class="btn-primary" id="assignSubmitBtn">
+          <i class="fas fa-check"></i> Assign
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONFIRM MODAL ─────────────────────────────── -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3 id="confirmTitle">Confirm Action</h3>
+        <button class="modal-close" id="confirmClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMsg" style="color:var(--text-sub);font-size:0.92rem;line-height:1.6"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="confirmCancelBtn">Cancel</button>
+        <button class="btn-danger" id="confirmOkBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DELETE EVENT MODAL ─────────────────────────── -->
+  <div class="modal-overlay" id="deleteEventModal">
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3>Delete Event</h3>
+        <button class="modal-close" id="deleteEventClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-sub);font-size:0.92rem;line-height:1.6">
+          Are you sure you want to permanently delete this event? This cannot be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="deleteEventCancel">Cancel</button>
+        <button class="btn-danger" id="deleteEventConfirm">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>
