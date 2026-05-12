@@ -18,7 +18,13 @@
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:5000/api'
   : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com/api';
-
+  
+const CONFIG = {
+  BASE_URL: window.location.hostname === 'localhost'
+    ? 'http://localhost:5000/'
+    : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com/',
+  USE_MOCK: false
+};
 
 const getToken  = () => localStorage.getItem('dearbup_token');
 const getUserId = () => {
