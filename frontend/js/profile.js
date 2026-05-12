@@ -14,8 +14,9 @@
 
 "use strict";
 
-// ── Config ────────────────────────────────────────────────
-const API_BASE  = "http://localhost:5000/api";
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/'
+  : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com/';
 const INDEX_URL = "../index.html"; // Adjust to your actual login/landing page path
 
 
