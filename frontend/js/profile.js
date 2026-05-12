@@ -978,6 +978,17 @@ function openCommentModal(postId) {
                         </div>
                     </div>
                     ${post.content ? `<div style="font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:8px;">${formatContent(post.content)}</div>` : ''}
+                    ${post.media?.url ? `
+                        <div style="margin-top:8px;border-radius:10px;overflow:hidden;background:#000;text-align:center;margin-bottom:8px;">
+                            ${post.media.type === 'video'
+                                ? `<video controls style="width:100%;max-height:200px;border-radius:10px;display:block;">
+                                      <source src="${post.media.url}" />
+                                  </video>`
+                                : `<img src="${post.media.url}" alt=""
+                                      style="max-width:100%;max-height:200px;width:auto;height:auto;display:block;margin:0 auto;border-radius:10px;object-fit:contain;"
+                                      loading="lazy" />`
+                            }
+                        </div>` : ''}
                     ${postSpotify}
                     ${sharedHtml}
                     <div class="cmp-stats">
