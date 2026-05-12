@@ -293,7 +293,54 @@
 
 
 <div class="toast" id="toast"></div>
-  <script type="module" src="/js/organization.js"></script>
+<div id="logoutModal" style="
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.65); backdrop-filter:blur(12px);
+    align-items:center; justify-content:center; padding:20px;">
+  <div style="
+      background:#242526; border-radius:20px; width:100%; max-width:380px;
+      padding:32px 28px; text-align:center;
+      box-shadow:0 24px 60px rgba(0,0,0,0.5);
+      border:1px solid rgba(255,255,255,0.08);
+      transform:scale(0.9); transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);"
+      id="logoutModalBox">
+
+    <div style="
+        width:64px; height:64px; border-radius:50%;
+        background:rgba(224,106,114,0.12);
+        display:flex; align-items:center; justify-content:center;
+        margin:0 auto 18px;">
+      <i class="fas fa-sign-out-alt" style="font-size:26px; color:#e06a72;"></i>
+    </div>
+
+    <h3 style="color:#fff; font-size:18px; font-weight:700; margin-bottom:8px;">
+      Log out?
+    </h3>
+    <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.6; margin-bottom:24px;">
+      Are you sure you want to log out of DearBUP?
+    </p>
+
+    <div style="display:flex; gap:10px;">
+      <button id="logoutCancelBtn" style="
+          flex:1; padding:11px; border-radius:10px;
+          background:rgba(255,255,255,0.08); border:none;
+          color:rgba(255,255,255,0.7); font-family:inherit;
+          font-size:14px; font-weight:600; cursor:pointer;
+          transition:background 0.2s;">
+        Cancel
+      </button>
+      <button id="logoutConfirmBtn" style="
+          flex:1; padding:11px; border-radius:10px;
+          background:linear-gradient(135deg,#e06a72,#d65d64); border:none;
+          color:white; font-family:inherit;
+          font-size:14px; font-weight:600; cursor:pointer;
+          transition:all 0.2s; box-shadow:0 4px 14px rgba(214,93,100,0.3);">
+        <i class="fas fa-sign-out-alt"></i> Log out
+      </button>
+    </div>
+  </div>
+</div>
+  <script type="module" src="../js/organization.js"></script>
 
   <script>
   const page = window.location.pathname.split('/').pop();

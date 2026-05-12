@@ -221,7 +221,49 @@ refreshEventsBtn?.addEventListener("click", () => {
 document.getElementById("menuToggle")?.addEventListener("click", () => {
   document.querySelector(".sidebar")?.classList.toggle("active");
 });
+function initLogoutModal() {
+    const modal      = document.getElementById('logoutModal');
+    const box        = document.getElementById('logoutModalBox');
+    const logoutBtn  = document.getElementById('logoutBtn');
+    const cancelBtn  = document.getElementById('logoutCancelBtn');
+    const confirmBtn = document.getElementById('logoutConfirmBtn');
 
+    if (!modal || !logoutBtn) return;
+
+    // Open
+    logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        modal.classList.add('active');
+    });
+
+    // Cancel
+    cancelBtn?.addEventListener('click', () => {
+        modal.classList.remove('active');
+    });
+
+    // Click outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+    });
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') modal.classList.remove('active');
+    });
+
+    // Confirm logout
+    confirmBtn?.addEventListener('click', () => {
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out…';
+        confirmBtn.disabled  = true;
+        setTimeout(() => {
+            localStorage.removeItem('dearbup_token');
+            localStorage.removeItem('dearbup_user');
+            window.location.href = '../index.html';
+        }, 600);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initLogoutModal);
 // =============================
 // INITIALIZE PAGE
 // =============================
@@ -229,4 +271,5 @@ document.addEventListener("DOMContentLoaded", () => {
   loadSidebarUser();   // 🔥 ADD THIS
   loadStats();
   loadUpcomingEvents();
+  initLogoutModal();
 });
