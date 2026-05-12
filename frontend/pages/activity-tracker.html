@@ -267,13 +267,6 @@
   } else if (av && user.display_name) {
     av.textContent = user.display_name[0].toUpperCase();
   }
-
-  // Logout
-  document.getElementById('logoutBtn')?.addEventListener('click', () => {
-    localStorage.removeItem('dearbup_token');
-    localStorage.removeItem('dearbup_user');
-    window.location.href = '../index.html';
-  });
 </script>
 </body>
 </html>
