@@ -271,18 +271,29 @@ function renderPosts(posts, viewedUser, loggedInUser) {
           </div>`;
       }
 
-      sharedHtml = `
-        <div class="shared-post-card">
-          <div class="shared-post-header">
-            <div class="shared-post-avatar">${origAvatar}</div>
-            <div class="shared-post-meta">
-              <div class="shared-post-author">${escapeHTML(origName)}</div>
-              <div class="shared-post-time">${timeAgo(orig.createdAt || orig.created_at)}</div>
-            </div>
-          </div>
-          ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
-          ${origSpotify}
-        </div>`;
+        sharedHtml = `
+            <div class="shared-post-card">
+                <div class="shared-post-header">
+                    <div class="shared-post-avatar">${origAvatar}</div>
+                    <div class="shared-post-meta">
+                        <div class="shared-post-author">${escapeHTML(origName)}</div>
+                        <div class="shared-post-time">${timeAgo(orig.createdAt || orig.created_at)}</div>
+                    </div>
+                </div>
+                ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
+                ${orig.media?.url ? `
+                    <div style="margin-top:10px;border-radius:10px;overflow:hidden;background:#000;text-align:center;">
+                        ${orig.media.type === 'video'
+                            ? `<video controls style="width:100%;max-height:300px;border-radius:10px;display:block;">
+                                <source src="${orig.media.url}" />
+                            </video>`
+                            : `<img src="${orig.media.url}" alt=""
+                                style="max-width:100%;max-height:300px;width:auto;height:auto;display:block;margin:0 auto;border-radius:10px;object-fit:contain;"
+                                loading="lazy" />`
+                        }
+                    </div>` : ''}
+                ${origSpotify}
+            </div>`;
     }
 
     return `
@@ -1076,6 +1087,9 @@ async function submitProfileComment() {
         const empty = list.querySelector('[style*="No comments"]');
         if (empty) empty.remove();
 
+        const scrollArea = document.getElementById('commentScrollArea');
+        if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+
         const avatar = _currentUser?.avatar_url
             ? `<img src="${escapeHTML(_currentUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
             : getInitials(_currentUser?.display_name || _currentUser?.username || 'U');
@@ -1091,7 +1105,6 @@ async function submitProfileComment() {
                 <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${escapeHTML(text)}</div>
             </div>`;
         list.appendChild(item);
-        list.scrollTop = list.scrollHeight;
 
         if (input) input.value = '';
         showToast('Comment posted! 💬', 'success');

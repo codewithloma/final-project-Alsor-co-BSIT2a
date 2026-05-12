@@ -344,21 +344,37 @@
   </div>
 
   <!-- Comment Modal -->
-  <div class="modal" id="commentModal">
-    <div class="modal-content comment-modal-content">
-      <div class="comment-modal-post" id="commentModalPost"></div>
-      <div class="comment-modal-header">
-        <h3>Comments</h3>
-        <button class="close-modal" id="closeCommentModal">&times;</button>
-      </div>
-      <div id="commentsList" class="comments-list"></div>
-      <div class="comment-input-wrap">
-        <div class="comment-input-avatar" id="commentInputAvatar"></div>
-        <input type="text" id="commentInput" placeholder="Write a comment…" maxlength="200" autocomplete="off" />
-        <button id="commentSubmitBtn"><i class="fas fa-paper-plane"></i></button>
-      </div>
+<div class="modal" id="commentModal">
+    <div class="modal-content comment-modal-content" style="display:flex;flex-direction:column;max-height:85vh;padding:0;overflow:hidden;">
+
+        <!-- Fixed header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+            <h3 style="color:#fff;font-size:16px;font-weight:700;">Comments</h3>
+            <button class="close-modal" id="closeCommentModal" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);">&times;</button>
+        </div>
+
+        <!-- ONE scrollable area: post preview + divider + comments -->
+        <div style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;" id="commentScrollArea">
+            <!-- Post preview renders here -->
+            <div id="commentModalPost"></div>
+
+            <!-- Divider -->
+            <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:12px;">
+                <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:12px;">Comments</div>
+            </div>
+
+            <!-- Comments list directly in the scroll area -->
+            <div id="commentsList" style="display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+
+        <!-- Fixed input bar at bottom -->
+        <div class="comment-input-wrap" style="flex-shrink:0;border-top:1px solid rgba(255,255,255,0.08);">
+            <div class="comment-input-avatar" id="commentInputAvatar"></div>
+            <input type="text" id="commentInput" placeholder="Write a comment…" maxlength="200" autocomplete="off" />
+            <button id="commentSubmitBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
     </div>
-  </div>
+</div>
 
   <!-- Share Modal -->
   <div class="modal" id="shareModal">
