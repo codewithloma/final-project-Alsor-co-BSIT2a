@@ -18,15 +18,52 @@ window.addEventListener("load", () => {
         document.body.classList.remove("loading");
         setTimeout(() => {
             loader.style.display = "none";
-        }, 500); // was 1500
-    }, 1000); // was 5000
+        }, 1500); 
+    }, 5000);
 });
 
 // Initialize
 document.addEventListener("DOMContentLoaded", function () {
     authModal = new bootstrap.Modal(document.getElementById("authModal"));
     document.getElementById("authForm").addEventListener("submit", handleAuth);
+    
+    // 🔥 ENTER KEY SUPPORT FOR AUTH FIELDS
+    setupEnterKeySupport();
 });
+
+// 🔥 ENTER KEY LOGIN SUPPORT
+function setupEnterKeySupport() {
+    // Auth modal fields
+    const authFields = [
+        'authEmail', 'authPassword', 'authUsername', 
+        'authStudentId', 'authCourse', 'authConfirmPassword', 'authOTP'
+    ];
+    
+    authFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAuth(e);
+                }
+            });
+        }
+    });
+    
+    // Hero login fields
+    ['heroEmail', 'heroPassword'].forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleHeroLogin();
+                }
+            });
+        }
+    });
+}
 
 // SHOW AUTH MODAL
 function showAuthModal(mode) {
@@ -245,6 +282,39 @@ async function handleAuth(e) {
     }
 }
 
+// HERO CARD LOGIN
+async function handleHeroLogin() {
+    const email    = document.getElementById("heroEmail").value.trim();
+    const password = document.getElementById("heroPassword").value;
+ 
+    if (!email || !password) {
+        showToast("Please enter your email and password.", "error");
+        return;
+    }
+ 
+    try {
+        const res  = await fetch(`${API_URL}/login`, {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+ 
+        if (!res.ok) {
+            showToast(data.message || "Login failed. Please check your credentials.", "error");
+            return;
+        }
+ 
+        saveAuthData(data);
+        showToast("Welcome back! Redirecting...", "success");
+        setTimeout(() => { window.location.href = HOME_URL; }, 1000);
+ 
+    } catch (err) {
+        console.error(err);
+        showToast("Server error during login. Is the backend running?", "error");
+    }
+}
+
 // TOAST NOTIFICATIONS
 function showToast(message, type = "info") {
     const existing = document.getElementById("dearbup-toast");
@@ -282,38 +352,8 @@ function showToast(message, type = "info") {
         setTimeout(() => toast.remove(), 400);
     }, 3500);
 }
-// HERO CARD LOGIN
-async function handleHeroLogin() {
-    const email    = document.getElementById("heroEmail").value.trim();
-    const password = document.getElementById("heroPassword").value;
- 
-    if (!email || !password) {
-        showToast("Please enter your email and password.", "error");
-        return;
-    }
- 
-    try {
-        const res  = await fetch(`${API_URL}/login`, {
-            method:  "POST",
-            headers: { "Content-Type": "application/json" },
-            body:    JSON.stringify({ email, password })
-        });
-        const data = await res.json();
- 
-        if (!res.ok) {
-            showToast(data.message || "Login failed. Please check your credentials.", "error");
-            return;
-        }
- 
-        saveAuthData(data);
-        showToast("Welcome back! Redirecting...", "success");
-        setTimeout(() => { window.location.href = HOME_URL; }, 1000);
- 
-    } catch (err) {
-        console.error(err);
-        showToast("Server error during login. Is the backend running?", "error");
-    }
-}
+
+// EXPOSE FUNCTIONS GLOBALLY
 window.handleHeroLogin = handleHeroLogin;
 window.showAuthModal = showAuthModal;
 window.toggleAuthMode = toggleAuthMode;
