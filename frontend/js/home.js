@@ -156,11 +156,37 @@ function initCreatePostTrigger() {
 }
 
 // ── Logout ────────────────────────────────────────────────
-function initLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        localStorage.removeItem('dearbup_token');
-        localStorage.removeItem('dearbup_user');
-        window.location.href = '../index.html';
+function initLogoutModal() {
+    const modal      = document.getElementById('logoutModal');
+    const logoutBtn  = document.getElementById('logoutBtn');
+    const cancelBtn  = document.getElementById('logoutCancelBtn');
+    const confirmBtn = document.getElementById('logoutConfirmBtn');
+
+    if (!modal || !logoutBtn) return;
+
+    logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        modal.classList.add('active');
+    });
+
+    cancelBtn?.addEventListener('click', () => modal.classList.remove('active'));
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') modal.classList.remove('active');
+    });
+
+    confirmBtn?.addEventListener('click', () => {
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out…';
+        confirmBtn.disabled  = true;
+        setTimeout(() => {
+            localStorage.removeItem('dearbup_token');
+            localStorage.removeItem('dearbup_user');
+            window.location.href = '../index.html';
+        }, 600);
     });
 }
 
@@ -168,7 +194,7 @@ function initLogout() {
 document.addEventListener('DOMContentLoaded', () => {
     initNavAvatar();
     initCreatePostTrigger();
-    initLogout();
+    initLogoutModal();
     loadOrgsPanel();
     loadActivitiesPanel();
 });
