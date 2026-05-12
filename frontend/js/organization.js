@@ -930,7 +930,6 @@ function initLogoutModal() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', initLogoutModal);
 
 /* ──────────────────────────────────────────────────────
    INIT
