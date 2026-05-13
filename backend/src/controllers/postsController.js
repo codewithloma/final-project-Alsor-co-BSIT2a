@@ -164,7 +164,6 @@ export const addComment = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-<<<<<<< Erick-branch
 };
 
 // ---------------- SHARE ----------------
@@ -222,7 +221,7 @@ export const updatePost = async (req, res) => {
   }
 };
 
-// ---------------- DELETE ----------------
+// ---------------- DELETE -----------------
 export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -254,6 +253,4 @@ export const getPostById = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-=======
->>>>>>> main
 };
