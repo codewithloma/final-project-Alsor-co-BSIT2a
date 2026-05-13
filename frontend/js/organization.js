@@ -934,8 +934,10 @@ function initLogoutModal() {
 /* ──────────────────────────────────────────────────────
    INIT
    ────────────────────────────────────────────────────── */
+document.addEventListener("DOMContentLoaded", () => {
 populateSidebar();
 initNotificationBadge();
 setInterval(initNotificationBadge, 30000);
 loadOrgs();
 initLogoutModal();
+});
