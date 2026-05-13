@@ -48,9 +48,10 @@ function renderLetters(letters) {
     const hasMusic = !!(l.spotifySongName || l.spotifyTrackUri);
 
     return `
-<div class="letter-card"
-         onclick="navigateToLetter('${l._id}')"
+    <div class="letter-card"
+         data-letter-id="${l._id}"
          style="cursor:pointer;animation-delay:${i * 0.04}s">
+
         <div class="letter-card-header">
           <div class="lc-avatar">${avatarHtml}</div>
           <div class="lc-meta">
@@ -84,10 +85,6 @@ function renderLetters(letters) {
   }).join('');
 }
 
-function navigateToLetter(id) {
-    window.location.href = `letter-view.html?id=${id}`;
-}
-
 function applyFilter(filter) {
   activeFilter = filter;
   const filtered = filter === 'all'
@@ -112,12 +109,11 @@ async function loadLetters() {
 }
 
 // Filter tabs
-document.querySelectorAll('.filter-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    applyFilter(btn.dataset.filter);
-  });
+document.getElementById('lettersGrid')?.addEventListener('click', (e) => {
+    const card = e.target.closest('[data-letter-id]');
+    if (card) {
+        window.location.href = `letter-view.html?id=${card.dataset.letterId}`;
+    }
 });
 
 loadLetters();
