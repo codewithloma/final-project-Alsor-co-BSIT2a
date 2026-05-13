@@ -348,7 +348,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     async function loadOverview() {
     try {
         const [orgs, eventsRes] = await Promise.all([
-        api.get('/api/organization'),
+        api.get('/api/organizations'),
         api.get('/api/events?limit=5&status=upcoming&sort=asc'),
         ]);
 
@@ -428,7 +428,7 @@ const BASE_URL = window.location.hostname === 'localhost'
         if (dept)   params.set('department', dept);
         const qs = params.toString();
 
-        const orgs = await api.get(`/api/organization${qs ? '?'+qs : ''}`);
+        const orgs = await api.get(`/api/organizations${qs ? '?'+qs : ''}`);
         S.orgs = orgs;
         populateOrgDropdowns();
 
@@ -475,7 +475,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     el('drawerMembers').innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i></div>`;
 
     try {
-        const org      = await api.get(`/api/organization/${orgId}`);
+        const org      = await api.get(`/api/organizations/${orgId}`);
         const approved = (org.members||[]).filter(m => m.status==='approved');
         const pending  = (org.members||[]).filter(m => m.status==='pending');
 
@@ -556,7 +556,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     container.innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading requests…</div>`;
 
     try {
-        const orgs = await api.get('/api/organization');
+        const orgs = await api.get('/api/organizations');
         S.orgs = orgs;
         populateOrgDropdowns();
 
@@ -603,7 +603,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     if (card) card.querySelectorAll('button').forEach(b => b.disabled = true);
 
     try {
-        await api.patch(`/api/organization/${orgId}/members/${userId}/approve`);
+        await api.post(`/api/organizations/${orgId}/approve/${userId}`);
         showToast(`✓ ${name} approved!`, 'success');
         animateRemove(`req-${userId}-${orgId}`);
         syncCache(orgId, userId, 'approved');
@@ -623,7 +623,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     S._rejectCb = async () => {
         closeModal('confirmModal');
         try {
-        await api.delete(`/api/organization/${orgId}/members/${userId}`);
+        await api.delete(`/api/organizations/${orgId}/reject/${userId}`);
         showToast(`${name} removed.`, 'success');
         animateRemove(`req-${userId}-${orgId}`);
         animateRemove(`mrow-${userId}-${orgId}`);
@@ -693,7 +693,7 @@ const BASE_URL = window.location.hostname === 'localhost'
 
         const orgSel = el('eventOrgFilter');
         if (orgSel && !orgSel.dataset.loaded) {
-        if (!S.orgs.length) { S.orgs = await api.get('/api/organization'); populateOrgDropdowns(); }
+        if (!S.orgs.length) { S.orgs = await api.get('/api/organizations'); populateOrgDropdowns(); }
         orgSel.dataset.loaded = 'true';
         }
     } catch (err) {
@@ -773,7 +773,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     tbody.innerHTML = `<tr><td colspan="4" class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading…</td></tr>`;
 
     try {
-        if (!S.orgs.length) { S.orgs = await api.get('/api/organization'); populateOrgDropdowns(); }
+        if (!S.orgs.length) { S.orgs = await api.get('/api/organizations'); populateOrgDropdowns(); }
 
         const filterOrgId = el('officerOrgFilter')?.value || '';
         const targetOrgs  = filterOrgId ? S.orgs.filter(o => o._id === filterOrgId) : S.orgs;
@@ -816,7 +816,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     el('assignUserId').value = '';
     openModal('assignModal');
     if (!S.orgs.length) {
-        api.get('/api/organization').then(orgs => { S.orgs = orgs; populateOrgDropdowns(); }).catch(()=>{});
+        api.get('/api/organizations').then(orgs => { S.orgs = orgs; populateOrgDropdowns(); }).catch(()=>{});
     }
     }
 
