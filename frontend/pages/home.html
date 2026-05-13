@@ -10,18 +10,27 @@
   <link rel="stylesheet" href="../CSS/home.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-  .delete-comment-btn {
-    background: none; 
-    border: none; 
-    color: rgba(255, 255, 255, 0.5); 
-    cursor: pointer; 
-    font-size: 14px; 
-    padding: 4px; 
-    display: inline-flex;
-    align-items: center;
+  .comment-item, .comment-content {
+    position: relative; /* Allows button to sit inside correctly */
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
   }
-  .delete-comment-btn:hover { 
-    color: #ff4d4d; 
+  .delete-comment-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 8px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Prevents the icon from squishing */
+  }
+
+  .delete-comment-btn:hover {
+    color: #e06a72;
+    transform: scale(1.1);
   }
 </style>
 </style>
