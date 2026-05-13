@@ -12,7 +12,11 @@ const CBOSchema = new mongoose.Schema({
     type: String, 
     default: "" 
   },
-  // This is where your Cloudinary URL (tsa.webp) will be saved
+
+  color: { 
+    type: String, 
+    default: "#000000" }, 
+  
   logo_url: { 
     type: String, 
     default: "" 
