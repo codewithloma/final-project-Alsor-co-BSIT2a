@@ -58,9 +58,9 @@ async function loadLetter() {
         document.title = `${letter.letter_title || 'Letter'} – DearBUP`;
 
         const authorName = letter.display_name || 'Anonymous';
-const avatarHtml = (!letter.is_anonymous && letter.user_id?.avatar_url)
-    ? `<img src="${escapeHTML(letter.user_id.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-    : escapeHTML(authorName.charAt(0).toUpperCase());
+        const avatarHtml = (!letter.is_anonymous && letter.user_id?.avatar_url)
+            ? `<img src="${escapeHTML(letter.user_id.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : escapeHTML(authorName.charAt(0).toUpperCase());
 
         // Spotify section
         let spotifyHtml = '';
@@ -122,15 +122,6 @@ const avatarHtml = (!letter.is_anonymous && letter.user_id?.avatar_url)
                 <p>Could not load this letter. Please try again.</p>
             </div>`;
     }
-    document.querySelector('.topbar-back')?.addEventListener('click', () => {
-    if (window.opener && !window.opener.closed) {
-        window.close();
-    } else if (window.history.length > 1) {
-        window.history.back();
-    } else {
-        window.location.href = '../pages/letterfull.html';
-    }
-});
 }
 
 function copyLink() {
@@ -144,15 +135,32 @@ function copyLink() {
         });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadLetter();
+// **SINGLE BACK BUTTON HANDLER** - handles all cases properly
+function setupBackButton() {
+    const backBtn = document.querySelector('.topbar-back');
+    if (!backBtn) return;
 
-    // Close/back button
-    document.querySelector('.topbar-back')?.addEventListener('click', () => {
+    backBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // 1. If opened in new window/tab (popup), close it
+        if (window.opener && !window.opener.closed) {
+            window.close();
+            return;
+        }
+        
+        // 2. If there's browser history, go back (preserves correct page)
         if (window.history.length > 1) {
             window.history.back();
-        } else {
-            window.location.href = '../pages/letterfull.html';
+            return;
         }
+        
+        // 3. Fallback: go to home page
+        window.location.href = 'letterfull.html'; // relative path
     });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadLetter();
+    setupBackButton(); // Only attach once here
 });
