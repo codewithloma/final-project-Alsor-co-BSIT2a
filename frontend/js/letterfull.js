@@ -48,7 +48,8 @@ function renderLetters(letters) {
     const hasMusic = !!(l.spotifySongName || l.spotifyTrackUri);
 
     return `
-      <a class="letter-card" href="letter-view.html?id=${l._id}" target="_blank"
+       <div class="letter-card" onclick="window.open('letter-view.html?id=${l._id}','_blank')" 
+         style="cursor:pointer;animation-delay:${i * 0.04}s">
          style="animation-delay:${i * 0.04}s">
         <div class="letter-card-header">
           <div class="lc-avatar">${avatarHtml}</div>
@@ -79,7 +80,7 @@ function renderLetters(letters) {
             </div>
             <i class="fab fa-spotify lc-music-icon"></i>
         </div>` : ''}
-      </a>`;
+      </div>`;
   }).join('');
 }
 
