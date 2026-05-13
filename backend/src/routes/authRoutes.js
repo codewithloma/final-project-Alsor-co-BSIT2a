@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/send-otp", sendOtp);
 router.post("/register", register);
 router.post("/login", login);
-router.post('/change-password', authMiddleware, changePassword);     
-router.delete('/delete-account', authMiddleware, deleteAccount);     
+router.post('/change-password', authMiddleware, changePassword);
+router.delete('/delete-account', authMiddleware, deleteAccount);
 
 export default router;
