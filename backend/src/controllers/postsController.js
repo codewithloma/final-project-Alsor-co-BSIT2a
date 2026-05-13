@@ -164,6 +164,7 @@ export const addComment = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+<<<<<<< Erick-branch
 };
 
 // ---------------- SHARE ----------------
@@ -253,4 +254,6 @@ export const getPostById = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+=======
+>>>>>>> main
 };
