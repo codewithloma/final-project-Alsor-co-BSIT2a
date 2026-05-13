@@ -18,7 +18,8 @@ const CBOSchema = new mongoose.Schema({
       "Nursing Department",
       "Technology Department",
       "Entrepreneur Department",
-      "Education Department Technology"
+      "Education Department Technology",
+      "School Community Department",
     ]
   },
 
