@@ -1,17 +1,29 @@
 import mongoose from "mongoose";
 
 const CBOSchema = new mongoose.Schema({
-  org_name: { type: String, required: true },
-  acronym: { type: String },
+  org_name: { 
+    type: String, 
+    required: [true, "Organization name is required"] 
+  },
+  acronym: { 
+    type: String 
+  },
+  description: { 
+    type: String, 
+    default: "" 
+  },
 
-  description: { type: String, default: "" },
-
-  logo_url: { type: String, default: "" },
-
-  // NEW FIELD (IMPORTANT)
+  color: { 
+    type: String, 
+    default: "#000000" }, 
+  
+  logo_url: { 
+    type: String, 
+    default: "" 
+  },
   department: {
     type: String,
-    required: true,
+    required: [true, "Department is required"],
     enum: [
       "Computer Studies Department",
       "Engineering Department",
@@ -22,9 +34,10 @@ const CBOSchema = new mongoose.Schema({
       "School Community Department",
     ]
   },
-
-  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-
+  created_by: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User" 
+  },
   members: [
     {
       user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -34,4 +47,6 @@ const CBOSchema = new mongoose.Schema({
   ]
 }, { timestamps: true });
 
-export default mongoose.model("CBO", CBOSchema);
+// Exporting as "CBO" to keep it consistent with your file name CboModel.js
+const CBO = mongoose.model("CBO", CBOSchema);
+export default CBO;

@@ -7,6 +7,7 @@ import {
   getPostById,
   reactToPost,
   addComment,
+  deleteComment, 
   sharePost,
   updatePost,
   deletePost,
@@ -26,6 +27,7 @@ router.get("/:id", authMiddleware, getPostById);
 
 router.post("/:id/react", authMiddleware, reactToPost);
 router.post("/:id/comment", authMiddleware, addComment);
+router.delete("/:id/comment/:commentId", authMiddleware, deleteComment); // New route para sa comment deletion
 router.post("/:id/share", authMiddleware, sharePost);
 
 router.put("/:id", authMiddleware, updatePost);

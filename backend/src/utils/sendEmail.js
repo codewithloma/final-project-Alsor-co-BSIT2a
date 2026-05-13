@@ -1,21 +1,25 @@
-import nodemailer from "nodemailer";
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
-// create transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-});
-// send OTP email
+const client = SibApiV3Sdk.ApiClient.instance;
+const apiKey = client.authentications["api-key"];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
 export const sendOtpEmail = async (email, code) => {
   try {
-    await transporter.sendMail({
-      from: `"DearBUP" <${process.env.GMAIL_USER}>`,
-      to: email,
+    const response = await tranEmailApi.sendTransacEmail({
+      sender: {
+        email: process.env.GMAIL_USER,
+        name: "DearBUP",
+      },
+      to: [
+        {
+          email: email,
+        },
+      ],
       subject: "DearBUP Verification Code",
-      html: `
+      htmlContent: `
         <div style="font-family: Arial; text-align: center;">
           <h2>Your OTP Code</h2>
           <h1 style="letter-spacing: 5px;">${code}</h1>
@@ -24,10 +28,9 @@ export const sendOtpEmail = async (email, code) => {
       `,
     });
 
-    console.log("✅ Email sent to:", email);
-
+    console.log("✅ OTP sent via Brevo:", response.messageId);
   } catch (error) {
-    console.error("❌ Email error:", error.message);
-    throw new Error("Failed to send email");
+    console.error("❌ Brevo email error:", error);
+    throw new Error("Failed to send OTP email");
   }
 };

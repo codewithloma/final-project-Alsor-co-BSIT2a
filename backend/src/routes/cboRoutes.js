@@ -1,6 +1,7 @@
 // routes/cboRoutes.js
 import express from "express";
 import {
+  createOrganization, // ADDED THIS
   getOrganizations,
   getOrganizationById,
   joinOrganization,
@@ -18,6 +19,7 @@ router.get("/",    getOrganizations);
 router.get("/:id", getOrganizationById);
 
 // Member actions — must be logged in
+router.post("/",          authMiddleware, createOrganization); // ADDED THIS: For saving the Cloudinary logo
 router.post("/:id/join",  authMiddleware, joinOrganization);
 router.post("/:id/leave", authMiddleware, leaveOrganization);
 

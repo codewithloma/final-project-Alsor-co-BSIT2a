@@ -1,7 +1,34 @@
-// controllers/cboController.js
 import CBO from "../models/CboModel.js";
 
-// GET /api/organization
+// @desc    Create a new organization (Saves Cloudinary URL)
+// @route   POST /api/organization
+export const createOrganization = async (req, res) => {
+  try {
+    const { org_name, acronym, description, logo_url, department } = req.body;
+
+    // Basic validation to ensure required fields match your Model
+    if (!org_name || !department) {
+      return res.status(400).json({ message: "Organization name and Department are required." });
+    }
+
+    const newOrg = new CBO({
+      org_name,
+      acronym,
+      description,
+      logo_url, // This is your tsa.webp link from Cloudinary
+      department,
+      created_by: req.user.id || req.user._id,
+    });
+
+    const savedOrg = await newOrg.save();
+    res.status(201).json(savedOrg);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// @desc    Get all organizations with filters
+// @route   GET /api/organization
 export const getOrganizations = async (req, res) => {
   try {
     const { department, search } = req.query;
@@ -30,7 +57,8 @@ export const getOrganizations = async (req, res) => {
   }
 };
 
-// GET /api/organization/:id
+// @desc    Get single organization by ID
+// @route   GET /api/organization/:id
 export const getOrganizationById = async (req, res) => {
   try {
     const org = await CBO.findById(req.params.id)
@@ -45,13 +73,14 @@ export const getOrganizationById = async (req, res) => {
   }
 };
 
-// POST /api/organization/:id/join
+// @desc    Join an organization
+// @route   POST /api/organization/:id/join
 export const joinOrganization = async (req, res) => {
   try {
     const org = await CBO.findById(req.params.id);
     if (!org) return res.status(404).json({ message: "Organization not found" });
 
-    const userId = req.user.id;
+    const userId = (req.user.id || req.user._id).toString();
 
     const existing = org.members.find(
       (m) => m.user_id?.toString() === userId
@@ -72,19 +101,20 @@ export const joinOrganization = async (req, res) => {
       .populate("created_by", "username display_name")
       .populate("members.user_id", "username display_name");
 
-    res.json({ message: "Join request sent! Waiting for approval.", org: updated });
+    res.json({ message: "Join request sent!", org: updated });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// POST /api/organization/:id/leave
+// @desc    Leave an organization
+// @route   POST /api/organization/:id/leave
 export const leaveOrganization = async (req, res) => {
   try {
     const org = await CBO.findById(req.params.id);
     if (!org) return res.status(404).json({ message: "Organization not found" });
 
-    const userId = req.user.id;
+    const userId = (req.user.id || req.user._id).toString();
     const before = org.members.length;
 
     org.members = org.members.filter(
@@ -92,7 +122,7 @@ export const leaveOrganization = async (req, res) => {
     );
 
     if (org.members.length === before) {
-      return res.status(400).json({ message: "You are not a member of this organization." });
+      return res.status(400).json({ message: "You are not a member." });
     }
 
     await org.save();
@@ -102,9 +132,8 @@ export const leaveOrganization = async (req, res) => {
   }
 };
 
-// ─── NEW: Admin member management ────────────────────────────
+// --- ADMIN MANAGEMENT ---
 
-// GET /api/organization/:id/pending
 export const getPendingMembers = async (req, res) => {
   try {
     const org = await CBO.findById(req.params.id)
@@ -119,7 +148,6 @@ export const getPendingMembers = async (req, res) => {
   }
 };
 
-// PATCH /api/organization/:id/members/:userId/approve
 export const approveMember = async (req, res) => {
   try {
     const org = await CBO.findById(req.params.id);
@@ -139,7 +167,6 @@ export const approveMember = async (req, res) => {
   }
 };
 
-// DELETE /api/organization/:id/members/:userId
 export const rejectMember = async (req, res) => {
   try {
     const org = await CBO.findById(req.params.id);
