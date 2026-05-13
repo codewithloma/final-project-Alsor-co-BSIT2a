@@ -735,15 +735,14 @@
         });
 
         if (res.ok) {
-            // Find the exact bubble that contains this button and remove it immediately
-            const target = event.target.closest('[data-has-delete]');
-            if (target) {
-                target.style.display = 'none'; 
-            } else {
-                location.reload(); // Safety fallback
+            // This finds the specific bubble and hides it instantly
+            const btn = event.currentTarget;
+            const bubble = btn.closest('[data-has-delete]');
+            if (bubble) {
+                bubble.style.display = 'none';
             }
         } else {
-            alert("Delete failed. You might not have permission.");
+            alert("Delete failed. Check your permissions.");
         }
     } catch (err) {
         console.error(err);

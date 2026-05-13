@@ -101,22 +101,26 @@ function injectDeleteButtons() {
         
         bubbles.forEach(bubble => {
             bubble.setAttribute('data-has-delete', 'true');
-            bubble.style.position = 'relative'; // Keeps bubble in place
-            bubble.style.paddingRight = '35px'; // Makes room for the icon
+            
+            // Keep the bubble fixed to the left/avatar
+            bubble.style.position = 'relative';
+            bubble.style.display = 'block'; 
+            bubble.style.margin = '0'; 
 
             const btn = document.createElement('button');
             btn.className = 'delete-comment-btn';
             btn.innerHTML = '<i class="fas fa-trash-alt"></i>';
             
-            // Fix positioning so it doesn't push the text
+            // Style the button to stay on the right INSIDE the bubble
             btn.style.position = 'absolute';
-            btn.style.right = '10px';
-            btn.style.top = '50%';
-            btn.style.transform = 'translateY(-50%)';
+            btn.style.right = '12px';
+            btn.style.top = '12px';
             btn.style.background = 'none';
             btn.style.border = 'none';
             btn.style.color = 'rgba(255,255,255,0.3)';
             btn.style.cursor = 'pointer';
+            btn.style.fontSize = '12px';
+            btn.style.zIndex = '10';
 
             const commentId = bubble.getAttribute('data-comment-id');
             const postId = document.getElementById('commentModal')?.getAttribute('data-post-id');
