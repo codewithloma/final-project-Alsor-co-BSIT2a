@@ -389,33 +389,60 @@ body {
 .btn-save-em:hover    { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(214,93,100,0.35); }
 .btn-save-em:disabled { opacity: 0.65; pointer-events: none; }
 .profile-content-layout {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    box-sizing: border-box;
 }
 
 .profile-about-side {
-    width: 320px;
-    flex-shrink: 0;
+    width: 100%;
+    min-width: 0;
     position: sticky;
-    top: 72px;          /* ← navbar height exactly */
-    align-self: flex-start;
-    max-height: calc(100vh - 72px);
+    top: 72px;
+    align-self: start;
+    max-height: calc(100vh - 90px);
     overflow-y: auto;
     scrollbar-width: none;
-    left: 150px;
 }
-.profile-about-side::-webkit-scrollbar { display: none; }
+
+.profile-about-side::-webkit-scrollbar {
+    display: none;
+}
 
 .profile-posts-side {
-    flex: 1;
+    width: 100%;
     min-width: 0;
+    display: block;
+}
+
+#postsContainer {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.post-card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .about-grid {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 14px;
+}
+
+.about-card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 /* ── Toast ────────────────────────────────────────────────── */
 .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
@@ -449,6 +476,38 @@ body {
     .profile-avatar       { width: 80px; height: 80px; font-size: 28px; }
     
     .profile-about-side {
+        width: 100%;
+    }
+}
+@media (max-width: 1050px) {
+    .tab-content-wrap {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .profile-content-layout {
+        grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    #postsContainer {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 850px) {
+    .profile-content-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-about-side {
+        position: relative;
+        top: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .profile-posts-side {
         width: 100%;
     }
 }

@@ -13,26 +13,13 @@ const CBOSchema = new mongoose.Schema({
     default: "" 
   },
 
-  color: { 
-    type: String, 
-    default: "#000000" }, 
-  
-  logo_url: { 
-    type: String, 
-    default: "" 
-  },
+  description: { type: String, default: "" },
+
+  logo_url: { type: String, default: "" },
+
   department: {
     type: String,
-    required: [true, "Department is required"],
-    enum: [
-      "Computer Studies Department",
-      "Engineering Department",
-      "Nursing Department",
-      "Technology Department",
-      "Entrepreneur Department",
-      "Education Department Technology",
-      "School Community Department",
-    ]
+    required: true
   },
   created_by: { 
     type: mongoose.Schema.Types.ObjectId, 
