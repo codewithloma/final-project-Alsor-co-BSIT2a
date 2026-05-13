@@ -314,9 +314,16 @@ function formatDate(d) {
 function getMembership(org) {
   const uid = getUserId();
   if (!uid) return null;
-  return (org.members || []).find(
-    (m) => (m.user_id?._id || m.user_id) === uid
-  ) || null;
+
+  return (org.members || []).find((m) => {
+    if (!m || !m.user_id) return false;
+
+    const memberId = typeof m.user_id === "object"
+      ? m.user_id._id
+      : m.user_id;
+
+    return String(memberId) === String(uid);
+  }) || null;
 }
 
 // ── Sidebar user population ──────────────────────────────
@@ -418,7 +425,9 @@ function renderSkeletons(count = 3) {
    RENDER — ORG CARD
    ────────────────────────────────────────────────────── */
 function buildOrgCard(org) {
-  const approved = (org.members || []).filter((m) => m.status === 'approved').length;
+  const approved = (org.members || []).filter(
+  (m) => m && m.status === 'approved'
+).length;
 
   const card = document.createElement('div');
   card.className = 'org-card';
@@ -682,26 +691,36 @@ function renderMembers(approved) {
   const list = document.getElementById('membersList');
   list.innerHTML = '';
 
-  const preview = approved.slice(0, 6);
+  const safeApproved = (approved || []).filter(m => m && m.user_id);
+
+  if (!safeApproved.length) {
+    list.innerHTML = '<p style="font-size:0.82rem;color:var(--text-light)">No approved members yet.</p>';
+    return;
+  }
+
+  const preview = safeApproved.slice(0, 6);
+
   preview.forEach((m) => {
     const name = m.user_id?.display_name || m.user_id?.username || 'Unknown';
-    const row  = document.createElement('div');
+
+    const row = document.createElement('div');
     row.className = 'member-row';
     row.innerHTML = `
       <div class="avatar">${initials(name)}</div>
       <div class="member-name">${name}</div>
-      <span class="member-role">${m.role || 'member'}</span>`;
+      <span class="member-role">${m.role || 'member'}</span>
+    `;
+
     list.appendChild(row);
   });
 
-  if (approved.length > 6) {
+  if (safeApproved.length > 6) {
     const more = document.createElement('p');
     more.style.cssText = 'text-align:center;font-size:0.8rem;color:var(--text-light);padding:6px 0';
-    more.textContent   = `+${approved.length - 6} more members`;
+    more.textContent = `+${safeApproved.length - 6} more members`;
     list.appendChild(more);
   }
 }
-
 /* ──────────────────────────────────────────────────────
    JOIN HANDLER
    Matches: POST /api/organizations/:id/join
