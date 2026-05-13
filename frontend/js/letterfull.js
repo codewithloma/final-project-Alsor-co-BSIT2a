@@ -48,9 +48,9 @@ function renderLetters(letters) {
     const hasMusic = !!(l.spotifySongName || l.spotifyTrackUri);
 
     return `
-       <div class="letter-card" onclick="window.open('letter-view.html?id=${l._id}','_blank')" 
+<div class="letter-card"
+         onclick="navigateToLetter('${l._id}')"
          style="cursor:pointer;animation-delay:${i * 0.04}s">
-         style="animation-delay:${i * 0.04}s">
         <div class="letter-card-header">
           <div class="lc-avatar">${avatarHtml}</div>
           <div class="lc-meta">
@@ -61,7 +61,7 @@ function renderLetters(letters) {
         </div>
         <div class="lc-title">${escapeHTML(l.letter_title || 'Untitled')}</div>
         <div class="lc-preview">${escapeHTML(l.letter_content || '')}</div>
-      ${hasMusic ? `
+        ${hasMusic ? `
         <div class="lc-music">
             ${l.spotifyImageUrl
                 ? `<img src="${escapeHTML(l.spotifyImageUrl)}" alt=""
@@ -80,8 +80,12 @@ function renderLetters(letters) {
             </div>
             <i class="fab fa-spotify lc-music-icon"></i>
         </div>` : ''}
-      </div>`;
+    </div>`;
   }).join('');
+}
+
+function navigateToLetter(id) {
+    window.location.href = `letter-view.html?id=${id}`;
 }
 
 function applyFilter(filter) {
