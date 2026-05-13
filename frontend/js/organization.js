@@ -879,10 +879,6 @@ const sidebar        = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
 const menuToggle     = document.getElementById('menuToggle');
 
-menuToggle.addEventListener('click', () => {
-  sidebar.classList.toggle('open');
-  sidebarOverlay.classList.toggle('open');
-});
 
 function initLogoutModal() {
     const modal      = document.getElementById('logoutModal');
