@@ -38,7 +38,7 @@ async function loadOrgsPanel() {
     if (!panel) return;
 
     try {
-        const res  = await fetch(`${API_BASE}/organization`, { headers: authHeaders() });
+        const res  = await fetch(`${API_BASE}/organizations`, { headers: authHeaders() });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const raw  = await res.json();
         const orgs = Array.isArray(raw) ? raw : (raw.organizations || raw.data || []);
