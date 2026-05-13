@@ -884,10 +884,6 @@ menuToggle.addEventListener('click', () => {
   sidebarOverlay.classList.toggle('open');
 });
 
-sidebarOverlay.addEventListener('click', () => {
-  sidebar.classList.remove('open');
-  sidebarOverlay.classList.remove('open');
-});
 function initLogoutModal() {
     const modal      = document.getElementById('logoutModal');
     const box        = document.getElementById('logoutModalBox');
