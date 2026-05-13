@@ -66,6 +66,7 @@ const PostSchema = new mongoose.Schema(
       ref: "User",
     }],
 
+    // Dito papasok ang delete logic natin base sa CommentSchema sa itaas
     comments: [CommentSchema],
 
     shared_from: {
