@@ -111,13 +111,47 @@
       <i class="fas fa-sign-out-alt"></i>
     </button>
  
+<!-- Right side — replace just the navAvatar div -->
+<div class="relative flex-shrink-0" id="navAvatarWrap">
     <div id="navAvatar"
          class="w-9 h-9 rounded-full bg-gradient-to-br from-[#e06a72] to-[#d65d64]
                 flex items-center justify-center
                 text-white font-bold text-[13px] cursor-pointer overflow-hidden
-                border-2 border-white/10">
+                border-2 border-white/10"
+         id="navAvatarBtn">
       ?
     </div>
+
+    <!-- Dropdown -->
+    <div id="navDropdown"
+         class="hidden absolute right-0 top-[44px] w-[200px] rounded-2xl overflow-hidden
+                bg-[#2d2e2f] border border-white/[0.08]
+                shadow-[0_8px_32px_rgba(0,0,0,0.4)] z-[300]">
+        <div class="px-4 py-3 border-b border-white/[0.08]">
+            <div id="dropdownName" class="text-[13px] font-semibold text-white truncate">User</div>
+            <div id="dropdownHandle" class="text-[11px] text-white/40 truncate">@username</div>
+        </div>
+        <a href="profile.html"
+           class="flex items-center gap-3 px-4 py-3 text-[13px] text-white/70
+                  hover:bg-white/[0.06] hover:text-white no-underline transition-colors">
+            <i class="fas fa-user w-4 text-center"></i> My Profile
+        </a>
+        <button id="changePasswordBtn"
+                class="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-white/70
+                       hover:bg-white/[0.06] hover:text-white bg-transparent border-none
+                       cursor-pointer text-left transition-colors">
+            <i class="fas fa-lock w-4 text-center"></i> Change Password
+        </button>
+        <div class="border-t border-white/[0.08]">
+            <button id="deleteAccountBtn"
+                    class="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-red-400
+                           hover:bg-red-500/10 bg-transparent border-none
+                           cursor-pointer text-left transition-colors">
+                <i class="fas fa-trash-alt w-4 text-center"></i> Delete Account
+            </button>
+        </div>
+    </div>
+</div>
  
   </div>
 </nav>
@@ -217,6 +251,164 @@
     </div>
   </div>
 </div>
+
+<!-- Change Password Modal -->
+<div id="changePasswordModal" style="
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.65); backdrop-filter:blur(12px);
+    align-items:center; justify-content:center; padding:20px;">
+  <div style="
+      background:#242526; border-radius:20px; width:100%; max-width:420px;
+      box-shadow:0 24px 60px rgba(0,0,0,0.5);
+      border:1px solid rgba(255,255,255,0.08);"
+      id="changePasswordBox">
+
+    <div style="padding:22px 24px 16px; border-bottom:1px solid rgba(255,255,255,0.08);
+                display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="color:#fff; font-size:16px; font-weight:700; margin:0;">
+        <i class="fas fa-lock" style="color:#e06a72; margin-right:8px;"></i>Change Password
+      </h3>
+      <button id="closeChangePassword" style="
+          background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.6);
+          width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:14px;
+          display:flex; align-items:center; justify-content:center;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div style="padding:20px 24px; display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <label style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4);
+                      letter-spacing:0.8px; text-transform:uppercase; display:block; margin-bottom:6px;">
+          Current Password
+        </label>
+        <div style="position:relative;">
+          <input type="password" id="currentPassword" placeholder="Enter current password"
+            style="width:100%; padding:11px 40px 11px 14px; border:1.5px solid rgba(214,93,100,0.2);
+                   border-radius:12px; background:rgba(255,255,255,0.06); color:#fff;
+                   font-family:inherit; font-size:14px; outline:none; box-sizing:border-box;
+                   transition:border-color 0.2s;" />
+          <button onclick="togglePwVis('currentPassword',this)" style="
+              position:absolute; right:12px; top:50%; transform:translateY(-50%);
+              background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size:13px;">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4);
+                      letter-spacing:0.8px; text-transform:uppercase; display:block; margin-bottom:6px;">
+          New Password
+        </label>
+        <div style="position:relative;">
+          <input type="password" id="newPassword" placeholder="Enter new password"
+            style="width:100%; padding:11px 40px 11px 14px; border:1.5px solid rgba(214,93,100,0.2);
+                   border-radius:12px; background:rgba(255,255,255,0.06); color:#fff;
+                   font-family:inherit; font-size:14px; outline:none; box-sizing:border-box;
+                   transition:border-color 0.2s;" />
+          <button onclick="togglePwVis('newPassword',this)" style="
+              position:absolute; right:12px; top:50%; transform:translateY(-50%);
+              background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size:13px;">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.4);
+                      letter-spacing:0.8px; text-transform:uppercase; display:block; margin-bottom:6px;">
+          Confirm New Password
+        </label>
+        <div style="position:relative;">
+          <input type="password" id="confirmNewPassword" placeholder="Confirm new password"
+            style="width:100%; padding:11px 40px 11px 14px; border:1.5px solid rgba(214,93,100,0.2);
+                   border-radius:12px; background:rgba(255,255,255,0.06); color:#fff;
+                   font-family:inherit; font-size:14px; outline:none; box-sizing:border-box;
+                   transition:border-color 0.2s;" />
+          <button onclick="togglePwVis('confirmNewPassword',this)" style="
+              position:absolute; right:12px; top:50%; transform:translateY(-50%);
+              background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size:13px;">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+      <div id="passwordError" style="display:none; color:#ef4444; font-size:12px; padding:8px 12px;
+           background:rgba(239,68,68,0.1); border-radius:8px;"></div>
+    </div>
+
+    <div style="padding:14px 24px 20px; display:flex; justify-content:flex-end; gap:10px;
+                border-top:1px solid rgba(255,255,255,0.08);">
+      <button id="cancelChangePassword" style="
+          padding:10px 20px; border-radius:50px; border:1px solid rgba(255,255,255,0.15);
+          background:transparent; color:rgba(255,255,255,0.6); font-family:inherit;
+          font-size:13px; cursor:pointer;">Cancel</button>
+      <button id="saveChangePassword" style="
+          padding:10px 22px; border-radius:50px;
+          background:linear-gradient(135deg,#e06a72,#d65d64); border:none;
+          color:white; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;">
+        <i class="fas fa-check"></i> Save Password
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div id="deleteAccountModal" style="
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.65); backdrop-filter:blur(12px);
+    align-items:center; justify-content:center; padding:20px;">
+  <div style="
+      background:#242526; border-radius:20px; width:100%; max-width:400px;
+      padding:32px 28px; text-align:center;
+      box-shadow:0 24px 60px rgba(0,0,0,0.5);
+      border:1px solid rgba(255,255,255,0.08);">
+
+    <div style="width:64px; height:64px; border-radius:50%;
+                background:rgba(239,68,68,0.12);
+                display:flex; align-items:center; justify-content:center;
+                margin:0 auto 18px;">
+      <i class="fas fa-trash-alt" style="font-size:26px; color:#ef4444;"></i>
+    </div>
+
+    <h3 style="color:#fff; font-size:18px; font-weight:700; margin-bottom:8px;">Delete Account?</h3>
+    <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.6; margin-bottom:20px;">
+      This will <strong style="color:#ef4444;">permanently delete</strong> your account and all your posts.
+      This action <strong style="color:#fff;">cannot be undone</strong>.
+    </p>
+
+    <div style="margin-bottom:20px;">
+      <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:8px;">
+        Type <strong style="color:#fff;">DELETE</strong> to confirm
+      </label>
+      <input type="text" id="deleteConfirmText" placeholder="Type DELETE here"
+        style="width:100%; padding:11px 14px; border:1.5px solid rgba(239,68,68,0.3);
+               border-radius:12px; background:rgba(255,255,255,0.06); color:#fff;
+               font-family:inherit; font-size:14px; outline:none; box-sizing:border-box;
+               text-align:center; letter-spacing:2px;" />
+    </div>
+
+    <div id="deleteAccountError" style="display:none; color:#ef4444; font-size:12px;
+         padding:8px 12px; background:rgba(239,68,68,0.1); border-radius:8px; margin-bottom:16px;"></div>
+
+    <div style="display:flex; gap:10px;">
+      <button id="cancelDeleteAccount" style="
+          flex:1; padding:11px; border-radius:10px;
+          background:rgba(255,255,255,0.08); border:none;
+          color:rgba(255,255,255,0.7); font-family:inherit;
+          font-size:14px; font-weight:600; cursor:pointer;">
+        Cancel
+      </button>
+      <button id="confirmDeleteAccount" style="
+          flex:1; padding:11px; border-radius:10px;
+          background:linear-gradient(135deg,#ef4444,#dc2626); border:none;
+          color:white; font-family:inherit;
+          font-size:14px; font-weight:600; cursor:pointer;
+          box-shadow:0 4px 14px rgba(239,68,68,0.3);">
+        <i class="fas fa-trash-alt"></i> Delete
+      </button>
+    </div>
+  </div>
+</div>
+
   <!-- notif-badge runs first to avoid badge showing on this page -->
   <script type="module" src="../js/notification.js"></script>
 
