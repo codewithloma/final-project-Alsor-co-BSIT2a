@@ -725,23 +725,29 @@
     av.textContent = user.display_name[0].toUpperCase();
   }
   window.deleteComment = async function(postId, commentId) {
-  if (!confirm("Delete this comment?")) return;
-  try {
-    const token = localStorage.getItem('dearbup_token');
-    const res = await fetch(`http://localhost:5000/api/posts/${postId}/comment/${commentId}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if (res.ok) {
-      const el = document.querySelector(`[data-comment-id="${commentId}"]`);
-      if (el) el.remove(); 
-      else location.reload();
-    } else {
-      alert("Failed to delete.");
+    if (!confirm("Delete this comment?")) return;
+
+    try {
+        const token = localStorage.getItem('dearbup_token');
+        const res = await fetch(`http://localhost:5000/api/posts/${postId}/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            // Find the exact bubble that contains this button and remove it immediately
+            const target = event.target.closest('[data-has-delete]');
+            if (target) {
+                target.style.display = 'none'; 
+            } else {
+                location.reload(); // Safety fallback
+            }
+        } else {
+            alert("Delete failed. You might not have permission.");
+        }
+    } catch (err) {
+        console.error(err);
     }
-  } catch (err) { 
-    console.error(err); 
-  }
 };
 
 </script>

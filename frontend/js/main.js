@@ -93,33 +93,45 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function injectDeleteButtons() {
-  const commentList = document.getElementById('commentsList');
-  if (!commentList) return;
+    const commentList = document.getElementById('commentsList');
+    if (!commentList) return;
 
-  const observer = new MutationObserver(() => {
-    const bubbles = commentList.querySelectorAll('.comment-item:not([data-has-delete]), .comment-content:not([data-has-delete])');
-    
-    bubbles.forEach(bubble => {
-      bubble.setAttribute('data-has-delete', 'true');
-      
-      const btn = document.createElement('button');
-      btn.className = 'delete-comment-btn';
-      btn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-      
-      const commentId = bubble.getAttribute('data-comment-id');
-      const postId = document.getElementById('commentModal')?.getAttribute('data-post-id');
+    const observer = new MutationObserver(() => {
+        const bubbles = commentList.querySelectorAll('.comment-item:not([data-has-delete]), .comment-content:not([data-has-delete])');
+        
+        bubbles.forEach(bubble => {
+            bubble.setAttribute('data-has-delete', 'true');
+            bubble.style.position = 'relative'; // Keeps bubble in place
+            bubble.style.paddingRight = '35px'; // Makes room for the icon
 
-      btn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (window.deleteComment) window.deleteComment(postId, commentId);
-      };
+            const btn = document.createElement('button');
+            btn.className = 'delete-comment-btn';
+            btn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            
+            // Fix positioning so it doesn't push the text
+            btn.style.position = 'absolute';
+            btn.style.right = '10px';
+            btn.style.top = '50%';
+            btn.style.transform = 'translateY(-50%)';
+            btn.style.background = 'none';
+            btn.style.border = 'none';
+            btn.style.color = 'rgba(255,255,255,0.3)';
+            btn.style.cursor = 'pointer';
 
-      bubble.appendChild(btn);
+            const commentId = bubble.getAttribute('data-comment-id');
+            const postId = document.getElementById('commentModal')?.getAttribute('data-post-id');
+
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.deleteComment(postId, commentId);
+            };
+
+            bubble.appendChild(btn);
+        });
     });
-  });
 
-  observer.observe(commentList, { childList: true, subtree: true });
+    observer.observe(commentList, { childList: true, subtree: true });
 }
 
 document.addEventListener('DOMContentLoaded', injectDeleteButtons);
