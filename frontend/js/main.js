@@ -91,3 +91,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+function injectDeleteButtons() {
+  const commentList = document.getElementById('commentsList');
+  if (!commentList) return;
+
+  const observer = new MutationObserver(() => {
+    const user = JSON.parse(localStorage.getItem('dearbup_user') || '{}');
+    const currentUserId = user.id || user._id;
+    const postId = document.getElementById('commentModal')?.getAttribute('data-post-id');
+
+    const comments = commentList.querySelectorAll('.comment-item:not([data-has-delete])');
+    
+    comments.forEach(comment => {
+      comment.setAttribute('data-has-delete', 'true');
+      const authorId = comment.getAttribute('data-user-id');
+
+      if (authorId === currentUserId || !authorId) { 
+        const btn = document.createElement('button');
+        btn.className = 'delete-comment-btn';
+        btn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        btn.style.marginLeft = 'auto';
+        
+        const commentId = comment.getAttribute('data-comment-id');
+        
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          if(window.deleteComment) window.deleteComment(postId, commentId);
+        };
+        
+        comment.appendChild(btn);
+      }
+    });
+  });
+
+  observer.observe(commentList, { childList: true, subtree: true });
+}
+
+document.addEventListener('DOMContentLoaded', injectDeleteButtons);

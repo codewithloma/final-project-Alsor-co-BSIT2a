@@ -9,6 +9,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../CSS/home.css" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  .delete-comment-btn {
+    background: none; 
+    border: none; 
+    color: rgba(255,255,255,0.2);
+    cursor: pointer; 
+    font-size: 11px; 
+    padding: 4px; 
+    transition: 0.2s;
+  }
+  .delete-comment-btn:hover { 
+    color: #ef4444; 
+    background: rgba(239,68,68,0.1); 
+    border-radius: 4px; 
+  }
+</style>
 </head>
 <body>
 
@@ -699,6 +715,25 @@
   } else if (av && user.display_name) {
     av.textContent = user.display_name[0].toUpperCase();
   }
+  window.deleteComment = async function(postId, commentId) {
+  if (!confirm("Delete this comment?")) return;
+  try {
+    const token = localStorage.getItem('dearbup_token');
+    const res = await fetch(`http://localhost:5000/api/posts/${postId}/comment/${commentId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) {
+      const el = document.querySelector(`[data-comment-id="${commentId}"]`);
+      if (el) el.remove(); 
+      else location.reload();
+    } else {
+      alert("Failed to delete.");
+    }
+  } catch (err) { 
+    console.error(err); 
+  }
+};
 
 </script>
 </body>
