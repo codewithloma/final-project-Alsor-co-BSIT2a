@@ -17,17 +17,10 @@
       <img src="../images/Logo.svg" alt="DearBUP" />
       DearBUP
     </a>
-<button class="topbar-back" onclick="
-    if (window.history.length > 1 && document.referrer) {
-        window.history.back();
-    } else if (window.opener) {
-        window.close();
-    } else {
-        window.location.href = '../pages/letterfull.html';
-    }
-">
-    <i class="fas fa-times"></i> Close
-</button>
+    <button class="topbar-back" onclick="window.history.back()">
+      <i class="fas fa-times"></i> Close
+    </button>
+  </div>
 
   <div class="main" id="main">
     <div class="state-msg">

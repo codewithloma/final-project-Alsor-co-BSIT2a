@@ -122,6 +122,15 @@ const avatarHtml = (!letter.is_anonymous && letter.user_id?.avatar_url)
                 <p>Could not load this letter. Please try again.</p>
             </div>`;
     }
+    document.querySelector('.topbar-back')?.addEventListener('click', () => {
+    if (window.opener && !window.opener.closed) {
+        window.close();
+    } else if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = '../pages/letterfull.html';
+    }
+});
 }
 
 function copyLink() {
