@@ -144,4 +144,15 @@ function copyLink() {
         });
 }
 
-document.addEventListener('DOMContentLoaded', loadLetter);
+document.addEventListener('DOMContentLoaded', () => {
+    loadLetter();
+
+    // Close/back button
+    document.querySelector('.topbar-back')?.addEventListener('click', () => {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = '../pages/letterfull.html';
+        }
+    });
+});
