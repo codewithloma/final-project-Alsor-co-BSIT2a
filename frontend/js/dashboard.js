@@ -16,8 +16,8 @@
     'use strict';
 
 const BASE_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:5000/'
-  : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com/';
+  ? 'http://localhost:5000'
+  : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com';
 
     /* ─────────────────────────────────────────────────────
     AUTH
@@ -475,7 +475,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     el('drawerMembers').innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i></div>`;
 
     try {
-        const org      = await api.get(`/api/organization/${orgId}`);
+        const org      = await api.get(`/api/organizations/${orgId}`);
         const approved = (org.members||[]).filter(m => m.status==='approved');
         const pending  = (org.members||[]).filter(m => m.status==='pending');
 
@@ -556,7 +556,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     container.innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading requests…</div>`;
 
     try {
-        const orgs = await api.get('/api/organization');
+        const orgs = await api.get('/api/organizations');
         S.orgs = orgs;
         populateOrgDropdowns();
 
@@ -603,7 +603,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     if (card) card.querySelectorAll('button').forEach(b => b.disabled = true);
 
     try {
-        await api.patch(`/api/organization/${orgId}/members/${userId}/approve`);
+        await api.patch(`/api/organizations/${orgId}/members/${userId}/approve`);
         showToast(`✓ ${name} approved!`, 'success');
         animateRemove(`req-${userId}-${orgId}`);
         syncCache(orgId, userId, 'approved');
@@ -623,7 +623,7 @@ const BASE_URL = window.location.hostname === 'localhost'
     S._rejectCb = async () => {
         closeModal('confirmModal');
         try {
-        await api.delete(`/api/organization/${orgId}/members/${userId}`);
+        await api.delete(`/api/organizations/${orgId}/members/${userId}`);
         showToast(`${name} removed.`, 'success');
         animateRemove(`req-${userId}-${orgId}`);
         animateRemove(`mrow-${userId}-${orgId}`);
