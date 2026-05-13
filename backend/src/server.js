@@ -44,6 +44,7 @@ app.use("/api/officers", cboOfficerRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/organization", cboRoutes);
+app.use('/api/auth', authRoutes);
 
 
 
