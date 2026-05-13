@@ -106,9 +106,12 @@ export const joinOrganization = async (req, res) => {
       return res.status(404).json({ message: "Organization not found" });
     }
 
-    const existing = org.members.find(
-      m => m.user_id.toString() === req.user.id
-    );
+    const userId = req.user.id || req.user._id;
+
+    const existing = org.members.find((m) => {
+      if (!m || !m.user_id) return false;
+      return String(m.user_id) === String(userId);
+    });
 
     if (existing) {
       return res.status(400).json({
@@ -117,7 +120,7 @@ export const joinOrganization = async (req, res) => {
     }
 
     org.members.push({
-      user_id: req.user.id,
+      user_id: userId,
       role: "member",
       status: "pending"
     });
@@ -126,7 +129,8 @@ export const joinOrganization = async (req, res) => {
 
     res.json({ message: "Join request sent" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Join organization error:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -315,11 +319,14 @@ export const leaveOrganization = async (req, res) => {
       return res.status(404).json({ message: "Organization not found" });
     }
 
-    org.members = org.members.filter(
-      m => m.user_id.toString() !== req.user.id
-    );
+    const userId = req.user.id || req.user._id;
 
-    await User.findByIdAndUpdate(req.user.id, {
+    org.members = org.members.filter((m) => {
+      if (!m || !m.user_id) return false;
+      return String(m.user_id) !== String(userId);
+    });
+
+    await User.findByIdAndUpdate(userId, {
       organization: null
     });
 
@@ -327,6 +334,7 @@ export const leaveOrganization = async (req, res) => {
 
     res.json({ message: "Left organization" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Leave organization error:", error);
+    res.status(500).json({ message: error.message });
   }
 };
