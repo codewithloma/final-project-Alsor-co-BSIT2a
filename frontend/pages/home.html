@@ -9,6 +9,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../CSS/home.css" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  .comment-item, .comment-content {
+    position: relative; /* Allows button to sit inside correctly */
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .delete-comment-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 8px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Prevents the icon from squishing */
+  }
+
+  .delete-comment-btn:hover {
+    color: #e06a72;
+    transform: scale(1.1);
+  }
+</style>
+</style>
 </head>
 <body>
 
@@ -699,6 +724,30 @@
   } else if (av && user.display_name) {
     av.textContent = user.display_name[0].toUpperCase();
   }
+  window.deleteComment = async function(postId, commentId) {
+    if (!confirm("Delete this comment?")) return;
+
+    try {
+        const token = localStorage.getItem('dearbup_token');
+        const res = await fetch(`http://localhost:5000/api/posts/${postId}/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            // This finds the specific bubble and hides it instantly
+            const btn = event.currentTarget;
+            const bubble = btn.closest('[data-has-delete]');
+            if (bubble) {
+                bubble.style.display = 'none';
+            }
+        } else {
+            alert("Delete failed. Check your permissions.");
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
 
 </script>
 </body>

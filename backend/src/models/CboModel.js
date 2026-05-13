@@ -1,8 +1,17 @@
 import mongoose from "mongoose";
 
 const CBOSchema = new mongoose.Schema({
-  org_name: { type: String, required: true },
-  acronym: { type: String },
+  org_name: { 
+    type: String, 
+    required: [true, "Organization name is required"] 
+  },
+  acronym: { 
+    type: String 
+  },
+  description: { 
+    type: String, 
+    default: "" 
+  },
 
   description: { type: String, default: "" },
 
@@ -12,9 +21,10 @@ const CBOSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-
-  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-
+  created_by: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User" 
+  },
   members: [
     {
       user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -24,4 +34,6 @@ const CBOSchema = new mongoose.Schema({
   ]
 }, { timestamps: true });
 
-export default mongoose.model("CBO", CBOSchema);
+// Exporting as "CBO" to keep it consistent with your file name CboModel.js
+const CBO = mongoose.model("CBO", CBOSchema);
+export default CBO;
