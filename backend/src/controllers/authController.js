@@ -3,6 +3,7 @@ import Otp from "../models/OtpModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendOtpEmail } from "../utils/sendEmail.js"; 
+import Post from "../models/PostModel.js";
 
 //  SEND OTP 
 export const sendOtp = async (req, res) => {
@@ -164,7 +165,6 @@ export const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
         const user = await User.findById(req.user.id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
 
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Current password is incorrect' });
