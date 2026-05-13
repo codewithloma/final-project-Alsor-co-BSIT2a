@@ -97,30 +97,40 @@ function injectDeleteButtons() {
   if (!commentList) return;
 
   const observer = new MutationObserver(() => {
-    const user = JSON.parse(localStorage.getItem('dearbup_user') || '{}');
-    const currentUserId = user.id || user._id;
-    const postId = document.getElementById('commentModal')?.getAttribute('data-post-id');
-
-    const comments = commentList.querySelectorAll('.comment-item:not([data-has-delete])');
+    // 1. Look for BOTH .comment-item and any div that looks like a comment
+    const items = commentList.querySelectorAll('div:not([data-has-delete])');
     
-    comments.forEach(comment => {
-      comment.setAttribute('data-has-delete', 'true');
-      const authorId = comment.getAttribute('data-user-id');
+    items.forEach(item => {
+      // Only target actual comment containers (they usually have a specific style or child)
+      if (item.children.length > 0 || item.innerText.length > 0) {
+        item.setAttribute('data-has-delete', 'true');
+        item.style.position = 'relative'; // Anchor for the button
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.style.justifyContent = 'space-between';
 
-      if (authorId === currentUserId || !authorId) { 
         const btn = document.createElement('button');
         btn.className = 'delete-comment-btn';
         btn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-        btn.style.marginLeft = 'auto';
         
-        const commentId = comment.getAttribute('data-comment-id');
-        
+        // Manual Styles to ensure it shows up
+        btn.style.color = '#ffffff'; 
+        btn.style.opacity = '0.6';
+        btn.style.background = 'none';
+        btn.style.border = 'none';
+        btn.style.cursor = 'pointer';
+        btn.style.padding = '8px';
+        btn.style.fontSize = '14px';
+
+        const commentId = item.getAttribute('data-comment-id') || item.id;
+        const postId = document.getElementById('commentModal')?.getAttribute('data-post-id');
+
         btn.onclick = (e) => {
           e.stopPropagation();
-          if(window.deleteComment) window.deleteComment(postId, commentId);
+          if (window.deleteComment) window.deleteComment(postId, commentId);
         };
-        
-        comment.appendChild(btn);
+
+        item.appendChild(btn);
       }
     });
   });
