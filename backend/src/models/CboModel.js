@@ -8,19 +8,9 @@ const CBOSchema = new mongoose.Schema({
 
   logo_url: { type: String, default: "" },
 
-  // NEW FIELD (IMPORTANT)
   department: {
     type: String,
-    required: true,
-    enum: [
-      "Computer Studies Department",
-      "Engineering Department",
-      "Nursing Department",
-      "Technology Department",
-      "Entrepreneur Department",
-      "Education Department Technology",
-      "School Community Department",
-    ]
+    required: true
   },
 
   created_by: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
