@@ -314,3 +314,6 @@ async function handleHeroLogin() {
         showToast("Server error during login. Is the backend running?", "error");
     }
 }
+window.handleHeroLogin = handleHeroLogin;
+window.showAuthModal = showAuthModal;
+window.toggleAuthMode = toggleAuthMode;
