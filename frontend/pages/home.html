@@ -243,13 +243,13 @@
 
   <!-- Create Post Modal -->
   <div class="modal" id="createPostModal">
-    <div class="modal-content" style="background:#242526;border-radius:20px;width:100%;max-width:560px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
+    <div class="modal-content" style="background:#242526;border-radius:20px;width:100%;max-width:560px;overflow:visible;border:1px solid rgba(255,255,255,0.08);">
       <div class="modal-header" style="background:#2d2e2f;border-bottom:1px solid rgba(255,255,255,0.08);">
         <h3 style="color:#e06a72;">What's on your mind?</h3>
         <button class="close-modal" id="closeModal" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);">&times;</button>
       </div>
       <form id="postForm" class="post-form">
-        <textarea id="postContent" placeholder="Feel. Write. Share your BUP story..." maxlength="280"
+        <textarea id="postContent" placeholder="Feel. Write. Share your BUP story..."
           style="background:transparent;color:#e0e0e0;padding:20px 24px;width:100%;border:none;outline:none;resize:none;min-height:110px;font-family:inherit;font-size:15px;"></textarea>
         <!-- Media Upload -->
         <div class="post-media-upload" id="postMediaUpload">
@@ -282,7 +282,7 @@
           </div>
         </div>
         <div class="post-actions">
-          <div class="char-counter"><span id="charCount">0</span>/280</div>
+          <div class="char-counter"><span id="charCount">0</span> characters</div>
           <button type="submit" class="post-submit" id="postSubmitBtn" disabled>Post</button>
         </div>
       </form>

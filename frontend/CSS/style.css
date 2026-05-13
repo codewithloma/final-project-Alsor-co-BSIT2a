@@ -1893,3 +1893,19 @@ body.loaded { animation: fadeIn 0.6s ease-out; }
 #logoutModal.active #logoutModalBox {
     transform: scale(1) !important;
 }
+#createPostModal {
+  align-items: flex-start !important;
+  overflow-y: auto !important;
+  padding: 80px 16px 24px;
+}
+
+#createPostModal .modal-content {
+  max-height: none !important;
+  overflow: visible !important;
+  margin: 0 auto;
+}
+
+#postContent {
+  max-height: none !important;
+  overflow: visible !important;
+}

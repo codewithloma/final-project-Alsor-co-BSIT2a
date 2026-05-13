@@ -948,9 +948,14 @@ closeModal() {
     if (uploadLabel) uploadLabel.style.display = 'inline-flex';
 }
 updateCharCount() {
-    const len     = this.postContent.value.length;
-    this.charCount.textContent = len;
-    const hasFile = !!document.getElementById('postFileInput')?.files[0];
-    this.postSubmit.disabled  = (len === 0 && !hasFile && !this.selectedTrack);
+  const length = this.postContent.value.length;
+  this.charCount.textContent = length;
+
+  const hasText = length > 0;
+  const hasFile = document.getElementById('postFileInput')?.files?.length > 0;
+  const hasSong = !!this.selectedTrack;
+
+  this.postSubmit.disabled = !hasText && !hasFile && !hasSong;
+  this.charCount.style.color = '#999';
 }
 }
