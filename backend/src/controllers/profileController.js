@@ -91,24 +91,35 @@ export const getUserPosts = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // VALIDATE OBJECT ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
     const posts = await Post.find({ user_id: id })
-      .populate("user_id", "username display_name avatar_url")
-      .populate("org_id", "org_name acronym")
-      .populate("comments.user_id", "username display_name avatar_url")
-      .sort({ createdAt: -1 });
+      .populate('user_id', 'username display_name avatar_url')
+      .populate({
+        path: 'shared_from',
+        select: 'content media spotify_track_url createdAt user_id',
+        populate: {
+          path: 'user_id',
+          select: 'username display_name avatar_url'
+        }
+      })
+      .sort({ createdAt: -1 })
+      .lean();
 
+    // Safe map — shared_from may be null if original post was deleted
     const transformedPosts = posts.map(post => ({
-      ...post.toObject(),
-      likes_count: post.reactions.length,
-      comments_count: post.comments.length
+      ...post,
+      likes_count: post.reactions?.length ?? 0,
+      comments_count: post.comments?.length ?? 0,
+      shared_from: post.shared_from && post.shared_from.user_id
+        ? post.shared_from
+        : null
     }));
 
     res.json(transformedPosts);
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
