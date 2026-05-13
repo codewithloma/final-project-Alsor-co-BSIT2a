@@ -221,7 +221,7 @@ export const updatePost = async (req, res) => {
   }
 };
 
-// ---------------- DELETE ----------------
+// ---------------- DELETE -----------------
 export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
