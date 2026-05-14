@@ -108,12 +108,22 @@ async function loadLetters() {
   }
 }
 
-// Filter tabs
 document.getElementById('lettersGrid')?.addEventListener('click', (e) => {
     const card = e.target.closest('[data-letter-id]');
     if (card) {
         window.location.href = `letter-view.html?id=${card.dataset.letterId}`;
     }
 });
+
+// Filter tabs
+document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter(btn.dataset.filter);
+    });
+});
+
+loadLetters();
 
 loadLetters();
