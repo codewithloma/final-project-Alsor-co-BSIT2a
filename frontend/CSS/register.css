@@ -578,3 +578,156 @@ body {
     font-weight: 600;
     text-decoration: none;
 }
+/* =====================================================
+   REGISTER PAGE MOBILE SCROLL FIX
+   ===================================================== */
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+body {
+  position: relative !important;
+}
+
+.hero-section,
+.register-section,
+.login-section,
+.auth-section {
+  min-height: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.min-vh-90,
+.min-vh-100,
+.vh-100 {
+  min-height: auto !important;
+  height: auto !important;
+}
+
+.container,
+.row {
+  max-width: 100% !important;
+}
+
+.auth-card,
+.register-card,
+.login-card,
+.card {
+  max-width: 100% !important;
+}
+
+/* Fix navbar on register page */
+.navbar {
+  position: sticky !important;
+  top: 0;
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(14px);
+}
+
+.navbar-brand {
+  max-width: 70%;
+  white-space: normal !important;
+}
+
+.navbar-brand img {
+  max-width: 48px;
+  height: auto;
+}
+
+/* Mobile register layout */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 40px;
+  }
+
+  .hero-section {
+    padding: 24px 0 50px !important;
+  }
+
+  .hero-section .container {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .hero-section .row {
+    min-height: auto !important;
+    padding-top: 20px !important;
+  }
+
+  .hero-title,
+  .display-4 {
+    font-size: clamp(2rem, 10vw, 3.2rem) !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+  }
+
+  .hero-subtitle,
+  .lead {
+    font-size: clamp(1rem, 5vw, 1.45rem) !important;
+    line-height: 1.6 !important;
+    text-align: center !important;
+  }
+
+  .btn,
+  .get-started-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .auth-card,
+  .register-card,
+  .login-card {
+    margin: 24px auto 60px !important;
+    padding: 24px 18px !important;
+    border-radius: 22px !important;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .navbar .container {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .navbar-brand {
+    font-size: 1rem !important;
+  }
+
+  .hero-section {
+    padding-top: 12px !important;
+  }
+
+  .hero-title,
+  .display-4 {
+    font-size: 2.45rem !important;
+  }
+
+  .hero-subtitle,
+  .lead {
+    font-size: 1.28rem !important;
+  }
+
+  .auth-card,
+  .register-card,
+  .login-card {
+    margin-top: 18px !important;
+    margin-bottom: 80px !important;
+  }
+}

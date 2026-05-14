@@ -387,3 +387,86 @@ body {
     .profile-display-name { font-size: 18px !important; }
     .tracker-stats  { grid-template-columns: 1fr 1fr !important; }
 }
+/* =====================================================
+   HOME MOBILE LAYOUT FIX
+   ===================================================== */
+
+@media (max-width: 900px) {
+  .page-body {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 78px 12px 40px !important;
+    margin: 0 !important;
+  }
+
+  .left-panel,
+  .right-panel {
+    display: none !important;
+  }
+
+  .center-feed {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .letters-carousel,
+  .letters-row,
+  .stories-row {
+    overflow-x: auto !important;
+    display: flex !important;
+    gap: 12px !important;
+    padding-bottom: 8px !important;
+    scrollbar-width: none;
+  }
+
+  .letters-carousel::-webkit-scrollbar,
+  .letters-row::-webkit-scrollbar,
+  .stories-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .letter-card,
+  .story-card {
+    flex: 0 0 220px !important;
+    max-width: 220px !important;
+  }
+
+  .create-post-card,
+  .post-card,
+  .feed-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 18px !important;
+  }
+
+  .post-card img,
+  .feed-card img,
+  .post-media img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-body {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .create-post-card {
+    padding: 14px !important;
+  }
+
+  .post-card,
+  .feed-card {
+    padding: 16px !important;
+  }
+
+  .post-content,
+  .post-text {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+  }
+}
