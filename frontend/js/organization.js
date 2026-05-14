@@ -946,9 +946,17 @@ function initLogoutModal() {
    INIT
    ────────────────────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
-populateSidebar();
-initNotificationBadge();
-setInterval(initNotificationBadge, 30000);
-loadOrgs();
-initLogoutModal();
+    // Clear search input in case browser autofilled it
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+        // Small delay to catch late autofill
+        setTimeout(() => { searchInput.value = ''; }, 300);
+    }
+
+    populateSidebar();
+    initNotificationBadge();
+    setInterval(initNotificationBadge, 30000);
+    loadOrgs();
+    initLogoutModal();
 });
