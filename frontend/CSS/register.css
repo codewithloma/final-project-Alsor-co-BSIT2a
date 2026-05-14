@@ -604,17 +604,6 @@ body {
   overflow: visible !important;
 }
 
-.min-vh-90,
-.min-vh-100,
-.vh-100 {
-  min-height: auto !important;
-  height: auto !important;
-}
-
-.container,
-.row {
-  max-width: 100% !important;
-}
 
 .auth-card,
 .register-card,
@@ -729,5 +718,122 @@ body {
   .login-card {
     margin-top: 18px !important;
     margin-bottom: 80px !important;
+  }
+}
+/* =====================================================
+   REGISTER RESPONSIVE FIX ONLY
+   ===================================================== */
+
+html,
+body {
+  overflow-x: hidden !important;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Desktop should stay normal */
+@media (min-width: 769px) {
+  html,
+  body {
+    overflow-y: auto !important;
+  }
+
+  .hero-section {
+    min-height: calc(100vh - 80px);
+  }
+
+  .auth-card,
+  .login-card,
+  .register-card {
+    max-width: 520px;
+  }
+}
+
+/* Mobile only */
+@media (max-width: 768px) {
+  html,
+  body {
+    width: 100%;
+    height: auto !important;
+    min-height: 100%;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  body {
+    position: relative !important;
+  }
+
+  .navbar {
+    position: sticky !important;
+    top: 0;
+    z-index: 999;
+    background: rgba(255,255,255,0.96) !important;
+    backdrop-filter: blur(14px);
+  }
+
+  .hero-section,
+  .register-section,
+  .login-section,
+  .auth-section {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    padding: 24px 0 60px !important;
+  }
+
+  .min-vh-90,
+  .min-vh-100,
+  .vh-100 {
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  .hero-section .container {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .hero-section .row {
+    min-height: auto !important;
+    gap: 24px;
+  }
+
+  .hero-title,
+  .display-4 {
+    font-size: clamp(2rem, 11vw, 3rem) !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+  }
+
+  .hero-subtitle,
+  .lead {
+    font-size: clamp(1rem, 5vw, 1.35rem) !important;
+    line-height: 1.55 !important;
+    text-align: center !important;
+  }
+
+  .btn,
+  .get-started-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .auth-card,
+  .login-card,
+  .register-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 20px auto 70px !important;
+    padding: 24px 18px !important;
+    border-radius: 22px !important;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }

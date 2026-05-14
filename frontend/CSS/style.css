@@ -9,7 +9,8 @@ body {
     background: linear-gradient(135deg, #e0c0ac 0%, #e06a72 50%, #d65d64 100%);
     min-height: 100vh;
     color: #333;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     line-height: 1.6;
 }
 
@@ -1999,4 +2000,165 @@ body.loaded { animation: fadeIn 0.6s ease-out; }
   nav.fixed.top-0 > div:last-child {
     display: none !important;
   }
+}
+@media (max-width: 768px) {
+    nav.fixed.top-0 {
+        height: 64px !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+        gap: 4px !important;
+        overflow: visible !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+    }
+
+    /* Left logo container */
+    nav.fixed.top-0 > a:first-child {
+        width: 38px !important;
+        min-width: 38px !important;
+        max-width: 38px !important;
+        flex-shrink: 0 !important;
+        gap: 0 !important;
+    }
+
+    nav.fixed.top-0 > a:first-child span {
+        display: none !important;
+    }
+
+    nav.fixed.top-0 > a:first-child div,
+    nav.fixed.top-0 > a:first-child img {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+    }
+
+    /* Center nav group */
+    nav.fixed.top-0 > div.flex-1 {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        display: flex !important;
+        justify-content: space-evenly !important;
+        align-items: center !important;
+        gap: 0 !important;
+        overflow: visible !important;
+    }
+
+    /* Override Tailwind w-[108px] */
+    nav.fixed.top-0 > div.flex-1 > a {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        flex: 1 1 0 !important;
+        height: 64px !important;
+        padding: 0 !important;
+        font-size: 16px !important;
+    }
+
+    nav.fixed.top-0 > div.flex-1 > a i {
+        font-size: 16px !important;
+        line-height: 1 !important;
+    }
+
+    nav.fixed.top-0 > div.flex-1 > a span {
+        display: block !important;
+        font-size: 7.5px !important;
+        line-height: 1 !important;
+        margin-top: 2px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Notification badge */
+    nav.fixed.top-0 .notification-badge {
+        top: 6px !important;
+        right: 8px !important;
+        min-width: 15px !important;
+        height: 15px !important;
+        font-size: 8px !important;
+        padding: 0 4px !important;
+    }
+
+    /* Right side: logout + profile */
+    nav.fixed.top-0 > div:last-child {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 4px !important;
+        flex-shrink: 0 !important;
+        width: auto !important;
+        min-width: 64px !important;
+        max-width: 70px !important;
+        overflow: visible !important;
+    }
+
+    nav.fixed.top-0 > div:last-child button,
+    nav.fixed.top-0 > div:last-child a {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        max-width: 30px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+
+    nav.fixed.top-0 > div:last-child img {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        max-width: 30px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+}
+
+@media (max-width: 430px) {
+    nav.fixed.top-0 {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        gap: 2px !important;
+    }
+
+    nav.fixed.top-0 > a:first-child {
+        width: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+    }
+
+    nav.fixed.top-0 > a:first-child div,
+    nav.fixed.top-0 > a:first-child img {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    nav.fixed.top-0 > div.flex-1 > a {
+        font-size: 14px !important;
+    }
+
+    nav.fixed.top-0 > div.flex-1 > a i {
+        font-size: 14px !important;
+    }
+
+    nav.fixed.top-0 > div.flex-1 > a span {
+        font-size: 6.8px !important;
+    }
+
+    nav.fixed.top-0 > div:last-child {
+        min-width: 58px !important;
+        max-width: 62px !important;
+        gap: 3px !important;
+    }
+
+    nav.fixed.top-0 > div:last-child button,
+    nav.fixed.top-0 > div:last-child a,
+    nav.fixed.top-0 > div:last-child img {
+        width: 27px !important;
+        height: 27px !important;
+        min-width: 27px !important;
+        max-width: 27px !important;
+    }
 }
