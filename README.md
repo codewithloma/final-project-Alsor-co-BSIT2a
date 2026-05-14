@@ -1,4 +1,17 @@
+<div align="center">
+
+
 # AlSor Co-FullStackWebApp
+
+---
+
+</div>
+
+<div align="center">
+
+# DearBUP - A campus social network community
+
+---
 
 ## Group Information
 
@@ -13,6 +26,8 @@
 
 ## Project Description
 DearBUP is a specialized blogging and social networking platform designed exclusively for the Bicol University-Polangui community. This repository contains the full-stack development progress, starting from Phase 1 (Planning) through Phase 7 (Deployment). The system serves as a bridge between students, campus organizations, and administration, providing a hub for storytelling and institutional updates.
+
+</div>
 
 ---
 
