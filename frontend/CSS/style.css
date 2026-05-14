@@ -1909,3 +1909,94 @@ body.loaded { animation: fadeIn 0.6s ease-out; }
   max-height: none !important;
   overflow: visible !important;
 }
+/* =====================================================
+   GLOBAL MOBILE NAVBAR RESPONSIVE FIX
+   Fixes hidden nav icons on phones
+   ===================================================== */
+
+@media (max-width: 768px) {
+  nav.fixed.top-0 {
+    height: 64px !important;
+    padding: 0 8px !important;
+    gap: 4px !important;
+    overflow: hidden !important;
+  }
+
+  nav.fixed.top-0 > a:first-child {
+    width: 42px !important;
+    min-width: 42px !important;
+    flex-shrink: 0 !important;
+  }
+
+  nav.fixed.top-0 > a:first-child span {
+    display: none !important;
+  }
+
+  nav.fixed.top-0 > a:first-child div {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  nav.fixed.top-0 > div.flex-1 {
+    justify-content: space-around !important;
+    gap: 0 !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  nav.fixed.top-0 > div.flex-1 a {
+    width: 56px !important;
+    min-width: 56px !important;
+    height: 64px !important;
+    flex-shrink: 1 !important;
+    font-size: 18px !important;
+    padding: 0 !important;
+  }
+
+  nav.fixed.top-0 > div.flex-1 a span {
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  nav.fixed.top-0 > div:last-child {
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  nav.fixed.top-0 > div:last-child button,
+  nav.fixed.top-0 > div:last-child a,
+  nav.fixed.top-0 > div:last-child .profile,
+  nav.fixed.top-0 > div:last-child img {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+
+  .main-content,
+  .page-body {
+    padding-top: 76px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  nav.fixed.top-0 {
+    padding: 0 5px !important;
+  }
+
+  nav.fixed.top-0 > div.flex-1 a {
+    width: 48px !important;
+    min-width: 48px !important;
+  }
+
+  nav.fixed.top-0 > div.flex-1 a i {
+    font-size: 17px !important;
+  }
+
+  nav.fixed.top-0 > div.flex-1 a span {
+    font-size: 8px !important;
+  }
+
+  nav.fixed.top-0 > div:last-child {
+    display: none !important;
+  }
+}
