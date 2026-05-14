@@ -172,7 +172,10 @@
             type="text"
             id="searchInput"
             placeholder="Search organizations…"
-            autocomplete="off"
+            autocomplete="new-password"
+            name="org-search-field"
+            readonly
+            onfocus="this.removeAttribute('readonly')"
           />
         </div>
                 <div class="filter-tabs" id="filterTabs">
