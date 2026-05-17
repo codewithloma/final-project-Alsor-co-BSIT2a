@@ -7,26 +7,19 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../CSS/admin-dashboard.css" />
+  <link rel="stylesheet" href="../CSS/style.css">
 </head>
 <body>
 
-  <!-- ── BACK BUTTON ───────────────────────────────── -->
-  <a href="home.html" class="back-btn" id="backHomeBtn">
-    <i class="fas fa-arrow-left"></i>
-    <span>Back to Home</span>
-  </a>
-
   <!-- ── TOP NAV BAR ───────────────────────────────── -->
-  <nav class="top-nav" id="topNav">
+  <nav class="top-nav">
     <div class="top-nav-brand">
-      <div class="brand-logo">
-        <img src="../images/Logo.svg" alt="DearBUP" onerror="this.style.display='none'" />
-      </div>
+      <img src="../images/Logo.svg" alt="DearBUP" onerror="this.style.display='none'" />
       <span class="brand-name">DearBUP</span>
       <span class="admin-pill">Admin</span>
     </div>
 
-    <div class="top-nav-links">
+    <div class="top-nav-links" id="topNavLinks">
       <a href="#" class="nav-item active" data-section="overview">
         <i class="fas fa-chart-pie"></i>
         <span>Overview</span>
@@ -41,20 +34,22 @@
         <span>Events</span>
       </a>
       <a href="#" class="nav-item" data-section="members">
-        <i class="fas fa-user-check"></i>
-        <span>Members</span>
+        <i class="fas fa-user-clock"></i>
+        <span>Member Requests</span>
         <span class="nav-badge" id="navMemberBadge" style="display:none"></span>
       </a>
       <a href="#" class="nav-item" data-section="officers">
         <i class="fas fa-shield-alt"></i>
         <span>Officers</span>
       </a>
-    </div>
+    <button class="nav-mobile-toggle" id="navMobileToggle">
+      <i class="fas fa-bars"></i>
+    </button>
 
     <div class="top-nav-user">
-      <div class="admin-avatar" id="sidebarAvatar">A</div>
+      <div class="admin-avatar" id="sidebarAvatar">?</div>
       <div class="admin-info">
-        <div class="admin-name" id="sidebarName">Admin</div>
+        <div class="admin-name" id="sidebarName">Loading...</div>
         <div class="admin-role">System Administrator</div>
       </div>
       <button class="logout-btn" id="logoutBtn" title="Logout">
@@ -63,7 +58,7 @@
     </div>
   </nav>
 
-  <!-- ── MAIN ───────────────────────────────────────── -->
+  <!-- ── MAIN CONTENT ───────────────────────────────────────── -->
   <main class="main-content">
 
     <!-- ── OVERVIEW SECTION ─────────────────────────── -->
@@ -167,6 +162,9 @@
           <h1 class="section-title">Events</h1>
           <p class="section-sub">All activities across organizations</p>
         </div>
+        <button class="btn-primary" id="addEventBtn">
+          <i class="fas fa-plus"></i> Add Event
+        </button>
       </div>
 
       <div class="toolbar">
@@ -315,6 +313,68 @@
     </div>
   </div>
 
+  <!-- ── ADD EVENT MODAL ─────────────────────────── -->
+  <div class="modal-overlay" id="addEventModal">
+    <div class="modal-box" style="max-width:540px">
+      <div class="modal-header">
+        <h3><i class="fas fa-calendar-plus"></i> Add Event</h3>
+        <button class="modal-close" id="addEventClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Organization *</label>
+        <select class="form-select" id="addEventOrg">
+          <option value="">Select organization…</option>
+        </select>
+
+        <label class="form-label">Title *</label>
+        <input class="form-input" type="text" id="addEventTitle" placeholder="Event title" maxlength="150" />
+
+        <label class="form-label">Description *</label>
+        <textarea class="form-input" id="addEventContent" rows="3" placeholder="Event description" maxlength="1000" style="resize:vertical"></textarea>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label class="form-label">Date *</label>
+            <input class="form-input" type="date" id="addEventDate" />
+          </div>
+          <div>
+            <label class="form-label">Time</label>
+            <input class="form-input" type="text" id="addEventTime" placeholder="e.g. 1:00 PM" />
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label class="form-label">Venue</label>
+            <input class="form-input" type="text" id="addEventVenue" placeholder="TBA" maxlength="150" />
+          </div>
+          <div>
+            <label class="form-label">Event Type</label>
+            <select class="form-select" id="addEventType" style="margin-bottom:0">
+              <option value="Other">Other</option>
+              <option value="Assembly">Assembly</option>
+              <option value="Seminar">Seminar</option>
+              <option value="Competition">Competition</option>
+              <option value="Training">Training</option>
+              <option value="Outreach">Outreach</option>
+              <option value="Social">Social</option>
+              <option value="University">University</option>
+              <option value="Academic">Academic</option>
+              <option value="Special Event">Special Event</option>
+              <option value="Awarding">Awarding</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="addEventCancel">Cancel</button>
+        <button class="btn-primary" id="addEventSubmit">
+          <i class="fas fa-plus"></i> Add Event
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── CONFIRM MODAL ─────────────────────────────── -->
   <div class="modal-overlay" id="confirmModal">
     <div class="modal-box modal-sm">
@@ -355,6 +415,19 @@
 
   <div class="toast" id="toast"></div>
 
+  <script>
+    // Mobile nav toggle
+    document.getElementById('navMobileToggle').addEventListener('click', () => {
+      document.getElementById('topNavLinks').classList.toggle('mobile-open');
+    });
+
+    // Close mobile nav when a link is clicked
+    document.querySelectorAll('.top-nav-links .nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.getElementById('topNavLinks').classList.remove('mobile-open');
+      });
+    });
+  </script>
   <script src="../js/dashboard.js"></script>
 </body>
 </html>
