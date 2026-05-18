@@ -140,14 +140,23 @@
           <div class="profile-handle"       id="profileHandle">@…</div>
           <div class="profile-badges"       id="profileBadges"></div>
         </div>
-        <div class="profile-actions">
-          <button class="btn-edit-profile" id="editProfileBtn">
-            <i class="fas fa-pen"></i> Edit Profile
-          </button>
-          <button class="btn-share" id="shareProfileBtn" title="Share profile">
-            <i class="fas fa-share-alt"></i>
-          </button>
-        </div>
+       <div class="profile-actions">
+  <button class="btn-edit-profile" id="editProfileBtn">
+    <i class="fas fa-pen"></i> Edit Profile
+  </button>
+  <button class="btn-share" id="shareProfileBtn" title="Share profile">
+    <i class="fas fa-share-alt"></i>
+  </button>
+ 
+  <!-- ADMIN SWITCH — hidden until JS reveals it -->
+  <button class="btn-admin-switch" id="adminSwitchBtn" style="display:none;"
+          title="Go to Admin Dashboard"
+          onclick="window.location.href='admin-dashboard.html'">
+    <span class="admin-switch-icon"><i class="fas fa-shield-alt"></i></span>
+    <span class="admin-switch-label">Admin Panel</span>
+    <span class="admin-switch-dot"></span>
+  </button>
+</div>
       </div>
 
       <p class="profile-bio" id="profileBio">No bio yet.</p>

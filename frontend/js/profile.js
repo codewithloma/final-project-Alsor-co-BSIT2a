@@ -1,15 +1,10 @@
 // ============================================================
-//  DearBUP – profile.js
-//  IT 112 – 2A | AlSor Co | AY 2025-2026
-//
-//  Backend contract:
-//    GET  /api/profile          → getProfile   (authMiddleware)
-//    PUT  /api/profile          → updateProfile (authMiddleware)
-//    Body for PUT: { display_name, bio, avatar_url }
-//
-//  Posts routes expected (add to your router):
-//    GET  /api/posts?author=<id>   → user's posts
-//    POST /api/posts/:id/like      → toggle like
+//  DearBUP – profile.js  (UPDATED — Admin Switch added)
+//  Changes from original:
+//  + initAdminSwitch(user) — shows "Admin Panel" button
+//    only for admin / officer user_type
+//  + fetchOfficerScope()   — gets officer's org from backend
+//  + initAdminSwitch called in DOMContentLoaded (own profile)
 // ============================================================
 
 "use strict";
@@ -17,10 +12,14 @@
 const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5000/'
   : 'https://final-project-alsor-co-bsit2a-n02f.onrender.com/';
-const INDEX_URL = "../index.html"; // Adjust to your actual login/landing page path
 
+// Use API_BASE_URL consistently (your original used API_BASE — keep whichever you use)
+const API_BASE = API_BASE_URL.replace(/\/$/, '');
+
+const INDEX_URL = "../index.html";
 
 let _badgePollInterval = null;
+
 // ── Auth ──────────────────────────────────────────────────
 const getToken = () => localStorage.getItem("dearbup_token");
 
@@ -64,7 +63,7 @@ function timeAgo(iso) {
   if (!iso) return "";
   const diff  = Date.now() - new Date(iso).getTime();
   const mins  = Math.floor(diff / 60_000);
-  const hrs   = Math.floor(diff / 3_360_000); // Corrected from 3_600_000 for logic consistency
+  const hrs   = Math.floor(diff / 3_600_000);
   const days  = Math.floor(diff / 86_400_000);
   if (mins < 1)  return "just now";
   if (mins < 60) return `${mins}m ago`;
@@ -80,43 +79,27 @@ function escapeHTML(str = "") {
 
 async function uploadToServer(file) {
   const reader = new FileReader();
-
   return new Promise((resolve, reject) => {
     reader.onload = async () => {
       try {
         const res = await fetch(`${API_BASE}/upload/avatar`, {
           method: "POST",
           headers: authHeaders(),
-          body: JSON.stringify({
-            image: reader.result
-          }),
+          body: JSON.stringify({ image: reader.result }),
         });
-
         const text = await res.text();
-
         let data;
-        try {
-          data = JSON.parse(text);
-        } catch {
-          console.error("Server returned non-JSON:", text);
-          throw new Error("Server returned invalid response");
-        }
-
-        if (!res.ok) {
-          throw new Error(data.message || "Upload failed");
-        }
-
+        try { data = JSON.parse(text); }
+        catch { throw new Error("Server returned invalid response"); }
+        if (!res.ok) throw new Error(data.message || "Upload failed");
         resolve(data.imageUrl);
-      } catch (error) {
-        reject(error);
-      }
+      } catch (error) { reject(error); }
     };
-
     reader.readAsDataURL(file);
   });
 }
-// ── API calls ─────────────────────────────────────────────
 
+// ── API calls ─────────────────────────────────────────────
 async function apiGetProfile() {
   const res = await fetch(`${API_BASE}/profile`, { headers: authHeaders() });
   if (res.status === 401) {
@@ -237,7 +220,6 @@ function renderPosts(posts, viewedUser, loggedInUser) {
   const authorInits = getInitials(authorName);
 
   container.innerHTML = posts.map((p, i) => {
-
     let spotifyHtml = '';
     if (p.spotify_track_url && !p.shared_from) {
       const id = extractSpotifyId(p.spotify_track_url);
@@ -258,7 +240,6 @@ function renderPosts(posts, viewedUser, loggedInUser) {
       const origAvatar = origUser?.avatar_url
         ? `<img src="${escapeHTML(origUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
         : origName.charAt(0).toUpperCase();
-
       let origSpotify = '';
       if (orig.spotify_track_url) {
         const id = extractSpotifyId(orig.spotify_track_url);
@@ -270,7 +251,6 @@ function renderPosts(posts, viewedUser, loggedInUser) {
               loading="lazy" style="border-radius:12px;display:block;"></iframe>
           </div>`;
       }
-
       sharedHtml = `
         <div class="shared-post-card">
           <div class="shared-post-header">
@@ -295,37 +275,30 @@ function renderPosts(posts, viewedUser, loggedInUser) {
           <div class="name">${escapeHTML(authorName)}</div>
           <div class="time">${timeAgo(p.createdAt || p.created_at)}</div>
         </div>
-          ${loggedInUser._id === p.user_id?._id || loggedInUser._id === p.user_id ? `
-          <div class="post-menu" style="position:relative;margin-left:auto;">
-            <button class="post-menu-btn" data-menu="${p._id}">
-              <i class="fas fa-ellipsis-h"></i>
-            </button>
-            <div class="post-menu-dropdown" id="menu-${p._id}">
-              <a href="#" data-action="edit" data-post-id="${p._id}">
-                <i class="fas fa-pen"></i> Edit post
-              </a>
-              <a href="#" data-action="delete" data-post-id="${p._id}">
-                <i class="fas fa-trash-alt"></i> Delete post
-              </a>
-            </div>
-          </div>` : ''}
-      </div>
-        ${p.content ? `<div class="post-card-body">${formatContent(p.content)}${p.edited ? ' <span class="edited-tag">(edited)</span>' : ''}</div>` : ''}
-
-        ${p.media?.url ? `
-        <div class="post-media" style="margin:10px 0;border-radius:12px;overflow:hidden;background:#000;">
-            ${p.media.type === 'video'
-                ? `<video controls style="width:100%;max-height:500px;border-radius:12px;display:block;">
-                    <source src="${p.media.url}" />
-                  </video>`
-                : `<img src="${p.media.url}" alt=""
-                    style="width:100%;max-height:600px;object-fit:contain;display:block;border-radius:12px;"
-                    loading="lazy" />`
-            }
+        ${loggedInUser._id === p.user_id?._id || loggedInUser._id === p.user_id ? `
+        <div class="post-menu" style="position:relative;margin-left:auto;">
+          <button class="post-menu-btn" data-menu="${p._id}">
+            <i class="fas fa-ellipsis-h"></i>
+          </button>
+          <div class="post-menu-dropdown" id="menu-${p._id}">
+            <a href="#" data-action="edit" data-post-id="${p._id}">
+              <i class="fas fa-pen"></i> Edit post
+            </a>
+            <a href="#" data-action="delete" data-post-id="${p._id}">
+              <i class="fas fa-trash-alt"></i> Delete post
+            </a>
+          </div>
         </div>` : ''}
-
-        ${spotifyHtml}
-        ${sharedHtml}
+      </div>
+      ${p.content ? `<div class="post-card-body">${formatContent(p.content)}${p.edited ? ' <span class="edited-tag">(edited)</span>' : ''}</div>` : ''}
+      ${p.media?.url ? `
+      <div class="post-media" style="margin:10px 0;border-radius:12px;overflow:hidden;background:#000;">
+        ${p.media.type === 'video'
+          ? `<video controls style="width:100%;max-height:500px;border-radius:12px;display:block;"><source src="${p.media.url}" /></video>`
+          : `<img src="${p.media.url}" alt="" style="width:100%;max-height:600px;object-fit:contain;display:block;border-radius:12px;" loading="lazy" />`}
+      </div>` : ''}
+      ${spotifyHtml}
+      ${sharedHtml}
       <div class="post-card-footer">
         <button class="pc-action ${p.liked_by_me ? "liked" : ""}"
           data-action="like" data-post-id="${p._id}" data-liked="${p.liked_by_me ? "1" : "0"}">
@@ -344,17 +317,12 @@ function renderPosts(posts, viewedUser, loggedInUser) {
     </div>`;
   }).join("");
 
-  // Like buttons
   container.querySelectorAll('[data-action="like"]').forEach((btn) =>
     btn.addEventListener("click", () => handleLike(btn))
   );
-
-  // Comment buttons
   container.querySelectorAll('[data-action="comment"]').forEach((btn) =>
     btn.addEventListener("click", () => openCommentModal(btn.dataset.postId))
   );
-
-  // Share buttons
   container.querySelectorAll('[data-action="share"]').forEach((btn) =>
     btn.addEventListener("click", async () => {
       const postId = btn.dataset.postId;
@@ -363,8 +331,6 @@ function renderPosts(posts, viewedUser, loggedInUser) {
       openProfileShareModal(postId, post);
     })
   );
-
-  // Menu toggles
   container.querySelectorAll('.post-menu-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -376,18 +342,13 @@ function renderPosts(posts, viewedUser, loggedInUser) {
       dropdown?.classList.toggle('open');
     });
   });
-
-  // Edit/Delete actions
   container.querySelectorAll('.post-menu-dropdown a').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       const postId  = btn.dataset.postId;
       const action  = btn.dataset.action;
       const postEl  = container.querySelector(`[data-post-id="${postId}"]`);
-
       document.querySelectorAll('.post-menu-dropdown.open').forEach(d => d.classList.remove('open'));
-
       if (action === 'edit') {
         const contentEl = postEl?.querySelector('.post-card-body');
         openProfileEditModal(postId, contentEl?.innerText || '', postEl);
@@ -396,12 +357,11 @@ function renderPosts(posts, viewedUser, loggedInUser) {
       }
     });
   });
-
-  // Close menus when clicking outside
   document.addEventListener('click', () => {
     document.querySelectorAll('.post-menu-dropdown.open').forEach(d => d.classList.remove('open'));
   });
 }
+
 function extractSpotifyId(url = "") {
   if (!url) return "";
   const match = url.match(/track\/([a-zA-Z0-9]+)/);
@@ -409,16 +369,13 @@ function extractSpotifyId(url = "") {
 }
 
 function formatContent(text = "") {
-  return escapeHTML(text).replace(/#(\w+)/g,
-    '<span class="hashtag">#$1</span>'
-  );
+  return escapeHTML(text).replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
 }
 
 // ── Render about tab ──────────────────────────────────────
 function renderAbout(user) {
   const container = document.getElementById("aboutContainer");
   if (!container) return;
-
   container.innerHTML = `
     <div class="about-card" style="animation-delay:0s">
       <h3>Personal Info</h3>
@@ -436,9 +393,7 @@ function renderAbout(user) {
           <div class="value">@${escapeHTML(user.username || "—")}</div>
         </div>
       </div>
-      </div>
     </div>
-
     <div class="about-card" style="animation-delay:0.07s">
       <h3>Academic Info</h3>
       <div class="info-row">
@@ -478,23 +433,19 @@ async function handleLike(btn) {
   const wasLiked = btn.dataset.liked === "1";
   const countEl  = btn.querySelector(".like-count");
   const prev     = parseInt(countEl.textContent, 10) || 0;
-
-  // Optimistic update
   btn.classList.toggle("liked");
   btn.dataset.liked   = wasLiked ? "0" : "1";
   countEl.textContent = wasLiked ? Math.max(0, prev - 1) : prev + 1;
-
- try {
-    const result = await apiToggleLike(postId);
-    const newCount = result.reactions ?? 0;
+  try {
+    const result    = await apiToggleLike(postId);
+    const newCount  = result.reactions ?? 0;
     const isNowLiked = !wasLiked;
     countEl.textContent = newCount;
     btn.dataset.liked   = isNowLiked ? "1" : "0";
     isNowLiked ? btn.classList.add("liked") : btn.classList.remove("liked");
     const iconEl = btn.querySelector('i');
     if (iconEl) iconEl.className = isNowLiked ? 'fas fa-heart' : 'far fa-heart';
-  }catch {
-    // Revert on error
+  } catch {
     btn.classList.toggle("liked");
     btn.dataset.liked   = wasLiked ? "1" : "0";
     countEl.textContent = prev;
@@ -512,8 +463,6 @@ function initTabs() {
       document.getElementById(`tab-${btn.dataset.tab}`)?.classList.add("active");
     });
   });
-
-  // Click on stat post count to jump to posts tab
   document.getElementById("statPostsBtn")?.addEventListener("click", () =>
     document.querySelector('[data-tab="posts"]')?.click()
   );
@@ -528,7 +477,6 @@ function openEditModal() {
   document.getElementById("editBioInput").value    = _currentUser.bio || "";
   document.getElementById("editAvatarUrl").value   = _currentUser.avatar_url || "";
   updateBioCount();
-
   const preview = document.getElementById("avatarPreview");
   if (preview) {
     if (_currentUser.avatar_url) {
@@ -537,25 +485,21 @@ function openEditModal() {
       preview.textContent = getInitials(_currentUser.display_name || _currentUser.username);
     }
   }
-
   const fileInput = document.getElementById("avatarFileInput");
   if (fileInput) {
     fileInput.onchange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = (ev) => {
         if (preview) preview.innerHTML = `<img src="${ev.target.result}" alt="" />`;
       };
       reader.readAsDataURL(file);
-
       fileInput._pendingFile = file;
       const hint = document.getElementById("avatarUploadHint");
       if (hint) hint.textContent = file.name;
     };
   }
-
   document.getElementById("editModal").classList.add("active");
 }
 
@@ -572,38 +516,30 @@ function updateBioCount() {
 async function saveProfile() {
   const saveBtn = document.getElementById("saveProfileBtn");
   if (!saveBtn) return;
-
   saveBtn.disabled  = true;
   saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
-
   try {
     const fileInput   = document.getElementById("avatarFileInput");
     const pendingFile = fileInput?._pendingFile;
-
     if (pendingFile) {
       saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading photo…';
       const imageUrl = await uploadToServer(pendingFile);
       document.getElementById("editAvatarUrl").value = imageUrl;
       fileInput._pendingFile = null;
     }
-
     const payload = {
       display_name: document.getElementById("editDisplayName").value.trim(),
       bio:           document.getElementById("editBioInput").value.trim(),
       avatar_url:    document.getElementById("editAvatarUrl").value.trim(),
     };
-
     const updatedUser = await apiUpdateProfile(payload);
     _currentUser = { ..._currentUser, ...updatedUser };
-
     localStorage.setItem("dearbup_user", JSON.stringify(_currentUser));
-
     renderProfile(_currentUser);
     populateSidebar(_currentUser);
     renderAbout(_currentUser);
     closeEditModal();
     showToast("Profile updated! ✨", "success");
-
   } catch (err) {
     showToast(err.message || "Could not save profile.", "error");
   } finally {
@@ -614,10 +550,6 @@ async function saveProfile() {
 
 // ── Profile Share Modal ───────────────────────────────────
 function openProfileShareModal(postId, post) {
-  // Reuse home's share modal structure but post to same API
-  const modal = document.getElementById('shareModal');
-  if (!modal) { showToast('Share feature not available here.'); return; }
-  // fallback — just share directly
   fetch(`${API_BASE}/posts/${postId}/share`, {
     method: 'POST',
     headers: authHeaders(),
@@ -638,11 +570,9 @@ let _editingPostEl  = null;
 function openProfileEditModal(postId, currentContent, postEl) {
   _editingPostId = postId;
   _editingPostEl = postEl;
-
   const modal    = document.getElementById('editPostModal');
   const textarea = document.getElementById('editPostContent');
   const counter  = document.getElementById('editPostCharCount');
-
   if (!modal || !textarea) return;
   textarea.value           = currentContent;
   if (counter) counter.textContent = currentContent.length;
@@ -661,28 +591,24 @@ async function submitProfileEdit() {
   const postEl     = _editingPostEl;
   const newContent = document.getElementById('editPostContent')?.value.trim();
   if (!postId || !newContent) return;
-
   const btn = document.getElementById('saveEditPostBtn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…'; }
-
   try {
     const res = await fetch(`${API_BASE}/posts/${postId}`, {
       method:  'PUT',
       headers: authHeaders(),
       body:    JSON.stringify({ content: newContent })
     });
-
-if (res.ok) {
-    const contentEl = postEl?.querySelector('.post-card-body');
-    if (contentEl) contentEl.innerHTML = formatContent(newContent) + ' <span class="edited-tag">(edited)</span>';
-    closeProfileEditModal();
-    showToast('Post updated ✨', 'success');
-}else {
+    if (res.ok) {
+      const contentEl = postEl?.querySelector('.post-card-body');
+      if (contentEl) contentEl.innerHTML = formatContent(newContent) + ' <span class="edited-tag">(edited)</span>';
+      closeProfileEditModal();
+      showToast('Post updated ✨', 'success');
+    } else {
       showToast('Failed to update', 'error');
     }
-  } catch {
-    showToast('Failed to update', 'error');
-  } finally {
+  } catch { showToast('Failed to update', 'error'); }
+  finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Save Changes'; }
   }
 }
@@ -707,16 +633,13 @@ async function submitProfileDelete() {
   const postId = _deletingPostId;
   const postEl = _deletingPostEl;
   if (!postId) return;
-
   const btn = document.getElementById('confirmDeletePostBtn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting…'; }
-
   try {
     const res = await fetch(`${API_BASE}/posts/${postId}`, {
       method:  'DELETE',
       headers: authHeaders()
     });
-
     if (res.ok) {
       closeProfileDeleteModal();
       postEl.style.transition = 'all 0.3s ease';
@@ -724,12 +647,9 @@ async function submitProfileDelete() {
       postEl.style.transform  = 'translateY(-10px)';
       setTimeout(() => postEl.remove(), 300);
       showToast('Post deleted', 'success');
-    } else {
-      showToast('Failed to delete', 'error');
-    }
-  } catch {
-    showToast('Failed to delete', 'error');
-  } finally {
+    } else { showToast('Failed to delete', 'error'); }
+  } catch { showToast('Failed to delete', 'error'); }
+  finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete'; }
   }
 }
@@ -759,7 +679,6 @@ function initShareBtn() {
   });
 }
 
-// ── Cover / avatar placeholders ───────────────────────────
 function initCoverBtn() {
   document.getElementById("editCoverBtn")?.addEventListener("click", () =>
     showToast("Cover photo upload coming soon!")
@@ -767,6 +686,211 @@ function initCoverBtn() {
   document.getElementById("avatarEditBtn")?.addEventListener("click", () =>
     showToast("Photo upload coming soon!")
   );
+}
+
+/* ═════════════════════════════════════════════════════
+   ★ NEW — ADMIN SWITCH
+   Shows the "Admin Panel" button only for admins/officers.
+   Called after the logged-in user data is loaded.
+═════════════════════════════════════════════════════ */
+function initAdminSwitch(user) {
+  const btn = document.getElementById('adminSwitchBtn');
+  if (!btn) return;
+
+  const isAdmin   = user?.user_type === 'admin' || user?.role === 'admin';
+  const isOfficer = user?.user_type === 'officer';
+
+  // Regular user — keep hidden
+  if (!isAdmin && !isOfficer) return;
+
+  // Reveal with a smooth animation
+  btn.style.display    = 'inline-flex';
+  btn.style.opacity    = '0';
+  btn.style.transform  = 'translateY(8px) scale(0.95)';
+  btn.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      btn.style.opacity   = '1';
+      btn.style.transform = 'translateY(0) scale(1)';
+    }, 280);
+  });
+
+  // Officers: fetch their org from backend and update tooltip/label
+  if (isOfficer && !isAdmin) {
+    fetch(`${API_BASE}/api/officers/me/scope`, { headers: authHeaders() })
+      .then(r => r.ok ? r.json() : null)
+      .then(scope => {
+        if (!scope?.isScoped) return;
+        const label = btn.querySelector('.admin-switch-label');
+        if (label) label.textContent = 'Officer Panel';
+        btn.title = `Officer Panel — ${scope.orgName || 'Your Org'} · ${scope.role || 'officer'}`;
+      })
+      .catch(() => {});
+  }
+
+  // Navigate to dashboard on click
+  btn.addEventListener('click', () => {
+    const label = btn.querySelector('.admin-switch-label');
+    const icon  = btn.querySelector('.admin-switch-icon');
+    if (label) label.textContent = 'Opening…';
+    if (icon)  icon.innerHTML    = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.style.pointerEvents = 'none';
+    window.location.href = 'admin-dashboard.html';
+  });
+}
+
+// ── Notification badge ────────────────────────────────────
+async function initNotificationBadge() {
+  const token = getToken();
+  const badge = document.getElementById("notificationBadge");
+  if (!token || !badge) return;
+  try {
+    const res = await fetch(`${API_BASE}/notifications/count`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) return;
+    const { unreadCount } = await res.json();
+    if (unreadCount > 0) {
+      badge.textContent   = unreadCount > 99 ? "99+" : String(unreadCount);
+      badge.style.display = "inline-flex";
+    } else {
+      badge.textContent   = "";
+      badge.style.display = "none";
+    }
+  } catch (err) { console.warn("Badge fetch failed:", err); }
+}
+
+// ── Comment Modal ─────────────────────────────────────────
+let _activeCommentPostId = null;
+
+function openCommentModal(postId) {
+  _activeCommentPostId = postId;
+  const modal       = document.getElementById('commentModal');
+  const list        = document.getElementById('commentsList');
+  const input       = document.getElementById('commentInput');
+  const preview     = document.getElementById('commentModalPost');
+  const inputAvatar = document.getElementById('commentInputAvatar');
+
+  if (inputAvatar && _currentUser) {
+    inputAvatar.innerHTML = _currentUser.avatar_url
+      ? `<img src="${escapeHTML(_currentUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+      : getInitials(_currentUser.display_name || _currentUser.username);
+  }
+
+  fetch(`${API_BASE}/posts/${postId}`, { headers: authHeaders() })
+    .then(r => r.json())
+    .then(post => {
+      const isLiked = _currentUser && post.reactions?.some(r =>
+        r?.toString() === _currentUser._id?.toString() || r === _currentUser._id
+      );
+      if (preview) {
+        const user       = post.user_id;
+        const authorName = user?.display_name || user?.username || 'Anonymous';
+        const avatarHtml = user?.avatar_url
+          ? `<img src="${escapeHTML(user.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+          : authorName.charAt(0).toUpperCase();
+        let postSpotify = '';
+        if (post.spotify_track_url && !post.shared_from) {
+          const id = extractSpotifyId(post.spotify_track_url);
+          if (id) postSpotify = `
+            <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
+              <iframe src="https://open.spotify.com/embed/track/${id}" width="100%" height="80" frameborder="0"
+                allow="encrypted-media" loading="lazy" style="border-radius:12px;display:block;"></iframe>
+            </div>`;
+        }
+        preview.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;overflow:hidden;flex-shrink:0;">${avatarHtml}</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:#fff;">${escapeHTML(authorName)}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);">${timeAgo(post.createdAt)}</div>
+            </div>
+          </div>
+          ${post.content ? `<div style="font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:8px;">${formatContent(post.content)}</div>` : ''}
+          ${postSpotify}
+          <div class="cmp-stats">
+            <span class="post-action ${isLiked ? 'liked' : ''}" style="cursor:default">
+              <i class="${isLiked ? 'fas' : 'far'} fa-heart" style="${isLiked ? 'color:#e06a72' : ''}"></i>
+              ${post.reactions?.length || 0}
+            </span>
+            <span><i class="far fa-comment"></i> ${post.comments?.length || 0} comments</span>
+            <span><i class="fas fa-share"></i> ${post.shares_count || 0} shares</span>
+          </div>`;
+      }
+
+      list.innerHTML = '';
+      const comments = post.comments || [];
+      if (!comments.length) {
+        list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);font-size:13px;padding:20px 0;">No comments yet. Be the first!</div>';
+      } else {
+        comments.forEach(c => {
+          const name   = c.user_id?.display_name || c.user_id?.username || 'User';
+          const avatar = c.user_id?.avatar_url
+            ? `<img src="${escapeHTML(c.user_id.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+            : name.charAt(0).toUpperCase();
+          const item = document.createElement('div');
+          item.style.cssText = 'display:flex;align-items:flex-start;gap:8px;';
+          item.innerHTML = `
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden;">${avatar}</div>
+            <div style="background:#3a3b3c;border-radius:18px;padding:8px 14px;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">${escapeHTML(name)}</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${escapeHTML(c.text)}</div>
+            </div>`;
+          list.appendChild(item);
+        });
+      }
+    })
+    .catch(() => {
+      list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px 0;">Could not load comments.</div>';
+    });
+
+  if (input) input.value = '';
+  modal.style.display = 'flex';
+  if (input) input.focus();
+}
+
+function closeCommentModal() {
+  document.getElementById('commentModal').style.display = 'none';
+  _activeCommentPostId = null;
+}
+
+async function submitProfileComment() {
+  const input  = document.getElementById('commentInput');
+  const text   = input?.value.trim();
+  const postId = _activeCommentPostId;
+  if (!text || !postId) return;
+  const btn = document.getElementById('commentSubmitBtn');
+  if (btn) btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/posts/${postId}/comment`, {
+      method:  'POST',
+      headers: authHeaders(),
+      body:    JSON.stringify({ text })
+    });
+    if (!res.ok) throw new Error('Failed');
+    const comments = await res.json();
+    const countEl  = document.querySelector(`.post-card [data-post-id="${postId}"][data-action="comment"]`);
+    if (countEl) countEl.innerHTML = `<i class="fas fa-comment"></i> ${comments.length}`;
+    const list  = document.getElementById('commentsList');
+    const empty = list.querySelector('[style*="No comments"]');
+    if (empty) empty.remove();
+    const avatar = _currentUser?.avatar_url
+      ? `<img src="${escapeHTML(_currentUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+      : getInitials(_currentUser?.display_name || _currentUser?.username || 'U');
+    const item = document.createElement('div');
+    item.style.cssText = 'display:flex;align-items:flex-start;gap:8px;';
+    item.innerHTML = `
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden;">${avatar}</div>
+      <div style="background:#3a3b3c;border-radius:18px;padding:8px 14px;">
+        <div style="font-size:13px;font-weight:600;color:#fff;">${escapeHTML(_currentUser?.display_name || _currentUser?.username || 'You')}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${escapeHTML(text)}</div>
+      </div>`;
+    list.appendChild(item);
+    list.scrollTop = list.scrollHeight;
+    if (input) input.value = '';
+    showToast('Comment posted! 💬', 'success');
+  } catch { showToast('Could not post comment.', 'error'); }
+  finally { if (btn) btn.disabled = false; }
 }
 
 // ── Bootstrap ─────────────────────────────────────────────
@@ -783,324 +907,81 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfile);
   document.getElementById('closeCommentModal')?.addEventListener('click', closeCommentModal);
   document.getElementById('commentModal')?.addEventListener('click', (e) => {
-  if (e.target === document.getElementById('commentModal')) closeCommentModal();
-});
+    if (e.target === document.getElementById('commentModal')) closeCommentModal();
+  });
   document.getElementById('commentSubmitBtn')?.addEventListener('click', submitProfileComment);
   document.getElementById('commentInput')?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submitProfileComment();
+    if (e.key === 'Enter') submitProfileComment();
   });
-
   document.getElementById("editModal")?.addEventListener("click", (e) => {
     if (e.target === e.currentTarget) closeEditModal();
   });
-
   document.getElementById("editBioInput")?.addEventListener("input", updateBioCount);
 
-try {
+  try {
     const urlParams  = new URLSearchParams(window.location.search);
     const viewUserId = urlParams.get('id');
 
-    // Fetch logged-in user for sidebar always
     const myData = await apiGetProfile();
     if (!myData) return;
     const loggedInUser = myData.user;
     populateSidebar(loggedInUser);
 
     if (viewUserId && viewUserId !== loggedInUser._id) {
-        // ── Viewing someone else's profile ──
-        document.getElementById('profileNavItem')?.classList.remove('active');
-        _currentUser = loggedInUser;
-
-        const res  = await fetch(`${API_BASE}/profile/user/${viewUserId}`, { headers: authHeaders() });
-        const data = await res.json();
-        const user = data.user;
-
-        renderProfile(user);
-        renderAbout(user);
-
-        // Hide edit button — not your profile
-        document.getElementById('editProfileBtn')?.style.setProperty('display', 'none');
-        document.getElementById('shareProfileBtn')?.style.setProperty('display', 'none');
-
-        // Other's profile  
-        const postsRes = await fetch(`${API_BASE}/profile/user/${viewUserId}/posts`, { headers: authHeaders() });
-        const posts    = postsRes.ok ? await postsRes.json() : [];
-        const totalLikes = posts.reduce((sum, p) => sum + (p.likes_count || 0), 0);
-        renderStats(posts.length, totalLikes);
-        renderPosts(posts, user, loggedInUser); // ✅ Pass viewed user first, loggedInUser second
+      // ── Viewing someone else's profile ──
+      _currentUser = loggedInUser;
+      const res  = await fetch(`${API_BASE}/profile/user/${viewUserId}`, { headers: authHeaders() });
+      const data = await res.json();
+      const user = data.user;
+      renderProfile(user);
+      renderAbout(user);
+      document.getElementById('editProfileBtn')?.style.setProperty('display', 'none');
+      document.getElementById('shareProfileBtn')?.style.setProperty('display', 'none');
+      // Don't show admin switch when viewing others
+      const postsRes  = await fetch(`${API_BASE}/profile/user/${viewUserId}/posts`, { headers: authHeaders() });
+      const posts     = postsRes.ok ? await postsRes.json() : [];
+      const totalLikes = posts.reduce((sum, p) => sum + (p.likes_count || 0), 0);
+      renderStats(posts.length, totalLikes);
+      renderPosts(posts, user, loggedInUser);
     } else {
-        // ── Viewing own profile ──
-          document.getElementById('profileNavItem')?.classList.add('active');
+      // ── Viewing own profile ──
+      document.getElementById('profileNavItem')?.classList.add('active');
+      _currentUser = loggedInUser;
+      renderProfile(loggedInUser);
+      renderAbout(loggedInUser);
 
-        _currentUser = loggedInUser;
+      // ★ ADMIN SWITCH — only shown on own profile, only if privileged
+      initAdminSwitch(loggedInUser);
 
-        renderProfile(loggedInUser);
-        renderAbout(loggedInUser);
-
-        // Own profile
-        const posts = await apiGetUserPosts(loggedInUser._id);
-        const totalLikes = posts.reduce((sum, p) => sum + (p.reactions?.length || p.likes_count || 0), 0);
-        renderStats(posts.length, totalLikes);
-        renderPosts(posts, loggedInUser, loggedInUser); // ✅ Pass both
-    }
-
-} catch (err) {
-    console.error("Failed to load profile:", err);
-    showToast("Could not load profile. Please try again.", "error");
-}
-  // Edit post modal
-document.getElementById('closeEditPostModal')?.addEventListener('click', closeProfileEditModal);
-document.getElementById('cancelEditPostModal')?.addEventListener('click', closeProfileEditModal);
-document.getElementById('editPostModal')?.addEventListener('click', (e) => {
-  if (e.target === document.getElementById('editPostModal')) closeProfileEditModal();
-});
-document.getElementById('saveEditPostBtn')?.addEventListener('click', submitProfileEdit);
-document.getElementById('editPostContent')?.addEventListener('input', () => {
-  const len = document.getElementById('editPostContent')?.value.length || 0;
-  const counter = document.getElementById('editPostCharCount');
-  if (counter) counter.textContent = len;
-});
-
-// Delete post modal
-document.getElementById('closeDeletePostModal')?.addEventListener('click', closeProfileDeleteModal);
-document.getElementById('cancelDeletePostModal')?.addEventListener('click', closeProfileDeleteModal);
-document.getElementById('deletePostModal')?.addEventListener('click', (e) => {
-  if (e.target === document.getElementById('deletePostModal')) closeProfileDeleteModal();
-});
-document.getElementById('confirmDeletePostBtn')?.addEventListener('click', submitProfileDelete);
-});
-
-async function initNotificationBadge() {
-  const token = getToken();
-  const badge = document.getElementById("notificationBadge");
-  if (!token || !badge) return;
-
-  try {
-    const res = await fetch(`${API_BASE}/notifications/count`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) return;
-
-    const { unreadCount } = await res.json();
-
-    if (unreadCount > 0) {
-      badge.textContent   = unreadCount > 99 ? "99+" : String(unreadCount);
-      badge.style.display = "inline-flex";
-    } else {
-      badge.textContent   = "";
-      badge.style.display = "none";
+      const posts      = await apiGetUserPosts(loggedInUser._id);
+      const totalLikes = posts.reduce((sum, p) => sum + (p.reactions?.length || p.likes_count || 0), 0);
+      renderStats(posts.length, totalLikes);
+      renderPosts(posts, loggedInUser, loggedInUser);
     }
   } catch (err) {
-    console.warn("Badge fetch failed:", err);
+    console.error("Failed to load profile:", err);
+    showToast("Could not load profile. Please try again.", "error");
   }
-}
 
-// ── Comment Modal ─────────────────────────────────────────
-let _activeCommentPostId = null;
+  document.getElementById('closeEditPostModal')?.addEventListener('click', closeProfileEditModal);
+  document.getElementById('cancelEditPostModal')?.addEventListener('click', closeProfileEditModal);
+  document.getElementById('editPostModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('editPostModal')) closeProfileEditModal();
+  });
+  document.getElementById('saveEditPostBtn')?.addEventListener('click', submitProfileEdit);
+  document.getElementById('editPostContent')?.addEventListener('input', () => {
+    const len     = document.getElementById('editPostContent')?.value.length || 0;
+    const counter = document.getElementById('editPostCharCount');
+    if (counter) counter.textContent = len;
+  });
+  document.getElementById('closeDeletePostModal')?.addEventListener('click', closeProfileDeleteModal);
+  document.getElementById('cancelDeletePostModal')?.addEventListener('click', closeProfileDeleteModal);
+  document.getElementById('deletePostModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('deletePostModal')) closeProfileDeleteModal();
+  });
+  document.getElementById('confirmDeletePostBtn')?.addEventListener('click', submitProfileDelete);
 
-function openCommentModal(postId) {
-    _activeCommentPostId = postId;
-    const modal    = document.getElementById('commentModal');
-    const list     = document.getElementById('commentsList');
-    const input    = document.getElementById('commentInput');
-    const preview  = document.getElementById('commentModalPost');
-    const inputAvatar = document.getElementById('commentInputAvatar');
-
-    // Show current user avatar
-    if (inputAvatar && _currentUser) {
-        inputAvatar.innerHTML = _currentUser.avatar_url
-            ? `<img src="${escapeHTML(_currentUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-            : getInitials(_currentUser.display_name || _currentUser.username);
-    }
-
-    // Fetch post data to show preview and comments
-    fetch(`${API_BASE}/posts/${postId}`, { headers: authHeaders() })
-        .then(r => r.json())
-        .then(post => {
-          const isLiked = _currentUser && post.reactions?.some(r => 
-              r?.toString() === _currentUser._id?.toString() || 
-              r === _currentUser._id
-          );
-            // Post preview
-            if (preview) {
-                const user       = post.user_id;
-                const authorName = user?.display_name || user?.username || 'Anonymous';
-                const avatarHtml = user?.avatar_url
-                    ? `<img src="${escapeHTML(user.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-                    : authorName.charAt(0).toUpperCase();
-
-                let postSpotify = '';
-                if (post.spotify_track_url && !post.shared_from) {
-                    const id = extractSpotifyId(post.spotify_track_url);
-                    if (id) postSpotify = `
-                        <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
-                            <iframe src="https://open.spotify.com/embed/track/${id}"
-                                width="100%" height="80" frameborder="0"
-                                allow="encrypted-media" loading="lazy"
-                                style="border-radius:12px;display:block;"></iframe>
-                        </div>`;
-                }
-
-                let sharedHtml = '';
-                if (post.shared_from && post.shared_from._id) {
-                    const orig     = post.shared_from;
-                    const origUser = orig.user_id;
-                    const origName = origUser?.display_name || origUser?.username || 'Someone';
-                    const origAvatar = origUser?.avatar_url
-                        ? `<img src="${escapeHTML(origUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-                        : origName.charAt(0).toUpperCase();
-
-                    let origSpotify = '';
-                    if (orig.spotify_track_url) {
-                        const id = extractSpotifyId(orig.spotify_track_url);
-                        if (id) origSpotify = `
-                            <div style="margin-top:10px;border-radius:12px;overflow:hidden;">
-                                <iframe src="https://open.spotify.com/embed/track/${id}"
-                                    width="100%" height="80" frameborder="0"
-                                    allow="encrypted-media" loading="lazy"
-                                    style="border-radius:12px;display:block;"></iframe>
-                            </div>`;
-                    }
-
-                    sharedHtml = `
-                        <div class="shared-post-card">
-                            <div class="shared-post-header">
-                                <div class="shared-post-avatar">${origAvatar}</div>
-                                <div class="shared-post-meta">
-                                    <div class="shared-post-author">${escapeHTML(origName)}</div>
-                                </div>
-                            </div>
-                            ${orig.content ? `<div class="shared-post-content">${formatContent(orig.content)}</div>` : ''}
-                            ${origSpotify}
-                        </div>`;
-                }
-
-                preview.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;overflow:hidden;flex-shrink:0;">
-                            ${avatarHtml}
-                        </div>
-                        <div>
-                            <div style="font-size:14px;font-weight:600;color:#fff;">${escapeHTML(authorName)}</div>
-                            <div style="font-size:12px;color:rgba(255,255,255,0.5);">${timeAgo(post.createdAt)}</div>
-                        </div>
-                    </div>
-                    ${post.content ? `<div style="font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:8px;">${formatContent(post.content)}</div>` : ''}
-                    ${postSpotify}
-                    ${sharedHtml}
-                    <div class="cmp-stats">
-                        <span class="post-action ${isLiked ? 'liked' : ''}" style="cursor:default">
-                            <i class="${isLiked ? 'fas' : 'far'} fa-heart" style="${isLiked ? 'color:#e06a72' : ''}"></i>
-                            ${post.reactions?.length || 0}
-                        </span>
-                        <span>
-                            <i class="far fa-comment"></i>
-                            ${post.comments?.length || 0} ${post.comments?.length === 1 ? 'comment' : 'comments'}
-                        </span>
-                        <span>
-                            <i class="fas fa-share"></i>
-                            ${post.shares_count || 0} ${post.shares_count === 1 ? 'share' : 'shares'}
-                        </span>
-                    </div>`;
-            }
-
-            // Render comments
-            list.innerHTML = '';
-            const comments = post.comments || [];
-            if (comments.length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);font-size:13px;padding:20px 0;">No comments yet. Be the first!</div>';
-            } else {
-                comments.forEach(c => {
-                    const name   = c.user_id?.display_name || c.user_id?.username || 'User';
-                    const avatar = c.user_id?.avatar_url
-                        ? `<img src="${escapeHTML(c.user_id.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-                        : name.charAt(0).toUpperCase();
-
-                    const item = document.createElement('div');
-                    item.style.cssText = 'display:flex;align-items:flex-start;gap:8px;';
-                    item.innerHTML = `
-                        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden;">
-                            ${avatar}
-                        </div>
-                        <div style="background:#3a3b3c;border-radius:18px;padding:8px 14px;">
-                            <div style="font-size:13px;font-weight:600;color:#fff;">${escapeHTML(name)}</div>
-                            <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${escapeHTML(c.text)}</div>
-                        </div>`;
-                    list.appendChild(item);
-                });
-            }
-        })
-        .catch(() => {
-            list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px 0;">Could not load comments.</div>';
-        });
-
-        if (input) input.value = '';
-        modal.style.display = 'flex';
-        if (input) input.focus();
-
-}
-
-function closeCommentModal() {
-    document.getElementById('commentModal').style.display = 'none';
-    _activeCommentPostId = null;
-}
-
-async function submitProfileComment() {
-    const input  = document.getElementById('commentInput');
-    const text   = input?.value.trim();
-    const postId = _activeCommentPostId;
-    if (!text || !postId) return;
-
-    const btn = document.getElementById('commentSubmitBtn');
-    if (btn) btn.disabled = true;
-
-    try {
-        const res = await fetch(`${API_BASE}/posts/${postId}/comment`, {
-            method:  'POST',
-            headers: authHeaders(),
-            body:    JSON.stringify({ text })
-        });
-
-        if (!res.ok) throw new Error('Failed');
-        const comments = await res.json();
-
-        // Update count on post card
-        const countEl = document.querySelector(`.post-card [data-post-id="${postId}"][data-action="comment"]`);
-        if (countEl) countEl.innerHTML = `<i class="fas fa-comment"></i> ${comments.length}`;
-
-        // Add to list
-        const list  = document.getElementById('commentsList');
-        const empty = list.querySelector('[style*="No comments"]');
-        if (empty) empty.remove();
-
-        const avatar = _currentUser?.avatar_url
-            ? `<img src="${escapeHTML(_currentUser.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-            : getInitials(_currentUser?.display_name || _currentUser?.username || 'U');
-
-        const item = document.createElement('div');
-        item.style.cssText = 'display:flex;align-items:flex-start;gap:8px;';
-        item.innerHTML = `
-            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e06a72,#d65d64);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;flex-shrink:0;overflow:hidden;">
-                ${avatar}
-            </div>
-            <div style="background:#3a3b3c;border-radius:18px;padding:8px 14px;">
-                <div style="font-size:13px;font-weight:600;color:#fff;">${escapeHTML(_currentUser?.display_name || _currentUser?.username || 'You')}</div>
-                <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${escapeHTML(text)}</div>
-            </div>`;
-        list.appendChild(item);
-        list.scrollTop = list.scrollHeight;
-
-        if (input) input.value = '';
-        showToast('Comment posted! 💬', 'success');
-
-    } catch {
-        showToast('Could not post comment.', 'error');
-    } finally {
-        if (btn) btn.disabled = false;
-    }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
+  // Notification badge polling
   initNotificationBadge();
-  setInterval(initNotificationBadge, 3000);
+  setInterval(initNotificationBadge, 30_000);
 });
