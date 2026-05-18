@@ -414,6 +414,19 @@
   </div>
 
   <div class="toast" id="toast"></div>
+<script>
+  // Auth guard — runs immediately on page load/back-navigation
+  (function() {
+    const token = localStorage.getItem('dearbup_token');
+    const user  = JSON.parse(localStorage.getItem('dearbup_user') || '{}');
+    const isAdmin = user.user_type === 'admin' || user.role === 'admin';
+
+    if (!token || !isAdmin) {
+      // Replace so the back button can't return here
+      window.location.replace('../pages/home.html');
+    }
+  })();
+</script>
 
   <script>
     // Mobile nav toggle
