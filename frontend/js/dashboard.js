@@ -32,6 +32,17 @@ const BASE_URL = window.location.hostname === 'localhost'
 /* ─────────────────────────────────────────────────────
    AUTH
 ───────────────────────────────────────────────────── */
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) {
+    const token   = localStorage.getItem('dearbup_token');
+    const user    = JSON.parse(localStorage.getItem('dearbup_user') || '{}');
+    const isAdmin = user.user_type === 'admin' || user.role === 'admin';
+    if (!token || !isAdmin) {
+      window.location.replace('../index.html');
+    }
+  }
+});
+
 const getToken = () => localStorage.getItem('dearbup_token');
 const getUser  = () => {
   try { return JSON.parse(localStorage.getItem('dearbup_user') || 'null'); }
@@ -1014,7 +1025,7 @@ function initEventListeners() {
     localStorage.removeItem('dearbup_officer_org_id');
     localStorage.removeItem('dearbup_officer_org_name');
     localStorage.removeItem('dearbup_officer_role');
-    window.location.href = '../index.html';
+    window.location.replace('../index.html')
   });
 
   // Org search + filter
