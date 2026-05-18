@@ -14,6 +14,50 @@
     if (nameEl)   nameEl.textContent   = user.display_name || user.username || 'User';
     if (handleEl) handleEl.textContent = '@' + (user.username || 'user');
 
+    // ── Inject Admin/Officer link if privileged ──────────
+    const isAdmin   = user.user_type === 'admin'   || user.role === 'admin';
+    const isOfficer = user.user_type === 'officer'  || user.role === 'officer';
+
+    if (isAdmin || isOfficer) {
+        const dropdown = document.getElementById('navDropdown');
+        const profileLink = dropdown?.querySelector('a[href="profile.html"]');
+
+        if (dropdown && profileLink) {
+            const divider = document.createElement('div');
+            divider.style.cssText = 'border-top:1px solid rgba(255,255,255,0.08);';
+
+            const adminLink = document.createElement('a');
+
+            if (isAdmin) {
+                adminLink.href = 'admin-dashboard.html';
+                adminLink.innerHTML = `
+                    <i class="fas fa-shield-alt" style="width:16px;text-align:center;color:#e06a72;"></i>
+                    Admin Dashboard
+                    <span style="margin-left:auto;font-size:10px;font-weight:700;
+                                 background:rgba(224,106,114,0.15);color:#e06a72;
+                                 padding:2px 7px;border-radius:50px;letter-spacing:0.3px;">ADMIN</span>`;
+                adminLink.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:13px;color:#e06a72;text-decoration:none;transition:background 0.15s;cursor:pointer;';
+                adminLink.addEventListener('mouseenter', () => adminLink.style.background = 'rgba(224,106,114,0.08)');
+                adminLink.addEventListener('mouseleave', () => adminLink.style.background = '');
+            } else {
+                adminLink.href = 'officer-gate.html';
+                adminLink.innerHTML = `
+                    <i class="fas fa-lock" style="width:16px;text-align:center;color:#a78bfa;"></i>
+                    Officer Dashboard
+                    <span style="margin-left:auto;font-size:10px;font-weight:700;
+                                 background:rgba(167,139,250,0.15);color:#a78bfa;
+                                 padding:2px 7px;border-radius:50px;letter-spacing:0.3px;">OFFICER</span>`;
+                adminLink.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:13px;color:rgba(255,255,255,0.7);text-decoration:none;transition:background 0.15s;cursor:pointer;';
+                adminLink.addEventListener('mouseenter', () => adminLink.style.background = 'rgba(255,255,255,0.06)');
+                adminLink.addEventListener('mouseleave', () => adminLink.style.background = '');
+            }
+
+            // Insert divider + link right after "My Profile"
+            profileLink.after(divider);
+            divider.after(adminLink);
+        }
+    }
+
     // Toggle dropdown
     const avatar   = document.getElementById('navAvatar');
     const dropdown = document.getElementById('navDropdown');
